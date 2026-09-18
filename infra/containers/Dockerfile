@@ -1,4 +1,4 @@
-FROM node:24.16.0-bookworm-slim
+FROM node:24.16.0-bookworm-slim AS build
 RUN npm install -g pnpm@9.15.5
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -8,7 +8,25 @@ COPY scripts ./scripts
 COPY infra ./infra
 COPY images/branding/ledger-l/web ./images/branding/ledger-l/web
 RUN pnpm install --frozen-lockfile && pnpm build
+FROM node:24.16.0-bookworm-slim AS runtime
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+WORKDIR /app
+ENV NODE_ENV=production
 USER node
-WORKDIR /app/apps/web
+FROM runtime AS api
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/apps/api ./apps/api
+COPY --from=build --chown=node:node /app/packages ./packages
+COPY --from=build --chown=node:node /app/scripts/local-env.mjs ./scripts/local-env.mjs
+COPY --from=build --chown=node:node /app/infra/certs ./infra/certs
+CMD ["node","apps/api/src/server.mjs"]
+FROM api AS worker
+COPY --from=build --chown=node:node /app/apps/worker ./apps/worker
+CMD ["node","apps/worker/src/main.mjs"]
+FROM runtime AS web
+COPY --from=build --chown=node:node /app/apps/web/.next/standalone ./
+COPY --from=build --chown=node:node /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=node:node /app/apps/web/public ./apps/web/public
 EXPOSE 3000
-CMD ["node_modules/.bin/next", "start", "--hostname", "0.0.0.0"]
+ENV HOSTNAME=0.0.0.0
+CMD ["node","apps/web/server.js"]

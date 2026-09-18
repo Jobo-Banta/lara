@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T09:54:45+00:00",
+  "updated_at": "2026-09-18T10:16:52+00:00",
   "releases": [
     {
       "id": "P00",
@@ -431,9 +431,9 @@ window.LARA_BUILD_STATUS = {
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Signed BFF identity and forced subject-scoped RLS implemented. Seven tests and real Supabase cross-run read/write/insert/RLS-disable negatives pass. Real OIDC login/consent callback evidence remains.",
-      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
-      "updated_at": "2026-09-18T09:54:44+00:00"
+      "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review.",
+      "evidence": "2026-09-18 user confirmation; four Playwright browser checks passed; Supabase subject-isolation test passed.",
+      "updated_at": "2026-09-18T10:16:52+00:00"
     },
     {
       "id": "P00-05",
@@ -5521,12 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T08:53:15+00:00",
-      "id": "P00-07",
-      "action": "done",
-      "note": ""
-    },
-    {
       "at": "2026-09-18T08:53:16+00:00",
       "id": "P00-08",
       "action": "blocked",
@@ -5699,6 +5693,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P01-02",
       "action": "in_progress",
       "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains."
+    },
+    {
+      "at": "2026-09-18T10:16:52+00:00",
+      "id": "P00-04",
+      "action": "in_review",
+      "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review."
     }
   ]
 };

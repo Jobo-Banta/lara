@@ -5,7 +5,7 @@ import { loadLocalEnv } from '../../../scripts/local-env.mjs';
 import { applyMigrations } from './runner.mjs';
 loadLocalEnv();
 if(process.env.LARA_MODE!=="demo") throw new Error("Engineering migrations require an explicitly configured demo target");
-const url=process.env.MIGRATION_DATABASE_URL || process.env.SUPABASE_OWNER_DATABASE_URL;
+const url=process.env.MIGRATION_DATABASE_URL || process.env.SUPABASE_LARA_MIGRATOR_DATABASE_URL || process.env.SUPABASE_OWNER_DATABASE_URL;
 if(!url) throw new Error('MIGRATION_DATABASE_URL is required');
 const dir=new URL('../migrations/',import.meta.url);
 const files=await Promise.all((await readdir(dir)).filter(n=>n.endsWith('.sql')).sort().map(async n=>({version:n.slice(0,-4),sql:await readFile(new URL(n,dir),'utf8')})));

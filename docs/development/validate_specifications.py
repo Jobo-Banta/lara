@@ -70,7 +70,7 @@ check(set(mapped)==source_ids,'BRD coverage differs: '+str(source_ids^set(mapped
 check(len(mapped)==len(set(mapped)),'Duplicate requirement ID')
 releases=read('release-plan.json')['releases'];release_ids={r['id'] for r in releases}
 for r in releases:
-    check((ROOT/r['spec']).exists(),'Missing release spec '+r['id'])
+    check((ROOT/Path(r['spec'].replace(chr(92),'/'))).exists(),'Missing release spec '+r['id'])
     check(all(d in release_ids for d in r['depends_on']),'Unknown dependency '+r['id'])
 graph={r['id']:r['depends_on'] for r in releases};visiting=set();done=set()
 def visit(k):
@@ -81,7 +81,7 @@ def visit(k):
     visiting.remove(k);done.add(k)
 for k in graph:visit(k)
 for q in requirements:
-    check((ROOT/q['specification']).exists(),'Missing requirement specification '+q['id'])
+    check((ROOT/Path(q['specification'].replace(chr(92),'/'))).exists(),'Missing requirement specification '+q['id'])
     check(q['production_completion_phase'] in release_ids|{'REMOVED','DEFERRED'},'Unknown requirement phase '+q['id'])
 tickets=read('backlog.json')['tickets'];ticketids={t['id'] for t in tickets}
 check(len(ticketids)==len(tickets),'Duplicate backlog ID')
@@ -109,7 +109,7 @@ for md in ROOT.rglob('*.md'):
     text=md.read_text(encoding='utf-8')
     for target in re.findall(r'\]\(([^)]+)\)',text):
         if target.startswith(('https://','http://','#','mailto:')):continue
-        check((md.parent/target.split('#')[0]).exists(),'Broken link '+str(md.relative_to(ROOT))+' → '+target)
+        check((md.parent/Path(target.split('#')[0].replace(chr(92),'/'))).exists(),'Broken link '+str(md.relative_to(ROOT))+' → '+target)
     if md.parent.name=='phases' and md.name!='README.md':
         for heading in ['Shipped scope','Data and migration contract','Calculation and business rules','Acceptance scenarios','Migration and recovery','Activation and release']:
             check('## '+heading in text,'Missing phase section '+md.name+' '+heading)

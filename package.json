@@ -26,12 +26,16 @@
     "test:isolation": "node scripts/test-subject-isolation.mjs",
     "dev:web": "pnpm --filter @lara/web dev",
     "test:restore": "node scripts/test-restore.mjs",
-    "test:database": "node scripts/test-foundation-db.mjs"
+    "test:database": "node scripts/test-foundation-db.mjs",
+    "test:e2e": "playwright test"
   },
   "pnpm": {
     "overrides": {
       "postcss": "8.5.23",
       "sharp": "0.35.4"
     }
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }

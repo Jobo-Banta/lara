@@ -15,7 +15,7 @@ try {
  assert.equal((await fetch('http://127.0.0.1:4011/demo/work')).status,401);
  const token=signIdentity('unassigned-test-subject','GET','/ops/version',process.env.SESSION_SECRET);
  const version=await fetch('http://127.0.0.1:4011/ops/version',{headers:{authorization:'Bearer '+token}});
- assert.equal(version.status,200);assert.equal((await version.json()).schema,'0006_demo_subject_isolation');
+ assert.equal(version.status,200);assert.equal((await version.json()).schema,'0007_demo_target_marker');
  const denied=await fetch('http://127.0.0.1:4011/demo/work',{headers:{authorization:'Bearer '+signIdentity('unassigned-test-subject','GET','/demo/work',process.env.SESSION_SECRET)}});
  assert.equal(denied.status,403);
  console.log('PASS: live, ready, unsigned API denial, authenticated version, unassigned subject denial');
