@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T09:03:37+00:00",
+  "updated_at": "2026-09-18T09:06:05+00:00",
   "releases": [
     {
       "id": "P00",
@@ -499,13 +499,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T08",
-      "status": "blocked",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
       "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target.",
-      "evidence": "",
-      "updated_at": "2026-09-18T08:53:16+00:00"
+      "evidence": "Supabase logical snapshot and restore rehearsal passed: 1 migration row and 0 seed rows restored and verified; release manifest generated; source commit f247097.",
+      "updated_at": "2026-09-18T09:06:05+00:00"
     },
     {
       "id": "P01-01",
@@ -5579,6 +5579,12 @@
       "id": "P00-06",
       "action": "in_review",
       "note": "Supabase demo schema is live; local seed remains demo-mode guarded."
+    },
+    {
+      "at": "2026-09-18T09:06:05+00:00",
+      "id": "P00-08",
+      "action": "done",
+      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
     }
   ]
 }
