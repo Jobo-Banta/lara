@@ -20,6 +20,7 @@ try {
  assert.deepEqual(await applyMigrations(db,files.slice(0,1),opts),[files[0].version]);
  assert.equal((await applyMigrations(db,files,opts)).length,files.length-1);
  assert.deepEqual(await applyMigrations(db,files,opts),[]);
+ assert.deepEqual(await applyMigrations(db,files.map(f=>({...f,sql:f.sql.replace(/\r\n/g,'\n').replace(/\n/g,'\r\n')})),opts),[]);
  console.log('PASS: clean schema, prior-version upgrade and no-op rerun using real migration SQL in rollback-only namespaces');
  await assert.rejects(applyMigrations(db,[{...files[0],sql:files[0].sql+'\n-- changed'}],opts),/checksum mismatch/);
  console.log('PASS: changed checksum rejected');

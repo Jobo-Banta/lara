@@ -36,3 +36,13 @@ P00 is not yet shipped. Do not conflate successful login or green CI with an eng
 | P00-08 | Signed release tag, release workflow/SBOM/digests and final engineering artifact delivery/attestation remain. Nonempty restore gate now passes. |
 
 No production finance module, external monitoring service or cloud deployment is activated by this review.
+
+## Follow-up: rotation, recovery and release delivery
+
+Bounded previous-key verification is implemented for both session/consent cookies and BFF API identities. Mounted-file and environment secret references, deadline expiry, malformed configuration and tamper rejection pass ten foundation/security tests. See SESSION-KEY-ROTATION.md.
+
+The isolated readiness failure/replacement test passed against Supabase: live 200, ready 503, safe stderr alert and OTLP/HTTP trace capture, then ready 200 with a healthy replacement. Worker non-owner readiness passed. No external paging destination is claimed.
+
+Bootstrap now validates Node/Python, the runtime database and OIDC discovery. Dev and build outputs are separate. Migration checksums normalize line endings; the exact historical mixed-ending checksum for 0004 is explicitly mapped to its canonical content. No SQL migration or stored checksum was altered. Content-change rejection and no-op replay still pass.
+
+CI now includes an isolated seeded authenticated browser workspace, worker checks and failure/recovery tests. Three image targets are scanned, archived and paired with CycloneDX SBOMs and image IDs. The release workflow verifies a signed tag and exact successful CI source before delivering those tested artifacts. These workflow additions still require passing CI before release attestation.

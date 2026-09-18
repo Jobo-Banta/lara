@@ -1,3 +1,5 @@
+import {requestTrace,exportTrace} from '../../../packages/config/src/telemetry.mjs';
+import {sessionKeys} from '../../../packages/config/src/session-keys.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { verifyIdentity } from './identity.mjs';
 const scope = new AsyncLocalStorage();
@@ -12,7 +14,7 @@ loadRootEnv();
 let config;
 try { config = loadConfig(); } catch (error) { console.error(safeConfigError(error)); process.exit(1); }
 const port = Number(process.env.API_PORT || 4000);
-function database() { return new pg.Client(connectionOptions(process.env.DATABASE_URL)); }
+function database() { return new pg.Client({...connectionOptions(process.env.DATABASE_URL),connectionTimeoutMillis:3000,query_timeout:5000}); }
 async function query(sql, params = []) {
  const db=database();await db.connect();
  try {await db.query('begin');await db.query("select set_config('lara.subject',$1,true),set_config('lara.run_id',$2,true)",[scope.getStore()?.sub || '',scope.getStore()?.run || '']);const result=await db.query(sql,params);await db.query('commit');return result;}
@@ -20,10 +22,11 @@ async function query(sql, params = []) {
 }
 async function body(request) { let text = ""; for await (const chunk of request) text += chunk; return text ? JSON.parse(text) : {}; }
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
-async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0006_demo_subject_isolation")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
+async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0007_demo_target_marker")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer((request, response) => scope.run({}, async () => {
   const started=performance.now();
-  response.once("finish",()=>{const record=JSON.stringify({service:"api",event:"request_completed",request_id:response.getHeader("x-request-id"),status:response.statusCode,duration_ms:Math.round(performance.now()-started)});if(response.statusCode>=500)console.error(record);else console.log(record);});
+  const trace=requestTrace();response.setHeader("x-trace-id",trace.traceId);
+  response.once("finish",()=>{const record=JSON.stringify({service:"api",event:"request_completed",trace_id:trace.traceId,request_id:response.getHeader("x-request-id"),status:response.statusCode,duration_ms:Math.round(performance.now()-started)});if(response.statusCode>=500)console.error(record);else console.log(record);void exportTrace(trace,response.statusCode);});
   response.setHeader("content-type", "application/json; charset=utf-8");
   response.setHeader("x-request-id", randomUUID());
   response.setHeader("cache-control", "no-store");
@@ -31,7 +34,7 @@ const server = http.createServer((request, response) => scope.run({}, async () =
     const url = new URL(request.url, "http://localhost"); const path = url.pathname; const method = request.method;
     if (path === "/health/live") return send(response, 200, { ok: true });
     if (path === "/health/ready") { const state = await ready(); return send(response, state.ok ? 200 : 503, state); }
-    const identity=verifyIdentity((request.headers.authorization || '').replace(/^Bearer /,''),method,path,process.env.SESSION_SECRET);
+    const identity=verifyIdentity((request.headers.authorization || '').replace(/^Bearer /,''),method,path,sessionKeys().verification);
     if(!identity) return send(response,401,{error:'AUTHENTICATION_REQUIRED'});
     scope.getStore().sub=identity.sub;
     if (path === "/ops/version") {
@@ -65,4 +68,4 @@ const server = http.createServer((request, response) => scope.run({}, async () =
     return send(response, 404, { error: "NOT_FOUND" });
   } catch (error) { return send(response, 500, { error: safeConfigError(error) }); }
 }));
-server.listen(port, "127.0.0.1", () => console.log("LARA API listening on http://127.0.0.1:" + port));
+server.listen(port, process.env.API_BIND_HOST || "127.0.0.1", () => console.log("LARA API listening on http://127.0.0.1:" + port));

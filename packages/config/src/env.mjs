@@ -1,11 +1,12 @@
+import {sessionKeys} from './session-keys.mjs';
 const MODES = new Set(['local', 'demo', 'staging', 'production']);
 export function loadConfig(s = process.env) {
   const mode = s.LARA_MODE;
   if (!MODES.has(mode)) throw new Error('Invalid LARA_MODE');
-  for (const name of ['APP_BASE_URL','API_INTERNAL_URL','DATABASE_URL','OIDC_ISSUER','OIDC_CLIENT_ID','OIDC_CLIENT_SECRET','SESSION_SECRET','OBJECT_ADAPTER','OBJECT_BUCKET','OBJECT_REGION','MAIL_ADAPTER','EINVOICE_ADAPTER','AI_ADAPTER','RULE_PROFILE_ID']) {
+  for (const name of ['APP_BASE_URL','API_INTERNAL_URL','DATABASE_URL','OIDC_ISSUER','OIDC_CLIENT_ID','OIDC_CLIENT_SECRET','OBJECT_ADAPTER','OBJECT_BUCKET','OBJECT_REGION','MAIL_ADAPTER','EINVOICE_ADAPTER','AI_ADAPTER','RULE_PROFILE_ID']) {
     if (!s[name]) throw new Error('Missing required configuration: ' + name);
   }
-  if (s.SESSION_SECRET.length < 32) throw new Error('SESSION_SECRET must contain at least 32 characters');
+  sessionKeys(s);
   for (const name of ['APP_BASE_URL','API_INTERNAL_URL','OIDC_ISSUER']) {
     let url;
     try { url = new URL(s[name]); } catch { throw new Error('Invalid URL configuration: ' + name); }

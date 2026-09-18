@@ -21,7 +21,7 @@
     "db:restore:snapshot": "node scripts/restore-snapshot.mjs",
     "release:manifest": "node scripts/release-manifest.mjs",
     "setup": "node scripts/setup.mjs",
-    "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs",
+    "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs tests/session-rotation.test.mjs",
     "verify": "pnpm test:foundation && pnpm contracts:check && pnpm status:check && pnpm build",
     "test:isolation": "node scripts/test-subject-isolation.mjs",
     "dev:web": "pnpm --filter @lara/web dev",

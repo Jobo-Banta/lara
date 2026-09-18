@@ -1,0 +1,7 @@
+{
+  "0004_phase1_runtime_grants": {
+    "recorded": "8eba4850a111ce0d3feb59a9317090365be9cfc84213b9a98bc54d4bbf11e0ac",
+    "canonical": "fb81c4c0b6ccb9fceb0fecffb9d2020f6538e2bbd4a154862beb62bc4896f333",
+    "reason": "Pre-baseline file used one CRLF among LF lines. Only this exact historical content is accepted; stored metadata remains unchanged."
+  }
+}

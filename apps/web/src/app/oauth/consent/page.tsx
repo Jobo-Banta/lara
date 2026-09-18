@@ -14,7 +14,7 @@ function destination(value:string) {
 }
 async function provider() {
  const value=(await cookies()).get('lara_provider_session')?.value;
- const session=value?unseal(value,authConfig().secret):null;
+ const session=value?unseal(value,authConfig().verificationKeys):null;
  if(!session?.accessToken || !session.refreshToken || session.expiresAt<=Date.now()) return null;
  const supabase=client();
  const {error}=await supabase.auth.setSession({access_token:session.accessToken,refresh_token:session.refreshToken});
