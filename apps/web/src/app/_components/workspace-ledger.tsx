@@ -14,7 +14,7 @@ type Ctx={entityId:string,me:Row,can:(p:string)=>boolean,tick:number,refresh:()=
 
 // The primary book: listed through GET /books when the actor may read books,
 // otherwise taken from the first account or period the actor can see.
-function useBookId(entityId:string,tick:number,me:Row){
+export function useBookId(entityId:string,tick:number,me:Row){
  const [bookId,setBookId]=useState<string|null>(null);
  useEffect(()=>{let live=true;if(!me.capabilities.includes('general_ledger'))return;(async()=>{
   try{if(me.permissions.includes('book.read')){const r=await api('GET','/books?limit=5',{entityId});const primary=r.data.items.find((b:Row)=>b.kind==='primary')||r.data.items[0];if(primary&&live){setBookId(primary.id);return;}}
@@ -30,8 +30,8 @@ export function Capabilities({entityId,me,can,tick,refresh}:Ctx){
  const cmd=useCommand(refresh);
  const [rows,setRows]=useState<string[]|null>(null);
  useEffect(()=>{api('GET','/me').then(r=>setRows(r.data.capabilities)).catch(()=>setRows([]));},[tick]);
- const caps:[string,string][]=[['workspace','Finance workspace (P02)'],['general_ledger','General ledger and close (P03)']];
- return <>{caps.map(([code,label])=><section key={code} className="demo-card"><h2>{label}</h2><p>{rows?.includes(code)?'Active on this entity.':'Not active. Request activation with the evidence the profile requires; a different principal approves.'}</p>{!rows?.includes(code)&&can('capability.activate')&&<Editor id={'cap'+code+entityId} label="Request or approve activation" onSave={async d=>!!await cmd.run('POST','/capabilities/activate',{entityId,body:{capability:code,profileVersion:d.profileVersion,evidenceIds:[d.evidenceId],reason:d.reason}})}>{input('Profile version','profileVersion',code==='workspace'?'p02.1':'p03.1','text',{required:true})}<label>Activation evidence<select name="evidenceId" required><option value="">Select available evidence</option>{(evidence.items||[]).map(e=><option key={e.id} value={e.id}>{e.filename}</option>)}</select></label>{input('Reason','reason','','text',{required:true})}</Editor>}</section>)}<ErrorPanel error={cmd.error} onRetry={cmd.retry} onReload={cmd.reload} canRetry={cmd.canRetry}/></>;
+ const caps:[string,string][]=[['workspace','Finance workspace (P02)'],['general_ledger','General ledger and close (P03)'],['sales','Sales invoicing and receivables (P04)']];
+ return <>{caps.map(([code,label])=><section key={code} className="demo-card"><h2>{label}</h2><p>{rows?.includes(code)?'Active on this entity.':'Not active. Request activation with the evidence the profile requires; a different principal approves.'}</p>{!rows?.includes(code)&&can('capability.activate')&&<Editor id={'cap'+code+entityId} label="Request or approve activation" onSave={async d=>!!await cmd.run('POST','/capabilities/activate',{entityId,body:{capability:code,profileVersion:d.profileVersion,evidenceIds:[d.evidenceId],reason:d.reason}})}>{input('Profile version','profileVersion',code==='workspace'?'p02.1':code==='sales'?'p04.1':'p03.1','text',{required:true})}<label>Activation evidence<select name="evidenceId" required><option value="">Select available evidence</option>{(evidence.items||[]).map(e=><option key={e.id} value={e.id}>{e.filename}</option>)}</select></label>{input('Reason','reason','','text',{required:true})}</Editor>}</section>)}<ErrorPanel error={cmd.error} onRetry={cmd.retry} onReload={cmd.reload} canRetry={cmd.canRetry}/></>;
 }
 
 export function LedgerAccounts({entityId,me,can,tick,refresh}:Ctx){

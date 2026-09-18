@@ -32,6 +32,8 @@ export const isUuid=v=>typeof v==='string'&&UUID.test(v);
 // the entities the actor may address. tenantId comes from membership, never
 // from the request body.
 export function requirePermission(ctx,permission){if(!ctx.permissions.has(permission))fail('FORBIDDEN','Permission '+permission+' is required.');}
+// Reference data (chart, tax rules) is readable by anyone who prepares documents against it.
+export function requireAnyPermission(ctx,permissions){if(!permissions.some(p=>ctx.permissions.has(p)))fail('FORBIDDEN','Permission '+permissions[0]+' is required.');}
 export function requireEntity(ctx,entityId){
  if(!isUuid(entityId))fail('VALIDATION_FAILED','X-Entity-Id must be a UUID.',{fieldErrors:[{path:'X-Entity-Id',message:'Invalid entity id'}]});
  // Inaccessible entities are reported as not found so scope is not disclosed.

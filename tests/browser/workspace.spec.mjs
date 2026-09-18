@@ -7,6 +7,8 @@ import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {spawn} from 'node:child_process';
 import {seal} from '../../packages/config/src/session-cookie.mjs';
+import {createRequire} from 'node:module';
+import {connectionOptions} from '../../packages/database/src/connection.mjs';
 
 const suffix=process.env.LARA_E2E_WORKSPACE_SUFFIX;
 const BASE='http://127.0.0.1:3016';
@@ -239,14 +241,123 @@ test('ledger: two-principal capability activation, chart, period, journal review
  await controller.context.close();await preparer.context.close();
 });
 
+// The sales profile (control accounts, rounding) and numbering series have no
+// reviewed operations yet, so the journey seeds them through the runtime role
+// exactly as an operator would today; everything else goes through the screens.
+async function seedSales(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const branch=(await db.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and code='HQ'",[tenantId,entity])).rows[0].id;
+  const acct=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const payload={arAccountId:await acct('1200'),outputTaxAccountId:await acct('2200'),cashAccountId:await acct('1010'),scale:2,dueDays:30};
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'sales_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),hash,await principal('preparer'),await principal('controller')]);
+  for(const [kind,prefix] of [['invoice','INV'],['credit_note','CN']])await db.query("insert into lara.document_series(tenant_id,entity_id,branch_id,kind,prefix,profile_version,created_by) values($1,$2,$3,$4,$5,'numbering-2026',$6)",[tenantId,entity,branch,kind,prefix,await principal('controller')]);
+  // A draft VAT rule authored by billing; the controller approves and activates it on screen.
+  const evidence=(await db.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and status='available' order by created_at limit 1",[tenantId,entity])).rows[0].id;
+  await db.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,content_hash,created_by) values($1,$2,'VAT12',1,'vat','2026-01-01',0.12,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-01\"]',$4,$5)",[tenantId,entity,JSON.stringify([evidence]),hash,await principal('billing')]);
+ }finally{await db.end();}
+}
+test('sales: capability activation, control accounts, tax rule approval, invoice with server totals through review and issuance, delivery job, receipt with allocation, customer statement and aging',async({browser})=>{
+ test.setTimeout(360000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),billing=await as(browser,'billing');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Sales invoicing and receivables'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Sales go-live requested':'Reviewed sales activation evidence');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ // Control accounts by the preparer and an October period by the controller (September was locked by the close journey).
+ await preparer.page.goto('/ledger/accounts');await settled(preparer.page);
+ const acct=async(code,name,category,control)=>{const form=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Create account'})});await form.getByLabel('Code',{exact:true}).fill(code);await form.getByLabel('Name',{exact:true}).fill(name);await form.getByRole('combobox',{name:'Category'}).selectOption(category);await form.getByRole('combobox',{name:'Control type'}).selectOption(control);await form.getByRole('button',{name:'Create account'}).click();await expect(preparer.page.getByRole('cell',{name:code,exact:true})).toBeVisible();};
+ await acct('1200','Receivables','asset','ar');await acct('2200','Output tax payable','liability','output_tax');
+ await controller.page.goto('/ledger/periods');await settled(controller.page);
+ await controller.page.getByLabel('Starts on').fill('2026-10-01');await controller.page.getByLabel('Ends on').fill('2026-10-31');
+ await controller.page.getByRole('button',{name:'Create period'}).click();
+ await expect(controller.page.getByRole('cell',{name:'2026-10-01 → 2026-10-31'})).toBeVisible();
+ await seedSales();
+ // Tax rule: controller approves and activates the drafted VAT rule.
+ await controller.page.goto('/settings/tax-rules');await settled(controller.page);
+ const ruleRow=()=>controller.page.getByRole('row').filter({hasText:'VAT12'});
+ await ruleRow().getByRole('button',{name:'Approve'}).click();
+ await expect(ruleRow().getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await ruleRow().getByLabel('Reason').fill('Effective 2026');
+ await ruleRow().getByRole('button',{name:'Activate'}).click();
+ await expect(ruleRow().getByRole('cell',{name:'active',exact:true})).toBeVisible();
+ // Invoice by billing: server totals, submit; preparer approves and issues.
+ await billing.page.goto('/sales/invoices');await settled(billing.page);
+ await expect(billing.page.getByText('No invoices yet.')).toBeVisible();
+ await billing.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await billing.page.getByLabel('Document date').fill('2026-10-05');await billing.page.getByLabel('Accounting date').fill('2026-10-05');
+ await billing.page.getByRole('textbox',{name:'Line 1 description'}).fill('Consulting retainer');
+ await billing.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('10000');
+ await billing.page.getByRole('combobox',{name:'Line 1 revenue account'}).selectOption({label:'4000 Service revenue'});
+ await billing.page.getByRole('combobox',{name:'Line 1 tax rule'}).selectOption({label:'VAT12 12%'});
+ await expect(billing.page.getByRole('status').filter({hasText:'Preview'})).toContainText('gross ₱11,200.00');
+ await billing.page.getByRole('button',{name:'Save draft'}).click();
+ await expect(billing.page).toHaveURL(/\/sales\/invoices\/[0-9a-f-]{36}$/);
+ const invoiceUrl=new URL(billing.page.url()).pathname;
+ await expect(billing.page.getByText('Gross ₱11,200.00',{exact:true})).toBeVisible();
+ await expect(billing.page.getByRole('button',{name:'Approve',exact:true})).toHaveCount(0);
+ await billing.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(billing.page.locator('.status-grid dd').first()).toHaveText('submitted');
+ await preparer.page.goto(invoiceUrl);await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('approved');
+ await preparer.page.getByRole('button',{name:'Issue invoice'}).click();
+ await expect(preparer.page.locator('h2').filter({hasText:'Invoice INV-000001'})).toBeVisible();
+ await expect(preparer.page.locator('.status-grid dd')).toHaveText(['posted','not requested','not applicable','unpaid']);
+ await expect(preparer.page.getByText('Issued documents are immutable; corrections are new linked documents.')).toBeVisible();
+ // Delivery through the worker.
+ await billing.page.goto(invoiceUrl);await settled(billing.page);
+ await billing.page.getByRole('button',{name:'Deliver to customer'}).click();
+ await expect(billing.page.locator('.status-grid dd').nth(1)).toHaveText('queued');
+ await expect.poll(async()=>{await billing.page.reload();await settled(billing.page);return billing.page.locator('.status-grid dd').nth(1).textContent();},{timeout:60000}).toBe('sent');
+ // Receipt with the allocation workbench; preparer approves and posts; the invoice is paid.
+ await billing.page.goto('/sales/collections');await settled(billing.page);
+ await billing.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await billing.page.getByLabel('Value date',{exact:true}).fill('2026-10-06');
+ await billing.page.getByLabel('Gross received').fill('11200');await billing.page.getByLabel('Cash amount').fill('11200');
+ await billing.page.getByRole('button',{name:'Full'}).click();
+ await expect(billing.page.getByRole('status').filter({hasText:'Allocated'})).toContainText('fully applied');
+ await billing.page.getByRole('button',{name:'Save receipt'}).click();
+ await expect(billing.page).toHaveURL(/\/sales\/collections\/[0-9a-f-]{36}$/);
+ const receiptUrl=new URL(billing.page.url()).pathname;
+ await billing.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(billing.page.getByText('State submitted',{exact:false})).toBeVisible();
+ await preparer.page.goto(receiptUrl);await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.getByText('State approved',{exact:false})).toBeVisible();
+ await preparer.page.getByRole('button',{name:'Post receipt'}).click();
+ await expect(preparer.page.getByText('State posted',{exact:false})).toBeVisible();
+ await expect(preparer.page.getByRole('cell',{name:'₱11,200.00'}).first()).toBeVisible();
+ await preparer.page.goto(invoiceUrl);await settled(preparer.page);
+ await expect(preparer.page.locator('.status-grid dd').nth(3)).toHaveText('paid');
+ // Customer statement: nothing outstanding; aging job renders from its snapshot.
+ await controller.page.goto('/sales/customers');await settled(controller.page);
+ await expect(controller.page.getByText('No receivables.')).toBeVisible();
+ await controller.page.getByRole('button',{name:'Generate aging report'}).click();
+ await expect(controller.page.getByRole('status').filter({hasText:'Aging job'})).toContainText('succeeded',{timeout:60000});
+ await expect(controller.page.getByText(/Nothing outstanding as of/)).toBeVisible();
+ for(const route of ['/sales/invoices','/sales/orders','/sales/collections','/sales/customers','/settings/tax-rules',invoiceUrl,receiptUrl]){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'sales '+route);}
+ await controller.context.close();await preparer.context.close();await billing.context.close();
+});
+
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/sales/invoices');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('(P04)',{exact:false})).toBeVisible();
+ await clerk.page.goto('/purchases/bills');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P05',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

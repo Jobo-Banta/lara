@@ -1,6 +1,6 @@
 # P04 implementation review — 19 September 2026
 
-P04 is in progress, not released. Build-order steps 1 (contracts, migration, permission and capability definitions), 2 (domain and accounting rules) and 3 (API and jobs) are implemented; no `sales` capability is activated for a live tenant and no tax rule version is active anywhere.
+P04 is in progress, not released. Build-order steps 1 (contracts, migration, permission and capability definitions), 2 (domain and accounting rules), 3 (API and jobs), 4 (user journeys) and 5 (acceptance and operations) are implemented; no `sales` capability is activated for a live tenant and no tax rule version is active anywhere.
 
 ## P04-01 contracts and migration
 
@@ -42,6 +42,25 @@ The 34 P04 operations are served by `apps/api/src/workspace-api.mjs` through `@l
 Worker: `document.deliver` rechecks the requester's `invoice.deliver`, records the delivery as `sent` with a `<MAIL_ADAPTER>:<jobId>` provider reference (the mail adapter is local in this release; a qualified delivery adapter is an activation gate) and sets the document's `delivery_state` projection; the worker role can update only those columns. `report.generate` handles `aging`.
 
 Verification: `scripts/test-p04-api.mjs` (six groups, API and worker as processes, also in CI for fresh and upgrade databases) covers the tax rule lifecycle over HTTP, invoice creation with server totals and contract rejection of client totals, idempotent replay, ETag/If-Match, forbidden and stale approvals, versioned issuance, posted immutability, filtered listing, correction eligibility and posting, collections with withholding and allocations, `ALLOCATION_EXCEEDS_BALANCE`, allocation and receipt reversals, delivery and aging jobs, and 404 isolation for unknown documents, foreign entities and mismatched kinds. `scripts/test-p02-api.mjs` now probes the later-phase gate with a P05 operation.
+
+## P04-04 user journeys
+
+`apps/web/src/app/_components/workspace-sales.tsx` adds the sales screens to the production composition (`/sales/invoices`, `/sales/invoices/{id}`, `/sales/orders`, `/sales/collections`, `/sales/collections/{id}`, `/sales/customers`, `/settings/tax-rules`), replacing the P04 roadmap placeholder in the navigation:
+
+- Invoice list and editor: customer, branch, dates, lines with quantity, unit price, discount, price basis, revenue account (control accounts excluded) and tax rule; a client-side preview is labelled as such and the recorded totals come back from the server. Filters by state; the list shows document, delivery and settlement states side by side.
+- Invoice detail: the four statuses (document, delivery, reporting, settlement) always shown separately, totals and outstanding, timeline, submit/approve/request changes/issue/deliver actions gated by permission and `If-Match`, immutable notice after issuance, draft editing, and the credit preview: remaining creditable net per revenue account after earlier credits, partial credit note or full reversal prepared as a linked draft.
+- Orders and quotations: editor, submit, approve, convert once to an invoice draft.
+- Receipts: editor with the allocation workbench (open items of the customer with outstanding amounts, "Full" shortcut, unapplied remainder shown as a customer advance), submit/approve/post/reverse, later application of the unapplied balance from the receipt page.
+- Customers: receivables by customer, statement of open items, aging report as a job rendered from its snapshot.
+- Tax rules: create draft versions from evidence and golden cases, approve and activate (separate principals), active versions immutable. The capabilities screen offers `sales` activation.
+
+Read access to the chart and tax rules is extended to document preparers (`invoice.prepare`, `invoice.read`, `sales_order.create`, `collection.create`) because they are reference data for the editors; creation and editing keep their own permissions.
+
+Verification: `tests/browser/workspace.spec.mjs` sales journey on the production composition — two-principal `sales` activation, control accounts through the chart screen, October period, tax rule approval and activation on screen, invoice with server totals through submit, approval and issuance to `INV-000001` with the four statuses, delivery through the worker, receipt with a full allocation through review and posting until the invoice shows `paid`, customer statement and aging job, WCAG checks on every sales route (also in CI on the production composition). The sales profile and numbering series are seeded through the runtime role because the contract has no operations for them yet.
+
+## P04-05 acceptance and operations
+
+Acceptance: P04-T01–T05 in `scripts/test-p04-domain.mjs` and `scripts/test-p04-api.mjs`; CORE regressions unchanged (P02/P03 suites pass with the P04 handlers registered); migration, restore and fresh/upgrade paths in `scripts/ci-database.mjs`. `scripts/test-p02-load.mjs` gained an issuance profile (prepare, submit, approve, issue with 10 concurrent workers) that asserts unique official numbers under concurrency and the p95 thresholds on the CI database. `docs/development/P04-RUNBOOK.md` covers activation gates, numbering incidents, issuance failures, corrections, receipts and allocations, delivery and reports. `docs/development/releases/0.4.0-draft.md` is the release draft for the owner; P04-06 stays blocked on the P03 release and owner sign-offs.
 
 ## Open items for the owner
 

@@ -3,7 +3,7 @@
 // opening imports, reports with immutable snapshots and the fiscal-year close.
 // Amounts travel as decimal strings; arithmetic happens in integer micros.
 import {createHash} from 'node:crypto';
-import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,page,pageArgs,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,page,pageArgs,requireAnyPermission,requireEntity,requirePermission,resource} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 
 const MICRO=1_000_000n;
@@ -82,9 +82,10 @@ export async function freezeAccount(tx,ctx,entityId,id,status,reason){
  await audit(tx,ctx,{entityId,action:'account.'+status,resourceType:'account',resourceId:id,resourceVersion:Number(updated.version),reason});
  return accountResource(tx,ctx,updated);
 }
-export async function getAccount(tx,ctx,entityId,id){requirePermission(ctx,'account.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.accounts where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Account not found.');return accountResource(tx,ctx,row);}
+const ACCOUNT_READERS=['account.read','invoice.prepare','invoice.read','sales_order.create','collection.create'];
+export async function getAccount(tx,ctx,entityId,id){requireAnyPermission(ctx,ACCOUNT_READERS);requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.accounts where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Account not found.');return accountResource(tx,ctx,row);}
 export async function listAccounts(tx,ctx,entityId,query){
- requirePermission(ctx,'account.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);
+ requireAnyPermission(ctx,ACCOUNT_READERS);requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
  if(query?.bookId){if(!isUuid(query.bookId))fail('VALIDATION_FAILED','bookId must be a UUID.');params.push(query.bookId);where+=' and book_id=$'+params.length;}
  if(query?.status){params.push(String(query.status));where+=' and status=$'+params.length;}

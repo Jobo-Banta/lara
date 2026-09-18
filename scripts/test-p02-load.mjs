@@ -42,7 +42,20 @@ try{
   const cash=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'1010',name:'Cash',category:'asset',controlType:'none',requiredDimensions:[]});
   const rev=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'4000',name:'Revenue',category:'income',controlType:'none',requiredDimensions:[]});
   await ledger.createPeriod(tx,fresh,entityId,{bookId:book,startsOn:'2026-01-01',endsOn:'2026-12-31'});
-  Object.assign(fixture,{bookId:book,branchId:branch.id,cash:cash.id,revenue:rev.id});
+  // Sales issuance profile: billing prepares and submits, the controller approves, the accountant issues; numbering serializes on the series row.
+  const b=await identity.resolvePrincipal(tx,tenantId,{issuer:process.env.OIDC_ISSUER,subject:'load-bill-'+suffix,displayName:'billing'});
+  const brole=(await tx.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) select $1,'billing','Billing',permissions,'approved',$2,$3 from lara.role_templates where code='billing' returning id",[tenantId,'2'.repeat(64),p.id])).rows[0].id;
+  await tx.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,b.id,brole,p.id]);
+  await tx.query("insert into lara.capability_activations(tenant_id,entity_id,capability,status,profile_version,approved_by,activated_at,created_by) values($1,$2,'sales','active','p04.1',$3,now(),$4)",[tenantId,entityId,p.id,a.id]);
+  const ar=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'1200',name:'Receivables',category:'asset',controlType:'ar',requiredDimensions:[]});
+  const otax=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'2200',name:'Output tax',category:'liability',controlType:'output_tax',requiredDimensions:[]});
+  const profile={arAccountId:ar.id,outputTaxAccountId:otax.id,cashAccountId:cash.id,scale:2,dueDays:30};
+  await tx.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'sales_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entityId,JSON.stringify(profile),'3'.repeat(64),a.id,p.id]);
+  await tx.query("insert into lara.document_series(tenant_id,entity_id,branch_id,kind,prefix,profile_version,created_by) values($1,$2,$3,'invoice','INV','numbering-2026',$4)",[tenantId,entityId,branch.id,p.id]);
+  const rule=(await tx.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,status,approved_by,activated_by,activated_at,content_hash,created_by) values($1,$2,'VAT12',1,'vat','2026-01-01',0.12,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-01\"]','active',$4,$4,now(),$5,$6) returning id",[tenantId,entityId,JSON.stringify([randomUUID()]),p.id,'4'.repeat(64),a.id])).rows[0].id;
+  const customer=(await tx.query("insert into lara.party(tenant_id,entity_id,legal_name,identity_status,status,content_hash,created_by) values($1,$2,'Load customer','unknown','active',$3,$4) returning id",[tenantId,entityId,'5'.repeat(64),p.id])).rows[0].id;
+  await tx.query("insert into lara.party_roles(tenant_id,entity_id,party_id,role,created_by) values($1,$2,$3,'customer',$4)",[tenantId,entityId,customer,p.id]);
+  Object.assign(fixture,{bookId:book,branchId:branch.id,cash:cash.id,revenue:rev.id,rule,customer});
  });
  child=spawn(process.execPath,['apps/api/src/server.mjs'],{env:{...process.env,API_PORT:String(PORT),API_BIND_HOST:'127.0.0.1',RATE_LIMIT_WRITES_PER_MINUTE:'100000',RATE_LIMIT_READS_PER_MINUTE:'100000',OBJECT_ADAPTER:'filesystem',OBJECT_BUCKET:'.local/load-'+suffix,FIELD_ENCRYPTION_KEY:process.env.FIELD_ENCRYPTION_KEY||randomBytes(32).toString('hex')},stdio:['ignore','ignore','pipe']});
  let stderr='';child.stderr.on('data',b=>stderr+=b);
@@ -68,9 +81,19 @@ try{
   const a=JSON.parse((await call('POST','/journals/'+j.id+'/approve',{decision:'approve',contentVersion:1},subject,{'if-match':'"'+s.version+'"'})).body);
   return call('POST','/journals/'+j.id+'/post',{},acct,{'if-match':'"'+a.version+'"'});
  });
- assert.equal(reads.errors+writes.errors+mixed.errors+postings.errors,0,'no request may fail under load: '+stderr.slice(-500));
+ // Issuance profile (P04-T02 under concurrency): reviewed invoices issue with a single-use number; the series lock serializes only the issue step.
+ const bill='load-bill-'+suffix;
+ const issuance=await run('invoice issue (after prepare, submit, approve)',async i=>{
+  const d=JSON.parse((await call('POST','/invoices',{kind:'invoice',branchId:fixture.branchId,bookId:fixture.bookId,partyId:fixture.customer,documentDate:'2026-06-15',accountingDate:'2026-06-15',currency:'PHP',ruleProfileVersion:'load',lines:[{description:'Load invoice '+i,quantity:'1',unitPrice:'1000',discount:'0',priceBasis:'exclusive',accountId:fixture.revenue,taxCodeId:fixture.rule,dimensions:{}}],evidenceIds:[]},bill)).body);
+  const s=JSON.parse((await call('POST','/invoices/'+d.id+'/submit',{},bill,{'if-match':'"'+d.version+'"'})).body);
+  const a=JSON.parse((await call('POST','/invoices/'+d.id+'/approve',{decision:'approve',contentVersion:1},subject,{'if-match':'"'+s.version+'"'})).body);
+  return call('POST','/invoices/'+d.id+'/post',{},acct,{'if-match':'"'+a.version+'"'});
+ });
+ const numbers=JSON.parse((await call('GET','/invoices?state=posted&limit=200',undefined,bill)).body).items.map(d=>d.officialNumber);
+ assert.equal(new Set(numbers).size,numbers.length,'official numbers must be unique under concurrent issuance');
+ assert.equal(reads.errors+writes.errors+mixed.errors+postings.errors+issuance.errors,0,'no request may fail under load: '+stderr.slice(-500));
  if(process.env.LARA_LOAD_ASSERT==='1'){
-  for(const s of [reads,writes,mixed,postings])assert.ok(s.p95<2000,s.label+' p95 '+s.p95+'ms exceeds the 2 s profile');
+  for(const s of [reads,writes,mixed,postings,issuance])assert.ok(s.p95<2000,s.label+' p95 '+s.p95+'ms exceeds the 2 s profile');
   assert.ok(writes.p95<1000&&postings.p95<1000,'local command/post p95 exceeds the 1 s profile: '+writes.p95+'/'+postings.p95);
   console.log('PASS P02 load profile asserted on the local database');
  }else console.log('REPORT P02 load measured against a remote database; thresholds not asserted (set LARA_LOAD_ASSERT=1 on the benchmark environment)');

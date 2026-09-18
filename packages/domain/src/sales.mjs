@@ -4,7 +4,7 @@
 // lara.post_journal_entry, official numbering, deliveries, receipts
 // (collections) and open-item allocations. Amounts travel as decimal strings;
 // arithmetic happens in BigInt at 1e-12 precision and rounds half up once.
-import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,expectVersion,fail,isUuid,iso,page,pageArgs,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,expectVersion,fail,isUuid,iso,page,pageArgs,requireAnyPermission,requireEntity,requirePermission,resource} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 import {micros,decimal} from './ledger.mjs';
 
@@ -167,8 +167,9 @@ export async function activateTaxRule(tx,ctx,entityId,id,input,expectedVersion){
  await emit(tx,ctx,{entityId,aggregateType:'tax_rule',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'rule.activated.v1',payload:{ruleProfileId:row.applicability_profile_id,version:row.version_number,effectiveFrom:iso(row.valid_from)}});
  return {resourceType:'tax_rule',resourceId:id,version:Number(updated.version),state:'active'};
 }
-export async function getTaxRule(tx,ctx,entityId,id){requirePermission(ctx,'tax_rule.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.tax_rule_versions where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Tax rule not found.');return taxRuleResource(row);}
-export async function listTaxRules(tx,ctx,entityId,query){requirePermission(ctx,'tax_rule.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.tax_rule_versions where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,taxRuleResource,scope);}
+const RULE_READERS=['tax_rule.read','invoice.prepare','invoice.read','sales_order.create'];
+export async function getTaxRule(tx,ctx,entityId,id){requireAnyPermission(ctx,RULE_READERS);requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.tax_rule_versions where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Tax rule not found.');return taxRuleResource(row);}
+export async function listTaxRules(tx,ctx,entityId,query){requireAnyPermission(ctx,RULE_READERS);requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.tax_rule_versions where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,taxRuleResource,scope);}
 
 // ---------------------------------------------------------------------------
 // Documents

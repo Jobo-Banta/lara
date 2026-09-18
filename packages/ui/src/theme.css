@@ -113,3 +113,4 @@ pre {white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:white;l
 .setup-steps li[aria-current="step"] {border-color:var(--color-accent, #0f6b6b);font-weight:600;}
 .overdue {color:#8a2a0f;font-weight:600;}
 .error-panel ul {margin:8px 0 0;padding-left:20px;}
+.status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0;padding:0}.status-grid div{padding:10px 12px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-page)}.status-grid dt{color:var(--color-text-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}.status-grid dd{margin:4px 0 0;font-weight:700;text-transform:capitalize}.timeline{margin:0;padding-left:20px;display:grid;gap:8px}button.link{padding:0;border:0;background:none;color:var(--color-accent);text-decoration:underline;cursor:pointer}@media(max-width:760px){.status-grid{grid-template-columns:1fr 1fr}}

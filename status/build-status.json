@@ -226,32 +226,32 @@
       "updated_at": "2026-09-18T22:34:12+00:00"
     },
     "P04-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
-      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
-      "evidence": "scripts/test-p04-api.mjs passed locally (6 groups, API+worker processes); P02/P03 API suites pass; CI run pending",
-      "updated_at": "2026-09-18T22:34:12+00:00"
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35402118677 (push, 91e86fe) and 35402121963 (pull_request) succeeded: verify + images incl. scripts/test-p04-api.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P04-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
+      "evidence": "Full browser suite 24/24 locally (demo + production composition, Supabase); CI run pending",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P04-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft.",
+      "evidence": "scripts/test-p02-load.mjs issuance profile measured locally (report mode); CI run with LARA_LOAD_ASSERT=1 pending",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P04-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter.",
+      "evidence": "docs/development/releases/0.4.0-draft.md",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P05-01": {
       "status": "not_started",
@@ -1926,7 +1926,31 @@
       "id": "P04-03",
       "action": "in_review",
       "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-03",
+      "action": "done",
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-04",
+      "action": "in_review",
+      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-05",
+      "action": "in_review",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-06",
+      "action": "blocked",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter."
     }
   ],
-  "updated_at": "2026-09-18T22:34:12+00:00"
+  "updated_at": "2026-09-18T23:17:39+00:00"
 }

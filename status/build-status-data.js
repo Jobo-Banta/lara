@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T22:34:12+00:00",
+  "updated_at": "2026-09-18T23:17:39+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1459,13 +1459,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
-      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
-      "evidence": "scripts/test-p04-api.mjs passed locally (6 groups, API+worker processes); P02/P03 API suites pass; CI run pending",
-      "updated_at": "2026-09-18T22:34:12+00:00"
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35402118677 (push, 91e86fe) and 35402121963 (pull_request) succeeded: verify + images incl. scripts/test-p04-api.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P04-04",
@@ -1517,13 +1517,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
+      "evidence": "Full browser suite 24/24 locally (demo + production composition, Supabase); CI run pending",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P04-05",
@@ -1575,13 +1575,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft.",
+      "evidence": "scripts/test-p02-load.mjs issuance profile measured locally (report mode); CI run with LARA_LOAD_ASSERT=1 pending",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P04-06",
@@ -1633,13 +1633,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Owner",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter.",
+      "evidence": "docs/development/releases/0.4.0-draft.md",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P05-01",
@@ -5521,30 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T17:48:26+00:00",
-      "id": "P02-03",
-      "action": "in_progress",
-      "note": "Implementing /v1 controllers over @lara/contracts and @lara/domain: actor resolution from the principal directory, header conventions, idempotent commands, evidence upload/complete/content, exports and jobs; worker job loop with leases, retries, scan and export handlers."
-    },
-    {
-      "at": "2026-09-18T18:45:25+00:00",
-      "id": "P02-03",
-      "action": "in_review",
-      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
-    },
-    {
-      "at": "2026-09-18T18:51:28+00:00",
-      "id": "P02-03",
-      "action": "done",
-      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
-    },
-    {
-      "at": "2026-09-18T18:51:28+00:00",
-      "id": "P02-04",
-      "action": "in_progress",
-      "note": "Implementing workspace screens over /v1 through a BFF proxy with mode-based composition (demo keeps the prototype), operator tenant provisioning and Playwright coverage."
-    },
-    {
       "at": "2026-09-18T20:02:55+00:00",
       "id": "P02-04",
       "action": "in_review",
@@ -5699,6 +5675,30 @@ window.LARA_BUILD_STATUS = {
       "id": "P04-03",
       "action": "in_review",
       "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-03",
+      "action": "done",
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-04",
+      "action": "in_review",
+      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-05",
+      "action": "in_review",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-06",
+      "action": "blocked",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter."
     }
   ]
 };
