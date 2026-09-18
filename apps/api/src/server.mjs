@@ -22,6 +22,8 @@ async function body(request) { let text = ""; for await (const chunk of request)
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
 async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0006_demo_subject_isolation")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer((request, response) => scope.run({}, async () => {
+  const started=performance.now();
+  response.once("finish",()=>{const record=JSON.stringify({service:"api",event:"request_completed",request_id:response.getHeader("x-request-id"),status:response.statusCode,duration_ms:Math.round(performance.now()-started)});if(response.statusCode>=500)console.error(record);else console.log(record);});
   response.setHeader("content-type", "application/json; charset=utf-8");
   response.setHeader("x-request-id", randomUUID());
   response.setHeader("cache-control", "no-store");

@@ -10,11 +10,13 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const stored = request.cookies.get("lara_oauth_state")?.value;
-  if (!code || !state || !stored || stored.split(".")[0] !== state) return NextResponse.json({ error: "Invalid OIDC callback state" }, { status: 400 });
+  if (!state || !stored || stored.split(".")[0] !== state) return NextResponse.json({ error: "Invalid OIDC callback state" }, { status: 400 });
+  if (url.searchParams.has("error")) return NextResponse.json({ error: "OIDC authorization was rejected", providerError: url.searchParams.get("error") }, { status: 400 });
+  if (!code || !stored.split(".")[2]) return NextResponse.json({error:"Missing authorization code or PKCE verifier"},{status:400});
   const tokenResponse = await fetch(config.issuer + "/oauth/token", {
     method: "POST",
     headers: { authorization: "Basic " + Buffer.from(config.clientId + ":" + config.clientSecret).toString("base64"), "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ grant_type: "authorization_code", code, redirect_uri: config.redirectUri }),
+    body: new URLSearchParams({ grant_type: "authorization_code", code, code_verifier: stored.split(".")[2], redirect_uri: config.redirectUri }),
     cache: "no-store",
   });
   if (!tokenResponse.ok) return NextResponse.json({ error: "OIDC token exchange failed" }, { status: 502 });

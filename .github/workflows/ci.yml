@@ -5,16 +5,63 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: pnpm/action-setup@v4
         with: {version: 9.15.5}
       - uses: actions/setup-node@v4
-        with: {node-version: 22, cache: pnpm}
+        with: {node-version: '24.16.0', cache: pnpm}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
       - run: git diff --exit-code -- apps/web/public/assets/lara
+      - run: pnpm audit --prod --audit-level low
+      - run: node scripts/ci-database.mjs
       - run: python3 docs/development/validate_specifications.py
       - run: python3 -m unittest scripts/test_build_status.py
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: engineering-baseline
+          path: |
+            apps/web/.next
+            apps/web/public
+            apps/api/src
+            apps/worker/src
+            packages
+            scripts
+            infra
+            package.json
+            pnpm-lock.yaml
+            pnpm-workspace.yaml
+            docs/development/P00-REVIEW.md
+            !**/node_modules/**
+            !**/.local/**
+            !**/.env*
+          include-hidden-files: true
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f infra/containers/Dockerfile -t lara:engineering .
+      - uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: lara:engineering
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true

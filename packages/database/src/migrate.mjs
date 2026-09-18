@@ -4,6 +4,7 @@ import pg from 'pg';
 import { loadLocalEnv } from '../../../scripts/local-env.mjs';
 import { applyMigrations } from './runner.mjs';
 loadLocalEnv();
+if(process.env.LARA_MODE!=="demo") throw new Error("Engineering migrations require an explicitly configured demo target");
 const url=process.env.MIGRATION_DATABASE_URL || process.env.SUPABASE_OWNER_DATABASE_URL;
 if(!url) throw new Error('MIGRATION_DATABASE_URL is required');
 const dir=new URL('../migrations/',import.meta.url);

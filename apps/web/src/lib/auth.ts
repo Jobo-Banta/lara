@@ -3,7 +3,7 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-type Session = { sub: string; email?: string; name?: string; expiresAt: number };
+type Session = { sub: string; email?: string; name?: string; expiresAt: number; accessToken?: string; refreshToken?: string };
 
 function loadLocalEnv() {
   const result: Record<string, string> = { ...process.env } as Record<string, string>;
@@ -26,7 +26,7 @@ export function authConfig() {
   if (!issuer || !clientId || !clientSecret) throw new Error("OIDC configuration is incomplete");
   const secret = env.SESSION_SECRET;
   if (!secret || secret.length < 32) throw new Error("Session secret is missing or too short");
-  return { issuer, clientId, clientSecret, redirectUri, secret };
+  return { issuer, clientId, clientSecret, redirectUri, secret, publishableKey: env.SUPABASE_PUBLISHABLE_KEY };
 }
 
 export function stateToken() {

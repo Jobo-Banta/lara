@@ -9,7 +9,7 @@
   "scripts": {
     "assets:build": "node scripts/copy-brand-assets.mjs",
     "status:check": "node scripts/python.mjs scripts/build_status.py check",
-    "dev": "pnpm --filter @lara/web dev",
+    "dev": "node scripts/dev.mjs",
     "build": "pnpm assets:build && pnpm --filter @lara/web build",
     "config:check": "node scripts/config-check.mjs",
     "api": "pnpm --filter @lara/api dev",
@@ -23,6 +23,15 @@
     "setup": "node scripts/setup.mjs",
     "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs",
     "verify": "pnpm test:foundation && pnpm status:check && pnpm build",
-    "test:isolation": "node scripts/test-subject-isolation.mjs"
+    "test:isolation": "node scripts/test-subject-isolation.mjs",
+    "dev:web": "pnpm --filter @lara/web dev",
+    "test:restore": "node scripts/test-restore.mjs",
+    "test:database": "node scripts/test-foundation-db.mjs"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.23",
+      "sharp": "0.35.4"
+    }
   }
 }

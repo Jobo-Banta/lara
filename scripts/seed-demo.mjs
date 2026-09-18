@@ -7,6 +7,6 @@ if (process.env.DEMO_DATABASE_CONFIRMED !== 'true') throw new Error('Explicit de
 const pg=createRequire(new URL('../packages/database/package.json',import.meta.url))('pg');
 const db=new pg.Client(connectionOptions(process.env.DATABASE_URL));
 await db.connect();
-try { await db.query("insert into lara.demo_seed_runs(fixture_version,row_count) values($1,$2)",['phase0-v1',0]); }
+try { const marker=await db.query("select purpose from lara.environment where id=true"); if(marker.rows[0]?.purpose!=="demo")throw new Error("Target is not a demo database"); await db.query("insert into lara.demo_seed_runs(fixture_version,row_count) values($1,$2)",['phase0-v1',0]); }
 finally { await db.end(); }
 console.log('Demo seed complete.');
