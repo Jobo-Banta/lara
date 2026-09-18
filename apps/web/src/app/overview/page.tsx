@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { scopedFetch } from '../../lib/api';
 export default async function OverviewPage() {
   let overview = { tasks: 3, amount: "120000.00", asOf: "2026-09-18" };

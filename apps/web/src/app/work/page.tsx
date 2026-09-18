@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { scopedFetch } from '../../lib/api';
 const fallback = [
   { id: "task-bill-001", title: "Review uncertain supplier bill", area: "Money out", status: "Needs review", owner: "Clerk", source: "Supplier bill · synthetic" },

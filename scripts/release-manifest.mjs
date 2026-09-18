@@ -1,1 +1,11 @@
-import fs from "node:fs/promises";import{execFileSync}from "node:child_process";const commit=(()=>{try{return execFileSync("git",["-c","safe.directory=D:/DCP/LARA","rev-parse","HEAD"],{encoding:"utf8"}).trim();}catch{return "uncommitted-local-baseline";}})();const manifest={release:"0.0.1",source_commit:commit,generated_at:new Date().toISOString(),database:"supabase-postgresql",migration_versions:["0001_phase0"],capabilities:["web-shell","configuration-validation","migration-runner","health-endpoints","demo-isolation","supabase-logical-backup-rehearsal"],activation:"engineering-baseline"};await fs.mkdir(".local",{recursive:true});await fs.writeFile(".local/release-manifest.json",JSON.stringify(manifest,null,2)+"\n");console.log("Release manifest written: .local/release-manifest.json");
+import {readdir,readFile,mkdir,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+const dir=new URL('../packages/database/migrations/',import.meta.url);
+const migrations=await Promise.all((await readdir(dir)).filter(n=>n.endsWith('.sql')).sort().map(async name=>({version:name.slice(0,-4),sha256:createHash('sha256').update(await readFile(new URL(name,dir))).digest('hex')})));
+const lock=await readFile('pnpm-lock.yaml');
+const manifest={release:'0.0.1',source_commit:commit,migrations,lockfile_sha256:createHash('sha256').update(lock).digest('hex'),activation:'synthetic-engineering-baseline',release_attested:false};
+await mkdir('.local',{recursive:true});
+await writeFile('.local/release-manifest.json',JSON.stringify(manifest,null,2)+'\n');
+console.log('Wrote .local/release-manifest.json; this is artifact provenance, not release approval.');
