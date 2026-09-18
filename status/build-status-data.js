@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T21:57:19+00:00",
+  "updated_at": "2026-09-18T22:22:08+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1401,13 +1401,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI.",
+      "evidence": "scripts/test-p04-domain.mjs passed locally against Supabase (9 groups); tests/domain.test.mjs kernel unit test; CI run pending",
+      "updated_at": "2026-09-18T22:22:08+00:00"
     },
     {
       "id": "P04-03",
@@ -5521,12 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T17:34:29+00:00",
-      "id": "P02-02",
-      "action": "in_progress",
-      "note": "Implementing @lara/domain: identity (actor context, memberships, revocation), organization (entity activation maker-checker, settings versions, capabilities), parties (encrypted tax ids, merge), evidence (verify, scan) and workflow (tasks, obligations, approval engine) with a real-database test."
-    },
-    {
       "at": "2026-09-18T17:44:47+00:00",
       "id": "P02-02",
       "action": "in_review",
@@ -5699,6 +5693,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P04-01",
       "action": "done",
       "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T22:22:08+00:00",
+      "id": "P04-02",
+      "action": "in_review",
+      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
     }
   ]
 };

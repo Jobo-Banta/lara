@@ -76,3 +76,24 @@ test('rate limiter refills per minute and denies the burst above the limit', asy
   now+=60_000;for(let i=0;i<4;i++)rateLimit('p1',true,now);
   assert.throws(()=>rateLimit('p1',true,now),/Too many requests/);
 });
+
+test('tax kernel rounds half up once per line or per document and allocates the residual cent deterministically', async () => {
+  const {computeLines,totals,rateScaled}=await import('../packages/domain/src/sales.mjs');
+  const {decimal}=await import('../packages/domain/src/ledger.mjs');
+  const rules=new Map([['L',{id:'L',rate:'0.12',rounding:'line_half_up'}],['D',{id:'D',rate:'0.12',rounding:'document_half_up'}]]);
+  const money=c=>c.map(x=>[decimal(x.net),decimal(x.tax),decimal(x.gross)]);
+  assert.equal(rateScaled('0.12'),120000000000n);
+  assert.deepEqual(money(computeLines([{quantity:'1',unitPrice:'10000',discount:'0',priceBasis:'exclusive',taxCodeId:'L'}],rules)),[['10000.00','1200.00','11200.00']]);
+  assert.deepEqual(money(computeLines([{quantity:'1',unitPrice:'11200',discount:'0',priceBasis:'inclusive',taxCodeId:'L'}],rules)),[['10000.00','1200.00','11200.00']]);
+  assert.deepEqual(money(computeLines([{quantity:'3',unitPrice:'33.333333',discount:'0',priceBasis:'exclusive',taxCodeId:'L'}],rules)),[['100.00','12.00','112.00']]);
+  assert.deepEqual(money(computeLines([{quantity:'1',unitPrice:'1.05',discount:'0',priceBasis:'exclusive',taxCodeId:'L'}],rules)),[['1.05','0.13','1.18']]);
+  const three=k=>[1,2,3].map(()=>({quantity:'1',unitPrice:'1.05',discount:'0',priceBasis:'exclusive',taxCodeId:k}));
+  assert.deepEqual(money(computeLines(three('L'),rules)).map(a=>a[1]),['0.13','0.13','0.13']);
+  assert.deepEqual(money(computeLines(three('D'),rules)).map(a=>a[1]),['0.13','0.13','0.12']);
+  assert.equal(decimal(totals(computeLines(three('D'),rules)).tax),'0.38');
+  // Larger remainder wins the residual cent regardless of position.
+  const uneven=computeLines([{quantity:'1',unitPrice:'1.04',discount:'0',priceBasis:'exclusive',taxCodeId:'D'},{quantity:'1',unitPrice:'1.07',discount:'0',priceBasis:'exclusive',taxCodeId:'D'}],rules);
+  assert.deepEqual(money(uneven).map(a=>a[1]),['0.12','0.13']);
+  assert.deepEqual(money(computeLines([{quantity:'2',unitPrice:'50',discount:'10',priceBasis:'exclusive'}],rules)),[['90.00','0.00','90.00']]);
+  assert.throws(()=>computeLines([{quantity:'0',unitPrice:'5',discount:'0',priceBasis:'exclusive'}],rules),e=>e.code==='VALIDATION_FAILED');
+});

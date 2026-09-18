@@ -219,11 +219,11 @@
       "updated_at": "2026-09-18T21:57:19+00:00"
     },
     "P04-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI.",
+      "evidence": "scripts/test-p04-domain.mjs passed locally against Supabase (9 groups); tests/domain.test.mjs kernel unit test; CI run pending",
+      "updated_at": "2026-09-18T22:22:08+00:00"
     },
     "P04-03": {
       "status": "not_started",
@@ -1908,7 +1908,13 @@
       "id": "P04-01",
       "action": "done",
       "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T22:22:08+00:00",
+      "id": "P04-02",
+      "action": "in_review",
+      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
     }
   ],
-  "updated_at": "2026-09-18T21:57:19+00:00"
+  "updated_at": "2026-09-18T22:22:08+00:00"
 }

@@ -38,6 +38,7 @@
     "test:p02-load": "node scripts/test-p02-load.mjs",
     "test:p03-schema": "node scripts/test-p03-schema.mjs",
     "test:p04-schema": "node scripts/test-p04-schema.mjs",
+    "test:p04-domain": "node scripts/test-p04-domain.mjs",
     "test:p03-domain": "node scripts/test-p03-domain.mjs",
     "test:p03-api": "node scripts/test-p03-api.mjs"
   },
