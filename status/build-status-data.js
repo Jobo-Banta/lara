@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T20:17:48+00:00",
+  "updated_at": "2026-09-18T20:25:59+00:00",
   "releases": [
     {
       "id": "P00",
@@ -964,13 +964,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases.",
-      "evidence": "Local 2026-09-19: load report reads p95 1.47 s, commands p95 1.94 s, mixed 1.46 s, zero errors against Supabase (concurrency 4); API 7 groups PASS; foundation 24/24; identity skew unit test. CI assertion pending push.",
-      "updated_at": "2026-09-18T20:16:03+00:00"
+      "evidence": "GitHub CI 35390504685 passed: load profile asserted (p95 under 2 s, command p95 under 1 s) on PostgreSQL 18, cursor scope negatives in scripts/test-p02-api.mjs, identity skew unit test, P00/P01/P02 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook: docs/development/P02-RUNBOOK.md. Local remote-database load report recorded in docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T20:19:44+00:00"
     },
     {
       "id": "P02-06",
@@ -1063,15 +1063,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P02"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts.",
+      "evidence": "Local 2026-09-19: scripts/test-p03-schema.mjs 7 groups PASS on Supabase PostgreSQL 17.6 through the runtime role; migration applied; foundation 24/24; restore rehearsal includes ledger tables. CI pending push.",
+      "updated_at": "2026-09-18T20:25:59+00:00"
     },
     {
       "id": "P03-02",
@@ -5522,24 +5522,6 @@ window.LARA_BUILD_STATUS = {
   "history": [
     {
       "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-05",
-      "action": "in_review",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-06",
-      "action": "in_review",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-07",
-      "action": "in_review",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
       "id": "P01-08",
       "action": "in_review",
       "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
@@ -5699,6 +5681,24 @@ window.LARA_BUILD_STATUS = {
       "id": "P02-06",
       "action": "blocked",
       "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions."
+    },
+    {
+      "at": "2026-09-18T20:19:21+00:00",
+      "id": "P03-01",
+      "action": "in_progress",
+      "note": "Designing ledger schema: accounts (cycle prevention, control types, dimension rules), dimensions, periods (non-overlap, open/soft_closed/locked), append-only journal entries/lines inserted only through a granted posting function enforcing balance and account/period rules, opening batches and staged rows, control balances, report snapshots, close tasks, substantiations, statement mappings and journal templates."
+    },
+    {
+      "at": "2026-09-18T20:19:44+00:00",
+      "id": "P02-05",
+      "action": "done",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T20:25:59+00:00",
+      "id": "P03-01",
+      "action": "in_review",
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
     }
   ]
 };
