@@ -22,12 +22,14 @@
     "release:manifest": "node scripts/release-manifest.mjs",
     "setup": "node scripts/setup.mjs",
     "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs",
-    "verify": "pnpm test:foundation && pnpm status:check && pnpm build",
+    "verify": "pnpm test:foundation && pnpm contracts:check && pnpm status:check && pnpm build",
     "test:isolation": "node scripts/test-subject-isolation.mjs",
     "dev:web": "pnpm --filter @lara/web dev",
     "test:restore": "node scripts/test-restore.mjs",
     "test:database": "node scripts/test-foundation-db.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "contracts:generate": "node scripts/generate-contracts.mjs",
+    "contracts:check": "node scripts/generate-contracts.mjs --check"
   },
   "pnpm": {
     "overrides": {

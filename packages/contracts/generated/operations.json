@@ -1,0 +1,1741 @@
+{
+  "source": "docs/development/contracts/openapi.json",
+  "sha256": "9a8c1d16b3c99add2e913ed5fa1d9a3c66c0004738af597f0b7731f75b53082f",
+  "operations": [
+    {
+      "method": "POST",
+      "path": "/entities",
+      "operationId": "post_entities"
+    },
+    {
+      "method": "GET",
+      "path": "/entities",
+      "operationId": "get_entities"
+    },
+    {
+      "method": "GET",
+      "path": "/entities/{id}",
+      "operationId": "get_entities_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/entities/{id}",
+      "operationId": "patch_entities_id"
+    },
+    {
+      "method": "POST",
+      "path": "/entities/{id}/activate",
+      "operationId": "post_entities_id_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/branches",
+      "operationId": "post_branches"
+    },
+    {
+      "method": "GET",
+      "path": "/branches",
+      "operationId": "get_branches"
+    },
+    {
+      "method": "GET",
+      "path": "/branches/{id}",
+      "operationId": "get_branches_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/branches/{id}",
+      "operationId": "patch_branches_id"
+    },
+    {
+      "method": "POST",
+      "path": "/parties",
+      "operationId": "post_parties"
+    },
+    {
+      "method": "GET",
+      "path": "/parties",
+      "operationId": "get_parties"
+    },
+    {
+      "method": "GET",
+      "path": "/parties/{id}",
+      "operationId": "get_parties_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/parties/{id}",
+      "operationId": "patch_parties_id"
+    },
+    {
+      "method": "POST",
+      "path": "/parties/{id}/archive",
+      "operationId": "post_parties_id_archive"
+    },
+    {
+      "method": "POST",
+      "path": "/memberships",
+      "operationId": "post_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/memberships",
+      "operationId": "get_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/memberships/{id}",
+      "operationId": "get_memberships_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/memberships/{id}",
+      "operationId": "patch_memberships_id"
+    },
+    {
+      "method": "POST",
+      "path": "/memberships/{id}/revoke",
+      "operationId": "post_memberships_id_revoke"
+    },
+    {
+      "method": "POST",
+      "path": "/roles",
+      "operationId": "post_roles"
+    },
+    {
+      "method": "GET",
+      "path": "/roles",
+      "operationId": "get_roles"
+    },
+    {
+      "method": "GET",
+      "path": "/roles/{id}",
+      "operationId": "get_roles_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/roles/{id}",
+      "operationId": "patch_roles_id"
+    },
+    {
+      "method": "POST",
+      "path": "/roles/{id}/approve",
+      "operationId": "post_roles_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/approval-policies",
+      "operationId": "post_approval_policies"
+    },
+    {
+      "method": "GET",
+      "path": "/approval-policies",
+      "operationId": "get_approval_policies"
+    },
+    {
+      "method": "GET",
+      "path": "/approval-policies/{id}",
+      "operationId": "get_approval_policies_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/approval-policies/{id}",
+      "operationId": "patch_approval_policies_id"
+    },
+    {
+      "method": "POST",
+      "path": "/approval-policies/{id}/approve",
+      "operationId": "post_approval_policies_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/approval-policies/{id}/activate",
+      "operationId": "post_approval_policies_id_activate"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "operationId": "get_me"
+    },
+    {
+      "method": "POST",
+      "path": "/capabilities/activate",
+      "operationId": "post_capabilities_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "operationId": "post_tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks",
+      "operationId": "get_tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{id}",
+      "operationId": "get_tasks_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/tasks/{id}",
+      "operationId": "patch_tasks_id"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{id}/assign",
+      "operationId": "post_tasks_id_assign"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{id}/resolve",
+      "operationId": "post_tasks_id_resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{id}/comments",
+      "operationId": "post_tasks_id_comments"
+    },
+    {
+      "method": "POST",
+      "path": "/obligations",
+      "operationId": "post_obligations"
+    },
+    {
+      "method": "GET",
+      "path": "/obligations",
+      "operationId": "get_obligations"
+    },
+    {
+      "method": "GET",
+      "path": "/obligations/{id}",
+      "operationId": "get_obligations_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/obligations/{id}",
+      "operationId": "patch_obligations_id"
+    },
+    {
+      "method": "POST",
+      "path": "/obligations/{id}/complete",
+      "operationId": "post_obligations_id_complete"
+    },
+    {
+      "method": "POST",
+      "path": "/evidence/uploads",
+      "operationId": "post_evidence_uploads"
+    },
+    {
+      "method": "POST",
+      "path": "/evidence/{id}/complete",
+      "operationId": "post_evidence_id_complete"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/{id}",
+      "operationId": "get_evidence_id"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/{id}/content",
+      "operationId": "get_evidence_id_content"
+    },
+    {
+      "method": "POST",
+      "path": "/exports",
+      "operationId": "post_exports"
+    },
+    {
+      "method": "GET",
+      "path": "/commands/{key}",
+      "operationId": "get_commands_key"
+    },
+    {
+      "method": "GET",
+      "path": "/jobs/{id}",
+      "operationId": "get_jobs_id"
+    },
+    {
+      "method": "POST",
+      "path": "/accounts",
+      "operationId": "post_accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/accounts",
+      "operationId": "get_accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/accounts/{id}",
+      "operationId": "get_accounts_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/accounts/{id}",
+      "operationId": "patch_accounts_id"
+    },
+    {
+      "method": "POST",
+      "path": "/journals",
+      "operationId": "post_journals"
+    },
+    {
+      "method": "GET",
+      "path": "/journals",
+      "operationId": "get_journals"
+    },
+    {
+      "method": "GET",
+      "path": "/journals/{id}",
+      "operationId": "get_journals_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/journals/{id}",
+      "operationId": "patch_journals_id"
+    },
+    {
+      "method": "POST",
+      "path": "/journals/{id}/submit",
+      "operationId": "post_journals_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/journals/{id}/approve",
+      "operationId": "post_journals_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/journals/{id}/post",
+      "operationId": "post_journals_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/journals/{id}/reverse",
+      "operationId": "post_journals_id_reverse"
+    },
+    {
+      "method": "POST",
+      "path": "/periods",
+      "operationId": "post_periods"
+    },
+    {
+      "method": "GET",
+      "path": "/periods",
+      "operationId": "get_periods"
+    },
+    {
+      "method": "GET",
+      "path": "/periods/{id}",
+      "operationId": "get_periods_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/periods/{id}",
+      "operationId": "patch_periods_id"
+    },
+    {
+      "method": "POST",
+      "path": "/periods/{id}/soft-close",
+      "operationId": "post_periods_id_soft_close"
+    },
+    {
+      "method": "POST",
+      "path": "/periods/{id}/lock",
+      "operationId": "post_periods_id_lock"
+    },
+    {
+      "method": "POST",
+      "path": "/periods/{id}/reopen",
+      "operationId": "post_periods_id_reopen"
+    },
+    {
+      "method": "POST",
+      "path": "/imports",
+      "operationId": "post_imports"
+    },
+    {
+      "method": "GET",
+      "path": "/imports",
+      "operationId": "get_imports"
+    },
+    {
+      "method": "GET",
+      "path": "/imports/{id}",
+      "operationId": "get_imports_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/imports/{id}",
+      "operationId": "patch_imports_id"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/validate",
+      "operationId": "post_imports_id_validate"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/approve",
+      "operationId": "post_imports_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/imports/{id}/commit",
+      "operationId": "post_imports_id_commit"
+    },
+    {
+      "method": "POST",
+      "path": "/reports",
+      "operationId": "post_reports"
+    },
+    {
+      "method": "POST",
+      "path": "/tax-rules",
+      "operationId": "post_tax_rules"
+    },
+    {
+      "method": "GET",
+      "path": "/tax-rules",
+      "operationId": "get_tax_rules"
+    },
+    {
+      "method": "GET",
+      "path": "/tax-rules/{id}",
+      "operationId": "get_tax_rules_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/tax-rules/{id}",
+      "operationId": "patch_tax_rules_id"
+    },
+    {
+      "method": "POST",
+      "path": "/tax-rules/{id}/approve",
+      "operationId": "post_tax_rules_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/tax-rules/{id}/activate",
+      "operationId": "post_tax_rules_id_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices",
+      "operationId": "post_invoices"
+    },
+    {
+      "method": "GET",
+      "path": "/invoices",
+      "operationId": "get_invoices"
+    },
+    {
+      "method": "GET",
+      "path": "/invoices/{id}",
+      "operationId": "get_invoices_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/invoices/{id}",
+      "operationId": "patch_invoices_id"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/submit",
+      "operationId": "post_invoices_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/approve",
+      "operationId": "post_invoices_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/post",
+      "operationId": "post_invoices_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/correct",
+      "operationId": "post_invoices_id_correct"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/deliver",
+      "operationId": "post_invoices_id_deliver"
+    },
+    {
+      "method": "POST",
+      "path": "/sales-orders",
+      "operationId": "post_sales_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/sales-orders",
+      "operationId": "get_sales_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/sales-orders/{id}",
+      "operationId": "get_sales_orders_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/sales-orders/{id}",
+      "operationId": "patch_sales_orders_id"
+    },
+    {
+      "method": "POST",
+      "path": "/sales-orders/{id}/submit",
+      "operationId": "post_sales_orders_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/sales-orders/{id}/approve",
+      "operationId": "post_sales_orders_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/sales-orders/{id}/convert",
+      "operationId": "post_sales_orders_id_convert"
+    },
+    {
+      "method": "POST",
+      "path": "/collections",
+      "operationId": "post_collections"
+    },
+    {
+      "method": "GET",
+      "path": "/collections",
+      "operationId": "get_collections"
+    },
+    {
+      "method": "GET",
+      "path": "/collections/{id}",
+      "operationId": "get_collections_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/collections/{id}",
+      "operationId": "patch_collections_id"
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/submit",
+      "operationId": "post_collections_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/approve",
+      "operationId": "post_collections_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/post",
+      "operationId": "post_collections_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/reverse",
+      "operationId": "post_collections_id_reverse"
+    },
+    {
+      "method": "GET",
+      "path": "/open-items",
+      "operationId": "get_open_items"
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/allocations",
+      "operationId": "post_collections_id_allocations"
+    },
+    {
+      "method": "POST",
+      "path": "/allocations/{id}/reverse",
+      "operationId": "post_allocations_id_reverse"
+    },
+    {
+      "method": "POST",
+      "path": "/bills",
+      "operationId": "post_bills"
+    },
+    {
+      "method": "GET",
+      "path": "/bills",
+      "operationId": "get_bills"
+    },
+    {
+      "method": "GET",
+      "path": "/bills/{id}",
+      "operationId": "get_bills_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/bills/{id}",
+      "operationId": "patch_bills_id"
+    },
+    {
+      "method": "POST",
+      "path": "/bills/{id}/submit",
+      "operationId": "post_bills_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/bills/{id}/approve",
+      "operationId": "post_bills_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/bills/{id}/post",
+      "operationId": "post_bills_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/bills/{id}/correct",
+      "operationId": "post_bills_id_correct"
+    },
+    {
+      "method": "POST",
+      "path": "/purchase-orders",
+      "operationId": "post_purchase_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/purchase-orders",
+      "operationId": "get_purchase_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/purchase-orders/{id}",
+      "operationId": "get_purchase_orders_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/purchase-orders/{id}",
+      "operationId": "patch_purchase_orders_id"
+    },
+    {
+      "method": "POST",
+      "path": "/purchase-orders/{id}/submit",
+      "operationId": "post_purchase_orders_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/purchase-orders/{id}/approve",
+      "operationId": "post_purchase_orders_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/purchase-orders/{id}/cancel",
+      "operationId": "post_purchase_orders_id_cancel"
+    },
+    {
+      "method": "POST",
+      "path": "/expense-claims",
+      "operationId": "post_expense_claims"
+    },
+    {
+      "method": "GET",
+      "path": "/expense-claims",
+      "operationId": "get_expense_claims"
+    },
+    {
+      "method": "GET",
+      "path": "/expense-claims/{id}",
+      "operationId": "get_expense_claims_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/expense-claims/{id}",
+      "operationId": "patch_expense_claims_id"
+    },
+    {
+      "method": "POST",
+      "path": "/expense-claims/{id}/submit",
+      "operationId": "post_expense_claims_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/expense-claims/{id}/approve",
+      "operationId": "post_expense_claims_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/expense-claims/{id}/post",
+      "operationId": "post_expense_claims_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/settlements",
+      "operationId": "post_settlements"
+    },
+    {
+      "method": "GET",
+      "path": "/settlements",
+      "operationId": "get_settlements"
+    },
+    {
+      "method": "GET",
+      "path": "/settlements/{id}",
+      "operationId": "get_settlements_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/settlements/{id}",
+      "operationId": "patch_settlements_id"
+    },
+    {
+      "method": "POST",
+      "path": "/settlements/{id}/submit",
+      "operationId": "post_settlements_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/payments",
+      "operationId": "post_payments"
+    },
+    {
+      "method": "GET",
+      "path": "/payments",
+      "operationId": "get_payments"
+    },
+    {
+      "method": "GET",
+      "path": "/payments/{id}",
+      "operationId": "get_payments_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/payments/{id}",
+      "operationId": "patch_payments_id"
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/submit",
+      "operationId": "post_payments_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/authorize",
+      "operationId": "post_payments_id_authorize"
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/release",
+      "operationId": "post_payments_id_release"
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/settle",
+      "operationId": "post_payments_id_settle"
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/return",
+      "operationId": "post_payments_id_return"
+    },
+    {
+      "method": "POST",
+      "path": "/bank-accounts",
+      "operationId": "post_bank_accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-accounts",
+      "operationId": "get_bank_accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-accounts/{id}",
+      "operationId": "get_bank_accounts_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/bank-accounts/{id}",
+      "operationId": "patch_bank_accounts_id"
+    },
+    {
+      "method": "POST",
+      "path": "/bank-accounts/{id}/approve",
+      "operationId": "post_bank_accounts_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/bank-matches",
+      "operationId": "post_bank_matches"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-matches",
+      "operationId": "get_bank_matches"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-matches/{id}",
+      "operationId": "get_bank_matches_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/bank-matches/{id}",
+      "operationId": "patch_bank_matches_id"
+    },
+    {
+      "method": "POST",
+      "path": "/bank-matches/{id}/confirm",
+      "operationId": "post_bank_matches_id_confirm"
+    },
+    {
+      "method": "POST",
+      "path": "/bank-matches/{id}/reverse",
+      "operationId": "post_bank_matches_id_reverse"
+    },
+    {
+      "method": "POST",
+      "path": "/transfers",
+      "operationId": "post_transfers"
+    },
+    {
+      "method": "GET",
+      "path": "/transfers",
+      "operationId": "get_transfers"
+    },
+    {
+      "method": "GET",
+      "path": "/transfers/{id}",
+      "operationId": "get_transfers_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/transfers/{id}",
+      "operationId": "patch_transfers_id"
+    },
+    {
+      "method": "POST",
+      "path": "/transfers/{id}/submit",
+      "operationId": "post_transfers_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/transfers/{id}/approve",
+      "operationId": "post_transfers_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/transfers/{id}/post",
+      "operationId": "post_transfers_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/checks",
+      "operationId": "post_checks"
+    },
+    {
+      "method": "GET",
+      "path": "/checks",
+      "operationId": "get_checks"
+    },
+    {
+      "method": "GET",
+      "path": "/checks/{id}",
+      "operationId": "get_checks_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/checks/{id}",
+      "operationId": "patch_checks_id"
+    },
+    {
+      "method": "POST",
+      "path": "/checks/{id}/release",
+      "operationId": "post_checks_id_release"
+    },
+    {
+      "method": "POST",
+      "path": "/checks/{id}/deposit",
+      "operationId": "post_checks_id_deposit"
+    },
+    {
+      "method": "POST",
+      "path": "/checks/{id}/clear",
+      "operationId": "post_checks_id_clear"
+    },
+    {
+      "method": "POST",
+      "path": "/checks/{id}/dishonor",
+      "operationId": "post_checks_id_dishonor"
+    },
+    {
+      "method": "POST",
+      "path": "/cash-sessions",
+      "operationId": "post_cash_sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/cash-sessions",
+      "operationId": "get_cash_sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/cash-sessions/{id}",
+      "operationId": "get_cash_sessions_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/cash-sessions/{id}",
+      "operationId": "patch_cash_sessions_id"
+    },
+    {
+      "method": "POST",
+      "path": "/cash-sessions/{id}/count",
+      "operationId": "post_cash_sessions_id_count"
+    },
+    {
+      "method": "POST",
+      "path": "/cash-sessions/{id}/close",
+      "operationId": "post_cash_sessions_id_close"
+    },
+    {
+      "method": "POST",
+      "path": "/cash-sessions/{id}/handover",
+      "operationId": "post_cash_sessions_id_handover"
+    },
+    {
+      "method": "POST",
+      "path": "/returns",
+      "operationId": "post_returns"
+    },
+    {
+      "method": "GET",
+      "path": "/returns",
+      "operationId": "get_returns"
+    },
+    {
+      "method": "GET",
+      "path": "/returns/{id}",
+      "operationId": "get_returns_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/returns/{id}",
+      "operationId": "patch_returns_id"
+    },
+    {
+      "method": "POST",
+      "path": "/returns/{id}/prepare",
+      "operationId": "post_returns_id_prepare"
+    },
+    {
+      "method": "POST",
+      "path": "/returns/{id}/approve",
+      "operationId": "post_returns_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/returns/{id}/filed",
+      "operationId": "post_returns_id_filed"
+    },
+    {
+      "method": "POST",
+      "path": "/transmissions/{id}/reconcile",
+      "operationId": "post_transmissions_id_reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/transmissions/{id}/retry",
+      "operationId": "post_transmissions_id_retry"
+    },
+    {
+      "method": "GET",
+      "path": "/transmissions/{id}",
+      "operationId": "get_transmissions_id"
+    },
+    {
+      "method": "POST",
+      "path": "/registration-packs",
+      "operationId": "post_registration_packs"
+    },
+    {
+      "method": "POST",
+      "path": "/source-ownership",
+      "operationId": "post_source_ownership"
+    },
+    {
+      "method": "GET",
+      "path": "/source-ownership",
+      "operationId": "get_source_ownership"
+    },
+    {
+      "method": "GET",
+      "path": "/source-ownership/{id}",
+      "operationId": "get_source_ownership_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/source-ownership/{id}",
+      "operationId": "patch_source_ownership_id"
+    },
+    {
+      "method": "POST",
+      "path": "/source-ownership/{id}/approve",
+      "operationId": "post_source_ownership_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/books",
+      "operationId": "post_books"
+    },
+    {
+      "method": "GET",
+      "path": "/books",
+      "operationId": "get_books"
+    },
+    {
+      "method": "GET",
+      "path": "/books/{id}",
+      "operationId": "get_books_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/books/{id}",
+      "operationId": "patch_books_id"
+    },
+    {
+      "method": "POST",
+      "path": "/books/{id}/activate",
+      "operationId": "post_books_id_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/fx-rates",
+      "operationId": "post_fx_rates"
+    },
+    {
+      "method": "GET",
+      "path": "/fx-rates",
+      "operationId": "get_fx_rates"
+    },
+    {
+      "method": "GET",
+      "path": "/fx-rates/{id}",
+      "operationId": "get_fx_rates_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/fx-rates/{id}",
+      "operationId": "patch_fx_rates_id"
+    },
+    {
+      "method": "POST",
+      "path": "/fx-rates/{id}/approve",
+      "operationId": "post_fx_rates_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/revaluations",
+      "operationId": "post_revaluations"
+    },
+    {
+      "method": "GET",
+      "path": "/revaluations",
+      "operationId": "get_revaluations"
+    },
+    {
+      "method": "GET",
+      "path": "/revaluations/{id}",
+      "operationId": "get_revaluations_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/revaluations/{id}",
+      "operationId": "patch_revaluations_id"
+    },
+    {
+      "method": "POST",
+      "path": "/revaluations/{id}/preview",
+      "operationId": "post_revaluations_id_preview"
+    },
+    {
+      "method": "POST",
+      "path": "/revaluations/{id}/approve",
+      "operationId": "post_revaluations_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/revaluations/{id}/post",
+      "operationId": "post_revaluations_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/items",
+      "operationId": "post_items"
+    },
+    {
+      "method": "GET",
+      "path": "/items",
+      "operationId": "get_items"
+    },
+    {
+      "method": "GET",
+      "path": "/items/{id}",
+      "operationId": "get_items_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/items/{id}",
+      "operationId": "patch_items_id"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-movements",
+      "operationId": "post_stock_movements"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-movements",
+      "operationId": "get_stock_movements"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-movements/{id}",
+      "operationId": "get_stock_movements_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/stock-movements/{id}",
+      "operationId": "patch_stock_movements_id"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-movements/{id}/submit",
+      "operationId": "post_stock_movements_id_submit"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-movements/{id}/approve",
+      "operationId": "post_stock_movements_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-movements/{id}/post",
+      "operationId": "post_stock_movements_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-counts",
+      "operationId": "post_stock_counts"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-counts",
+      "operationId": "get_stock_counts"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-counts/{id}",
+      "operationId": "get_stock_counts_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/stock-counts/{id}",
+      "operationId": "patch_stock_counts_id"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-counts/{id}/approve",
+      "operationId": "post_stock_counts_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/stock-counts/{id}/post",
+      "operationId": "post_stock_counts_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/landed-costs",
+      "operationId": "post_landed_costs"
+    },
+    {
+      "method": "GET",
+      "path": "/landed-costs",
+      "operationId": "get_landed_costs"
+    },
+    {
+      "method": "GET",
+      "path": "/landed-costs/{id}",
+      "operationId": "get_landed_costs_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/landed-costs/{id}",
+      "operationId": "patch_landed_costs_id"
+    },
+    {
+      "method": "POST",
+      "path": "/landed-costs/{id}/preview",
+      "operationId": "post_landed_costs_id_preview"
+    },
+    {
+      "method": "POST",
+      "path": "/landed-costs/{id}/approve",
+      "operationId": "post_landed_costs_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/landed-costs/{id}/post",
+      "operationId": "post_landed_costs_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/assets",
+      "operationId": "post_assets"
+    },
+    {
+      "method": "GET",
+      "path": "/assets",
+      "operationId": "get_assets"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/{id}",
+      "operationId": "get_assets_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/assets/{id}",
+      "operationId": "patch_assets_id"
+    },
+    {
+      "method": "POST",
+      "path": "/assets/{id}/approve",
+      "operationId": "post_assets_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/assets/{id}/events",
+      "operationId": "post_assets_id_events"
+    },
+    {
+      "method": "POST",
+      "path": "/schedules",
+      "operationId": "post_schedules"
+    },
+    {
+      "method": "GET",
+      "path": "/schedules",
+      "operationId": "get_schedules"
+    },
+    {
+      "method": "GET",
+      "path": "/schedules/{id}",
+      "operationId": "get_schedules_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/schedules/{id}",
+      "operationId": "patch_schedules_id"
+    },
+    {
+      "method": "POST",
+      "path": "/schedules/{id}/approve",
+      "operationId": "post_schedules_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/schedules/{id}/pause",
+      "operationId": "post_schedules_id_pause"
+    },
+    {
+      "method": "POST",
+      "path": "/schedule-runs",
+      "operationId": "post_schedule_runs"
+    },
+    {
+      "method": "POST",
+      "path": "/assistant/runs",
+      "operationId": "post_assistant_runs"
+    },
+    {
+      "method": "POST",
+      "path": "/assistant/suggestions/{id}/review",
+      "operationId": "post_assistant_suggestions_id_review"
+    },
+    {
+      "method": "GET",
+      "path": "/assistant/suggestions/{id}",
+      "operationId": "get_assistant_suggestions_id"
+    },
+    {
+      "method": "POST",
+      "path": "/portal-invites",
+      "operationId": "post_portal_invites"
+    },
+    {
+      "method": "GET",
+      "path": "/portal-invites",
+      "operationId": "get_portal_invites"
+    },
+    {
+      "method": "GET",
+      "path": "/portal-invites/{id}",
+      "operationId": "get_portal_invites_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/portal-invites/{id}",
+      "operationId": "patch_portal_invites_id"
+    },
+    {
+      "method": "POST",
+      "path": "/portal-invites/{id}/revoke",
+      "operationId": "post_portal_invites_id_revoke"
+    },
+    {
+      "method": "POST",
+      "path": "/message-requests",
+      "operationId": "post_message_requests"
+    },
+    {
+      "method": "GET",
+      "path": "/message-requests",
+      "operationId": "get_message_requests"
+    },
+    {
+      "method": "GET",
+      "path": "/message-requests/{id}",
+      "operationId": "get_message_requests_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/message-requests/{id}",
+      "operationId": "patch_message_requests_id"
+    },
+    {
+      "method": "POST",
+      "path": "/message-requests/{id}/send",
+      "operationId": "post_message_requests_id_send"
+    },
+    {
+      "method": "POST",
+      "path": "/payment-links",
+      "operationId": "post_payment_links"
+    },
+    {
+      "method": "GET",
+      "path": "/payment-links",
+      "operationId": "get_payment_links"
+    },
+    {
+      "method": "GET",
+      "path": "/payment-links/{id}",
+      "operationId": "get_payment_links_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/payment-links/{id}",
+      "operationId": "patch_payment_links_id"
+    },
+    {
+      "method": "POST",
+      "path": "/payment-links/{id}/cancel",
+      "operationId": "post_payment_links_id_cancel"
+    },
+    {
+      "method": "POST",
+      "path": "/firm-mandates",
+      "operationId": "post_firm_mandates"
+    },
+    {
+      "method": "GET",
+      "path": "/firm-mandates",
+      "operationId": "get_firm_mandates"
+    },
+    {
+      "method": "GET",
+      "path": "/firm-mandates/{id}",
+      "operationId": "get_firm_mandates_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/firm-mandates/{id}",
+      "operationId": "patch_firm_mandates_id"
+    },
+    {
+      "method": "POST",
+      "path": "/firm-mandates/{id}/approve",
+      "operationId": "post_firm_mandates_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/firm-mandates/{id}/revoke",
+      "operationId": "post_firm_mandates_id_revoke"
+    },
+    {
+      "method": "POST",
+      "path": "/firm-assignments",
+      "operationId": "post_firm_assignments"
+    },
+    {
+      "method": "GET",
+      "path": "/firm-assignments",
+      "operationId": "get_firm_assignments"
+    },
+    {
+      "method": "GET",
+      "path": "/firm-assignments/{id}",
+      "operationId": "get_firm_assignments_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/firm-assignments/{id}",
+      "operationId": "patch_firm_assignments_id"
+    },
+    {
+      "method": "POST",
+      "path": "/groups",
+      "operationId": "post_groups"
+    },
+    {
+      "method": "GET",
+      "path": "/groups",
+      "operationId": "get_groups"
+    },
+    {
+      "method": "GET",
+      "path": "/groups/{id}",
+      "operationId": "get_groups_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/groups/{id}",
+      "operationId": "patch_groups_id"
+    },
+    {
+      "method": "POST",
+      "path": "/groups/{id}/activate",
+      "operationId": "post_groups_id_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/intercompany-pairs",
+      "operationId": "post_intercompany_pairs"
+    },
+    {
+      "method": "GET",
+      "path": "/intercompany-pairs",
+      "operationId": "get_intercompany_pairs"
+    },
+    {
+      "method": "GET",
+      "path": "/intercompany-pairs/{id}",
+      "operationId": "get_intercompany_pairs_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/intercompany-pairs/{id}",
+      "operationId": "patch_intercompany_pairs_id"
+    },
+    {
+      "method": "POST",
+      "path": "/intercompany-pairs/{id}/accept",
+      "operationId": "post_intercompany_pairs_id_accept"
+    },
+    {
+      "method": "POST",
+      "path": "/intercompany-pairs/{id}/post",
+      "operationId": "post_intercompany_pairs_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidations",
+      "operationId": "post_consolidations"
+    },
+    {
+      "method": "GET",
+      "path": "/consolidations",
+      "operationId": "get_consolidations"
+    },
+    {
+      "method": "GET",
+      "path": "/consolidations/{id}",
+      "operationId": "get_consolidations_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/consolidations/{id}",
+      "operationId": "patch_consolidations_id"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidations/{id}/preview",
+      "operationId": "post_consolidations_id_preview"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidations/{id}/approve",
+      "operationId": "post_consolidations_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidations/{id}/publish",
+      "operationId": "post_consolidations_id_publish"
+    },
+    {
+      "method": "POST",
+      "path": "/budgets",
+      "operationId": "post_budgets"
+    },
+    {
+      "method": "GET",
+      "path": "/budgets",
+      "operationId": "get_budgets"
+    },
+    {
+      "method": "GET",
+      "path": "/budgets/{id}",
+      "operationId": "get_budgets_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/budgets/{id}",
+      "operationId": "patch_budgets_id"
+    },
+    {
+      "method": "POST",
+      "path": "/budgets/{id}/approve",
+      "operationId": "post_budgets_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/budgets/{id}/activate",
+      "operationId": "post_budgets_id_activate"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-runs",
+      "operationId": "post_allocation_runs"
+    },
+    {
+      "method": "GET",
+      "path": "/allocation-runs",
+      "operationId": "get_allocation_runs"
+    },
+    {
+      "method": "GET",
+      "path": "/allocation-runs/{id}",
+      "operationId": "get_allocation_runs_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/allocation-runs/{id}",
+      "operationId": "patch_allocation_runs_id"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-runs/{id}/preview",
+      "operationId": "post_allocation_runs_id_preview"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-runs/{id}/approve",
+      "operationId": "post_allocation_runs_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-runs/{id}/post",
+      "operationId": "post_allocation_runs_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/projects",
+      "operationId": "post_projects"
+    },
+    {
+      "method": "GET",
+      "path": "/projects",
+      "operationId": "get_projects"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}",
+      "operationId": "get_projects_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/projects/{id}",
+      "operationId": "patch_projects_id"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{id}/progress-billing",
+      "operationId": "post_projects_id_progress_billing"
+    },
+    {
+      "method": "POST",
+      "path": "/leases",
+      "operationId": "post_leases"
+    },
+    {
+      "method": "GET",
+      "path": "/leases",
+      "operationId": "get_leases"
+    },
+    {
+      "method": "GET",
+      "path": "/leases/{id}",
+      "operationId": "get_leases_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/leases/{id}",
+      "operationId": "patch_leases_id"
+    },
+    {
+      "method": "POST",
+      "path": "/leases/{id}/approve",
+      "operationId": "post_leases_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/discount-eligibility",
+      "operationId": "post_discount_eligibility"
+    },
+    {
+      "method": "GET",
+      "path": "/discount-eligibility",
+      "operationId": "get_discount_eligibility"
+    },
+    {
+      "method": "GET",
+      "path": "/discount-eligibility/{id}",
+      "operationId": "get_discount_eligibility_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/discount-eligibility/{id}",
+      "operationId": "patch_discount_eligibility_id"
+    },
+    {
+      "method": "POST",
+      "path": "/discount-eligibility/{id}/approve",
+      "operationId": "post_discount_eligibility_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/report-definitions",
+      "operationId": "post_report_definitions"
+    },
+    {
+      "method": "GET",
+      "path": "/report-definitions",
+      "operationId": "get_report_definitions"
+    },
+    {
+      "method": "GET",
+      "path": "/report-definitions/{id}",
+      "operationId": "get_report_definitions_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/report-definitions/{id}",
+      "operationId": "patch_report_definitions_id"
+    },
+    {
+      "method": "POST",
+      "path": "/report-definitions/{id}/publish",
+      "operationId": "post_report_definitions_id_publish"
+    },
+    {
+      "method": "POST",
+      "path": "/rule-proposals",
+      "operationId": "post_rule_proposals"
+    },
+    {
+      "method": "GET",
+      "path": "/rule-proposals",
+      "operationId": "get_rule_proposals"
+    },
+    {
+      "method": "GET",
+      "path": "/rule-proposals/{id}",
+      "operationId": "get_rule_proposals_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/rule-proposals/{id}",
+      "operationId": "patch_rule_proposals_id"
+    },
+    {
+      "method": "POST",
+      "path": "/rule-proposals/{id}/impact",
+      "operationId": "post_rule_proposals_id_impact"
+    },
+    {
+      "method": "POST",
+      "path": "/rule-proposals/{id}/approve",
+      "operationId": "post_rule_proposals_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/tool-grants",
+      "operationId": "post_tool_grants"
+    },
+    {
+      "method": "GET",
+      "path": "/tool-grants",
+      "operationId": "get_tool_grants"
+    },
+    {
+      "method": "GET",
+      "path": "/tool-grants/{id}",
+      "operationId": "get_tool_grants_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/tool-grants/{id}",
+      "operationId": "patch_tool_grants_id"
+    },
+    {
+      "method": "POST",
+      "path": "/tool-grants/{id}/approve",
+      "operationId": "post_tool_grants_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/tool-grants/{id}/revoke",
+      "operationId": "post_tool_grants_id_revoke"
+    },
+    {
+      "method": "POST",
+      "path": "/packs/install",
+      "operationId": "post_packs_install"
+    },
+    {
+      "method": "POST",
+      "path": "/demo/scenarios",
+      "operationId": "post_demo_scenarios"
+    },
+    {
+      "method": "POST",
+      "path": "/demo/reset",
+      "operationId": "post_demo_reset"
+    },
+    {
+      "method": "POST",
+      "path": "/demo/feedback",
+      "operationId": "post_demo_feedback"
+    },
+    {
+      "method": "GET",
+      "path": "/health/live",
+      "operationId": "get_health_live"
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "operationId": "get_health_ready"
+    }
+  ]
+}

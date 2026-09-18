@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T10:16:52+00:00",
+  "updated_at": "2026-09-18T11:22:39+00:00",
   "releases": [
     {
       "id": "P00",
@@ -373,13 +373,13 @@ window.LARA_BUILD_STATUS = {
       "depends_on": [],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T01",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Fixed deterministic branding assets and cross-platform verify/setup. Clean-clone full stack, worker and version manifest remain.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:15+00:00"
+      "note": "Pinned toolchain, Supabase onboarding and full-stack dev launcher verified locally; clean-machine operator bootstrap review remains.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:27+00:00"
     },
     {
       "id": "P00-02",
@@ -391,13 +391,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T02",
-      "status": "done",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Generated local session secret, removed fallback; strict runtime configuration validated at startup. Local-file baseline; external secret-manager rotation remains a deployment concern.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:15+00:00"
+      "note": "Local-file configuration and startup rejection verified. Reopened completion pending the specified overlapping-key rotation and secret-reference review.",
+      "evidence": "docs/development/P00-REVIEW.md; seven foundation tests pass; no production vault deployment claimed.",
+      "updated_at": "2026-09-18T11:22:39+00:00"
     },
     {
       "id": "P00-03",
@@ -409,13 +409,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T03/P00-T05",
-      "status": "in_progress",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Migration 0006 applied; clean-schema upgrade, checksum rejection and runtime DDL negatives pass. Dedicated migrator provisioning and clean-database CI remain.",
-      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
-      "updated_at": "2026-09-18T09:54:43+00:00"
+      "note": "Dedicated migrator owns LARA objects; PostgreSQL 18 fresh/upgrade migration, checksums, rollback and runtime denial passed in CI.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:27+00:00"
     },
     {
       "id": "P00-04",
@@ -427,13 +427,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T04",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review.",
-      "evidence": "2026-09-18 user confirmation; four Playwright browser checks passed; Supabase subject-isolation test passed.",
-      "updated_at": "2026-09-18T10:16:52+00:00"
+      "note": "Real Supabase login confirmed by owner. PKCE, encrypted session, signed BFF identity and forced runtime RLS verified.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:28+00:00"
     },
     {
       "id": "P00-05",
@@ -449,9 +449,9 @@ window.LARA_BUILD_STATUS = {
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Fixed Linux Python execution, added foundation/asset/spec checks and fail-closed release checker. Remote main, enforced checks and scan gates still need implementation.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:17+00:00"
+      "note": "Both CI jobs green. Generated-contract drift gate added; required branch checks and final CI rerun remain.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:28+00:00"
     },
     {
       "id": "P00-06",
@@ -463,13 +463,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T06",
-      "status": "in_progress",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Unassigned subjects denied; runs require operator assignment. Nine demo tables enforce RLS. Dedicated target checks and complete session reset remain.",
-      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
-      "updated_at": "2026-09-18T09:54:44+00:00"
+      "note": "Confirmed dedicated demo marker, production seed refusal and per-subject run entitlement. P01 reset remains disabled.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:29+00:00"
     },
     {
       "id": "P00-07",
@@ -485,9 +485,9 @@ window.LARA_BUILD_STATUS = {
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Authenticated version API returns schema 0006; unsigned requests denied; readiness passes. Structured telemetry and alerts remain.",
-      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
-      "updated_at": "2026-09-18T09:54:45+00:00"
+      "note": "Live local stack healthy; worker heartbeat and safe request logs verified. Negative readiness recovery and alert-route verification remain.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:29+00:00"
     },
     {
       "id": "P00-08",
@@ -503,9 +503,9 @@ window.LARA_BUILD_STATUS = {
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:18+00:00"
+      "note": "12-table nonempty restore and corruption rejection passed. Accurate provenance manifest and setup guide added; signed release workflow and artifact attestation remain.",
+      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
+      "updated_at": "2026-09-18T11:22:30+00:00"
     },
     {
       "id": "P01-01",
@@ -5521,54 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T08:53:16+00:00",
-      "id": "P00-08",
-      "action": "blocked",
-      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
-    },
-    {
-      "at": "2026-09-18T09:02:06+00:00",
-      "id": "P00-03",
-      "action": "in_review",
-      "note": "Supabase migration runner applied and reran cleanly; lara_api pooler role provisioned and verified over TLS. Clean/prior-release database rehearsal remains."
-    },
-    {
-      "at": "2026-09-18T09:03:37+00:00",
-      "id": "P00-06",
-      "action": "in_review",
-      "note": "Supabase demo schema is live; local seed remains demo-mode guarded."
-    },
-    {
-      "at": "2026-09-18T09:06:05+00:00",
-      "id": "P00-08",
-      "action": "done",
-      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
-    },
-    {
-      "at": "2026-09-18T09:16:16+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login."
-    },
-    {
-      "at": "2026-09-18T09:19:23+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states."
-    },
-    {
-      "at": "2026-09-18T09:24:28+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
-    },
-    {
-      "at": "2026-09-18T09:24:33+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
-    },
-    {
       "at": "2026-09-18T09:35:29+00:00",
       "id": "P01-03",
       "action": "in_review",
@@ -5699,6 +5651,54 @@ window.LARA_BUILD_STATUS = {
       "id": "P00-04",
       "action": "in_review",
       "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review."
+    },
+    {
+      "at": "2026-09-18T11:22:27+00:00",
+      "id": "P00-01",
+      "action": "in_review",
+      "note": "Pinned toolchain, Supabase onboarding and full-stack dev launcher verified locally; clean-machine operator bootstrap review remains."
+    },
+    {
+      "at": "2026-09-18T11:22:27+00:00",
+      "id": "P00-03",
+      "action": "done",
+      "note": "Dedicated migrator owns LARA objects; PostgreSQL 18 fresh/upgrade migration, checksums, rollback and runtime denial passed in CI."
+    },
+    {
+      "at": "2026-09-18T11:22:28+00:00",
+      "id": "P00-04",
+      "action": "done",
+      "note": "Real Supabase login confirmed by owner. PKCE, encrypted session, signed BFF identity and forced runtime RLS verified."
+    },
+    {
+      "at": "2026-09-18T11:22:28+00:00",
+      "id": "P00-05",
+      "action": "in_progress",
+      "note": "Both CI jobs green. Generated-contract drift gate added; required branch checks and final CI rerun remain."
+    },
+    {
+      "at": "2026-09-18T11:22:29+00:00",
+      "id": "P00-06",
+      "action": "done",
+      "note": "Confirmed dedicated demo marker, production seed refusal and per-subject run entitlement. P01 reset remains disabled."
+    },
+    {
+      "at": "2026-09-18T11:22:29+00:00",
+      "id": "P00-07",
+      "action": "in_progress",
+      "note": "Live local stack healthy; worker heartbeat and safe request logs verified. Negative readiness recovery and alert-route verification remain."
+    },
+    {
+      "at": "2026-09-18T11:22:30+00:00",
+      "id": "P00-08",
+      "action": "in_progress",
+      "note": "12-table nonempty restore and corruption rejection passed. Accurate provenance manifest and setup guide added; signed release workflow and artifact attestation remain."
+    },
+    {
+      "at": "2026-09-18T11:22:39+00:00",
+      "id": "P00-02",
+      "action": "in_review",
+      "note": "Local-file configuration and startup rejection verified. Reopened completion pending the specified overlapping-key rotation and secret-reference review."
     }
   ]
 };
