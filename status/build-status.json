@@ -233,18 +233,18 @@
       "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P04-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
-      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
-      "evidence": "Full browser suite 24/24 locally (demo + production composition, Supabase); CI run pending",
-      "updated_at": "2026-09-18T23:17:39+00:00"
+      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded: seeded browser suite incl. the sales journey on the production composition, verify + images",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     "P04-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
-      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft.",
-      "evidence": "scripts/test-p02-load.mjs issuance profile measured locally (report mode); CI run with LARA_LOAD_ASSERT=1 pending",
-      "updated_at": "2026-09-18T23:17:39+00:00"
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded with LARA_LOAD_ASSERT=1 (issuance profile) and fresh/upgrade migration and restore checks",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     "P04-06": {
       "status": "blocked",
@@ -1950,7 +1950,19 @@
       "id": "P04-06",
       "action": "blocked",
       "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter."
+    },
+    {
+      "at": "2026-09-18T23:40:31+00:00",
+      "id": "P04-04",
+      "action": "done",
+      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-18T23:40:31+00:00",
+      "id": "P04-05",
+      "action": "done",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft."
     }
   ],
-  "updated_at": "2026-09-18T23:17:39+00:00"
+  "updated_at": "2026-09-18T23:40:31+00:00"
 }
