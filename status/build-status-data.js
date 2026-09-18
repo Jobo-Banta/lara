@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T14:36:46+00:00",
+  "updated_at": "2026-09-18T14:42:39+00:00",
   "releases": [
     {
       "id": "P00",
@@ -373,13 +373,13 @@ window.LARA_BUILD_STATUS = {
       "depends_on": [],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T01",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Pinned toolchain, Supabase onboarding and full-stack dev launcher verified locally; clean-machine operator bootstrap review remains.",
-      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
-      "updated_at": "2026-09-18T11:22:27+00:00"
+      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented.",
+      "evidence": "CI 35357486680 verify passed; pnpm setup and local web/API 200 plus worker readiness passed.",
+      "updated_at": "2026-09-18T14:42:39+00:00"
     },
     {
       "id": "P00-02",
@@ -445,13 +445,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T07",
-      "status": "in_progress",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Both CI jobs green. Generated-contract drift gate added; required branch checks and final CI rerun remain.",
-      "evidence": "docs/development/P00-REVIEW.md; GitHub CI 35339015868 passed; local verification recorded 2026-09-18.",
-      "updated_at": "2026-09-18T11:22:28+00:00"
+      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed.",
+      "evidence": "CI 35357486680 all four jobs successful; GitHub protection read-back verified contexts and no force-push/deletion.",
+      "updated_at": "2026-09-18T14:42:39+00:00"
     },
     {
       "id": "P00-06",
@@ -5521,18 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T09:35:31+00:00",
-      "id": "P01-06",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:31+00:00",
-      "id": "P01-07",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
       "at": "2026-09-18T09:35:32+00:00",
       "id": "P01-08",
       "action": "in_review",
@@ -5699,6 +5687,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P00-08",
       "action": "in_review",
       "note": "Signed-tag workflow, verification key, tested-image archives/SBOMs and deployment runbook implemented. CI and actual signed artifact delivery still required."
+    },
+    {
+      "at": "2026-09-18T14:42:39+00:00",
+      "id": "P00-01",
+      "action": "done",
+      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented."
+    },
+    {
+      "at": "2026-09-18T14:42:39+00:00",
+      "id": "P00-05",
+      "action": "done",
+      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
     }
   ]
 };

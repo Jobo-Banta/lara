@@ -1,48 +1,32 @@
 # P00 implementation review — 18 September 2026
 
-## Scope and approved exception
+The owner approved retaining the public repository Jobo-Banta/lara and using Supabase for development. Credentials and the automation signing private key remain in ignored local files. The source contains only public certificate/signing verification material.
 
-The owner explicitly approved retaining public GitHub repository Jobo-Banta/lara. Credentials remain in ignored .env.local. Supabase is the selected local-development database; the inspected project runs PostgreSQL 17.6. CI independently tests PostgreSQL 18.
+## Acceptance evidence
 
-## Verified evidence
+CI https://github.com/Jobo-Banta/lara/actions/runs/35357486680 passed all four jobs for 854bfb63c08a8cdd8aef54bf73a5a3d4ae676529: verify, image (web), image (api), image (worker). It delivered the engineering artifact plus three scanned image archives, CycloneDX SBOMs and immutable image IDs.
 
-- Real Supabase Auth login, PKCE and consent succeeded. The owner confirmed return to LARA signed in on 18 September 2026. A verified Auth subject has an isolated empty demo workspace; shared fixtures remain inaccessible.
-- Signed, short-lived BFF identities bind subject, audience, method and path. Browser tokens are kept in encrypted HttpOnly cookies. Nine demo tables enforce RLS. Real runtime tests passed missing-scope, cross-run read/write/insert denial, RLS alteration denial and transaction-scope cleanup.
-- Dedicated lara_migrator was provisioned and assigned ownership of LARA schemas and migration metadata. Runtime roles remain non-owner, non-superuser and without BYPASSRLS. All seven checked migrations replay as a no-op.
-- PostgreSQL 18 CI passed genuine fresh and previous-version database migrations, checksum/rollback checks, role isolation and restore rehearsals.
-- Supabase snapshot rehearsal restored and compared content hashes for 12 tables: seven migrations, one environment marker, two seed executions, two demo runs, three tasks, two invoices and other nonempty synthetic fixtures. Corrupted snapshot content was rejected. Restoration is transactionally rolled back.
-- Demo seeding checks explicit demo mode, operator confirmation and database marker. Two executions preserved fixture counts. Production mode is rejected before connection.
-- Seven foundation tests and four Chromium smoke tests passed. Protected work/overview pages render dynamically, including builds without local secrets. Anonymous BFF and cross-origin command requests are denied.
-- CI run https://github.com/Jobo-Banta/lara/actions/runs/35339015868 passed both verify and image jobs for b4e1dfd: build/types, tests, PostgreSQL 18, dependency audit, gitleaks, specification/tracker validation and container vulnerability scan.
-- Next 15.5.24, React 19.1.7 and patched transitive dependencies have no reported production dependency audit vulnerabilities. The runtime container excludes package-manager tooling and applies base OS security updates.
-- pnpm verify additionally checks deterministic generated OpenAPI operation metadata. Local verification passed; this addition still requires its subsequent CI run.
-- README documents Supabase setup; infra/toolchain.json records tool versions. pnpm dev starts API, waits for readiness, then starts worker/web. The restarted local stack returned web 200, API readiness 200 and worker ready heartbeat.
-- Structured API logs include request ID, status and duration without payloads. Local worker emits readiness/dependency events. No external alert destination is claimed.
-- Release manifest now derives the actual commit, lockfile digest and all migration checksums; it does not attest a release.
-
-## Remaining phase gates
-
-P00 is not yet shipped. Do not conflate successful login or green CI with an engineering release.
-
-| Ticket | Remaining gate |
+| Case | Verified outcome |
 | --- | --- |
-| P00-01 | Complete clean-machine operator bootstrap review against the setup contract; local stack and clean CI web startup pass. |
-| P00-02 | Local-file secret baseline passes. Managed secret references and overlapping-key rotation remain unverified; do not claim a production secret-management deployment. |
-| P00-03 | Acceptance passed: provisioned roles, real fresh/upgrade databases, repeat/checksum/failure tests. |
-| P00-04 | Acceptance passed: real-provider sign-in, scoped BFF identity and runtime RLS negatives. |
-| P00-05 | Enforce required main-branch checks and rerun CI with the generated-contract gate. |
-| P00-06 | Demo target and runtime entitlement checks pass. Full session scenario seeding/reset is P01 work and remains disabled. |
-| P00-07 | Negative dependency readiness/recovery and alert-route verification remain. |
-| P00-08 | Signed release tag, release workflow/SBOM/digests and final engineering artifact delivery/attestation remain. Nonempty restore gate now passes. |
+| P00-T01 | Clean CI checkout builds web, runs isolated authenticated seeded browser workspace, starts API and worker with non-owner roles. Local pnpm setup checks Node/Python, Supabase runtime DB and OIDC discovery; pnpm dev runs all services. Web and API readiness return 200; worker emits ready heartbeat. |
+| P00-T02 | Ten foundation/security tests pass: missing/invalid configuration fails safely; mounted/env secret references work; explicit previous-key overlap preserves sessions and API signatures until expiry; tampered cookies/tokens fail. |
+| P00-T03 | Seven migrations replay as no-op on Supabase. Changed content is rejected; failed versions leave no metadata. Line-ending normalization is portable. One exact historical mixed-ending checksum is mapped without editing SQL or stored migration metadata. |
+| P00-T04 | The owner confirmed successful real Supabase login/consent and return to LARA. PKCE, encrypted HttpOnly sessions and scoped signed BFF identity pass. Nine tables force RLS; missing/cross-subject read/write/insert and RLS alteration are denied. |
+| P00-T05 | PostgreSQL 18 clean and previous-version databases migrate in CI; Supabase PostgreSQL 17.6 separately passes live rehearsals. Dedicated migrator owns LARA objects; runtime cannot alter schemas. |
+| P00-T06 | Seeding requires explicit demo mode, confirmation and the dedicated demo marker. Two runs preserve fixture counts; production mode is rejected before connection. Unassigned subjects cannot access shared fixtures. |
+| P00-T07 | GitHub main protection requires verify plus all three image jobs, strict up-to-date checks and pull requests, including admins. Force-push/deletion are disabled. Release-source verification rejects failed/mismatched CI. Contract/schema, deterministic assets, tracker, dependency/secret/image scans pass. |
+| P00-T08 | Rollback-only snapshot restoration verifies hashes for 12 tables with nonempty tasks, invoices and other fixtures; corruption is rejected. Engineering artifact delivery is staged in CI; signed release publication remains the final gate. |
 
-No production finance module, external monitoring service or cloud deployment is activated by this review.
+## Operational evidence
 
-## Follow-up: rotation, recovery and release delivery
+The isolated dependency test proves live=200/ready=503 with an unavailable DB, safe stderr alert routing and a trace received by a local OTLP/HTTP collector. A healthy replacement recovers ready=200. The test never stops Supabase. The API exposes random request/trace IDs, bounded dependency timeouts and authenticated version/schema metadata. Worker non-owner readiness passes.
 
-Bounded previous-key verification is implemented for both session/consent cookies and BFF API identities. Mounted-file and environment secret references, deadline expiry, malformed configuration and tamper rejection pass ten foundation/security tests. See SESSION-KEY-ROTATION.md.
+SESSION-KEY-ROTATION.md describes coordinated overlap across web/API replicas. Existing real login keys were not rotated. Mounted secret-manager values are supported; no cloud vault or external pager is claimed deployed.
 
-The isolated readiness failure/replacement test passed against Supabase: live 200, ready 503, safe stderr alert and OTLP/HTTP trace capture, then ready 200 with a healthy replacement. Worker non-owner readiness passed. No external paging destination is claimed.
+README.md and infra/deployment/README.md document setup, release-image loading, health checks and rollback boundaries. infra/toolchain.json records versions and a measured local development observation. Development output is isolated from production builds.
 
-Bootstrap now validates Node/Python, the runtime database and OIDC discovery. Dev and build outputs are separate. Migration checksums normalize line endings; the exact historical mixed-ending checksum for 0004 is explicitly mapped to its canonical content. No SQL migration or stored checksum was altered. Content-change rejection and no-op replay still pass.
+## Release boundary
 
-CI now includes an isolated seeded authenticated browser workspace, worker checks and failure/recovery tests. Three image targets are scanned, archived and paired with CycloneDX SBOMs and image IDs. The release workflow verifies a signed tag and exact successful CI source before delivering those tested artifacts. These workflow additions still require passing CI before release attestation.
+P00 is an engineering baseline, not production finance. The signed-tag workflow verifies tag signature and exact successful CI source, retrieves already-built/scanned images and publishes their archives/SBOMs/provenance. P00 remains unshipped until that workflow delivers the release and the tracker records its evidence.
+
+Full session scenario seeding/reset remains P01 work; reset is disabled. No production accounting, tax compliance activation or cloud deployment is attested.

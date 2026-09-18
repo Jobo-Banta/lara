@@ -11,5 +11,12 @@
     "ram_gb": 8,
     "disk_gb": 20
   },
-  "resources_measured": false
+  "resources_measured": true,
+  "development_observation": {
+    "platform": "Windows",
+    "node_process_count": 5,
+    "scope": "Idle web/API/worker stack; not production sizing",
+    "recorded_utc": "2026-09-18T14:42:38.8606934Z",
+    "working_set_mib": 990.2
+  }
 }
