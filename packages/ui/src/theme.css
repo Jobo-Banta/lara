@@ -19,7 +19,14 @@ body {
   color: var(--color-text);
   font-family: Manrope, system-ui, sans-serif;
 }
-.lara-shell { min-height: 100vh; }
+.lara-shell { min-height: 100vh; display: flex; }
+.lara-nav { width: 250px; flex: 0 0 250px; padding: 24px 18px; background: var(--color-navigation); color: #fff; }
+.lara-nav nav { display: grid; gap: 6px; margin-top: 32px; }
+.lara-nav a, .nav-disabled { padding: 11px 12px; border-radius: 8px; color: #d9e8e8; text-decoration: none; }
+.lara-nav a:hover, .lara-nav a.active { background: #2e4b52; color: #fff; }
+.nav-disabled { color: #8ea3a6; }
+.demo-badge { display: inline-block; margin: 22px 0 0; padding: 5px 8px; border: 1px solid #69d5c4; border-radius: 999px; color: #b7f0e7; font-size: .75rem; }
+.lara-content { flex: 1; min-width: 0; }
 .lara-header {
   display: flex;
   align-items: center;
@@ -27,6 +34,7 @@ body {
   padding: 16px 24px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  justify-content: space-between;
 }
 .lara-panel {
   max-width: 720px;
@@ -35,6 +43,34 @@ body {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
+}
+.hero-panel { margin: 7vh auto 24px; }
+.user-actions, .action-row { display: flex; align-items: center; gap: 14px; }
+.user-actions a { color: var(--color-accent); }
+.button { display: inline-block; padding: 11px 16px; border-radius: 8px; background: var(--color-accent); color: #fff !important; text-decoration: none; font-weight: 700; }
+.button.secondary { background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent) !important; }
+.metric-grid, .overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 920px; margin: 0 auto; padding: 0 24px 32px; }
+.metric-card, .overview-grid article { display: grid; gap: 8px; padding: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; }
+.metric-card span, .overview-grid span, .metric-card small, .overview-grid small { color: var(--color-text-muted); }
+.metric-card strong, .overview-grid strong { font-size: 1.35rem; }
+.workspace-page { max-width: 960px; margin: 0 auto; padding: 48px 24px; }
+.page-intro { color: var(--color-text-muted); }
+.task-list { display: grid; gap: 12px; margin: 28px 0; }
+.task-list article { display: flex; justify-content: space-between; gap: 20px; padding: 18px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; }
+.task-list article div { display: grid; gap: 6px; }
+.task-list span { color: var(--color-text-muted); font-size: .9rem; }
+.status { align-self: start; color: var(--color-success); }
+.status.warning { color: var(--color-warning); }
+.status.neutral { color: var(--color-text-muted); }
+.back-link { color: var(--color-accent); }
+@media (max-width: 760px) {
+  .lara-shell { display: block; }
+  .lara-nav { width: auto; }
+  .lara-nav nav { display: flex; overflow-x: auto; margin-top: 20px; }
+  .lara-header { align-items: flex-start; gap: 14px; flex-direction: column; }
+  .lara-panel { margin: 5vh 16px 20px; }
+  .metric-grid, .overview-grid { grid-template-columns: 1fr; padding: 0 16px 24px; }
+  .action-row { flex-wrap: wrap; }
 }
 .eyebrow { color: var(--color-accent); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }

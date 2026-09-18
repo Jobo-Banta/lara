@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T09:16:16+00:00",
+  "updated_at": "2026-09-18T09:19:23+00:00",
   "releases": [
     {
       "id": "P00",
@@ -515,15 +515,15 @@ window.LARA_BUILD_STATUS = {
       "depends_on": [],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T05",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on_releases": [
         "P00"
       ],
       "spec_status": "ready_for_implementation",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Codex",
+      "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states.",
+      "evidence": "pnpm run build passed; home, /work, and /overview returned HTTP 200.",
+      "updated_at": "2026-09-18T09:19:23+00:00"
     },
     {
       "id": "P01-02",
@@ -5591,6 +5591,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P00-04",
       "action": "in_review",
       "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login."
+    },
+    {
+      "at": "2026-09-18T09:19:23+00:00",
+      "id": "P01-01",
+      "action": "in_progress",
+      "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states."
     }
   ]
 };

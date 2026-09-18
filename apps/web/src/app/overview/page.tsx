@@ -1,0 +1,3 @@
+export default function OverviewPage() {
+  return <main className="workspace-page"><p className="eyebrow">Overview · Demo</p><h1>Finance signals at a glance</h1><p className="page-intro">All totals are synthetic, with an as-of date and simulation label.</p><div className="overview-grid"><article><span>Accounts receivable overdue</span><strong>PHP 126,400.00</strong><small>4 synthetic documents</small></article><article><span>Accounts payable overdue</span><strong>PHP 74,800.00</strong><small>3 synthetic documents</small></article><article><span>Next obligation</span><strong>Payroll review</strong><small>Due 20 September · simulated</small></article></div><a className="back-link" href="/">← Back to workspace</a></main>;
+}
