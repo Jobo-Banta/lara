@@ -4,13 +4,13 @@ Open [LARA build status](../../build-status.html). This working repository utili
 
 ## Open and keep current
 
-Double-click `build-status.html` for an offline snapshot; use its Refresh button after updating the data. For automatic refresh, run from the repository root with Python 3.10 or newer:
+Double-click `build-status.html` for an offline snapshot; use its Refresh button after updating the data. The tracker starts automatically with `pnpm dev`. To start it separately, run from the repository root:
 
 ```powershell
-python -m http.server 8765 --bind 127.0.0.1
+pnpm status:serve
 ```
 
-Open `http://127.0.0.1:8765/build-status.html`. The page reads generated status JSON every five seconds; connection failures retain the last good snapshot and display a warning. It does not infer progress from time, documentation readiness or files appearing. Progress becomes visible after a developer or automation records an update. This local server exposes workspace files only on loopback; stop with Ctrl+C. For shared hosting, publish only the tracker, generated read-only data, linked specs and approved web assets to an authenticated internal host. Never expose the whole repository or secrets through a public directory server.
+Open `http://127.0.0.1:8765/build-status.html`. The page reads generated status JSON every five seconds; connection failures retain the last good snapshot and display a warning. It does not infer progress from time, documentation readiness or files appearing. Progress becomes visible after a developer or automation records an update. This server binds only to loopback and serves an explicit allowlist of tracker files, specifications and branding assets; credentials and other workspace files return 404. Stop a standalone server with Ctrl+C. If the address refuses a connection, start it with `pnpm status:serve` or `pnpm dev`. For shared hosting, publish only the tracker, generated read-only data, linked specs and approved web assets to an authenticated internal host. Never expose the whole repository or secrets through a public directory server.
 
 ## Record actual work
 
