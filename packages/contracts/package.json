@@ -1,0 +1,1 @@
+{"name":"@lara/contracts","private":true,"version":"0.0.1","type":"module","exports":{".":"./src/index.mjs"},"dependencies":{"ajv":"8.20.0","ajv-formats":"3.0.1"}}

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T17:00:58+00:00",
+  "updated_at": "2026-09-18T17:21:53+00:00",
   "releases": [
     {
       "id": "P00",
@@ -734,15 +734,15 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P01"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata.",
+      "evidence": "Local 2026-09-19: scripts/test-p02-schema.mjs 15 groups PASS on Supabase PostgreSQL 17.6; tests/contracts.test.mjs 6/6; foundation 17/17; restore rehearsal includes new tables; migration applied to engineering database. CI pending push.",
+      "updated_at": "2026-09-18T17:21:53+00:00"
     },
     {
       "id": "P02-02",
@@ -5521,18 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-01",
-      "action": "done",
-      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented."
-    },
-    {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-05",
-      "action": "done",
-      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
-    },
-    {
       "at": "2026-09-18T14:51:41+00:00",
       "id": "P00-08",
       "action": "done",
@@ -5699,6 +5687,18 @@
       "id": "P01-09",
       "action": "in_review",
       "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
+    },
+    {
+      "at": "2026-09-18T17:03:09+00:00",
+      "id": "P02-01",
+      "action": "in_progress",
+      "note": "Designing production workspace schema (tenant/entity tables, approval, evidence, tasks, obligations, durable operation tables), RLS, immutable audit chain, permission and role template seeds, typed contract validators."
+    },
+    {
+      "at": "2026-09-18T17:21:53+00:00",
+      "id": "P02-01",
+      "action": "in_review",
+      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata."
     }
   ]
 }
