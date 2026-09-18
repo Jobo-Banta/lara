@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T09:06:05+00:00",
+  "updated_at": "2026-09-18T09:16:16+00:00",
   "releases": [
     {
       "id": "P00",
@@ -427,13 +427,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T04",
-      "status": "blocked",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "OIDC issuer and client credentials are not available; identity provider integration cannot be verified.",
-      "evidence": "",
-      "updated_at": "2026-09-18T08:53:13+00:00"
+      "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login.",
+      "evidence": "OIDC discovery returned 200; /api/auth/login returned 307 with state/nonce and callback rejected invalid state with 400.",
+      "updated_at": "2026-09-18T09:16:16+00:00"
     },
     {
       "id": "P00-05",
@@ -5585,6 +5585,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P00-08",
       "action": "done",
       "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
+    },
+    {
+      "at": "2026-09-18T09:16:16+00:00",
+      "id": "P00-04",
+      "action": "in_review",
+      "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login."
     }
   ]
 };
