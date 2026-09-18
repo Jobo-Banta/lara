@@ -51,11 +51,11 @@
       "updated_at": "2026-09-18T14:36:45+00:00"
     },
     "P00-08": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Codex",
-      "note": "Signed-tag workflow, verification key, tested-image archives/SBOMs and deployment runbook implemented. CI and actual signed artifact delivery still required.",
-      "evidence": "Nonempty restore passed; release source gate rejects mismatched CI; release workflow and signing trust source awaiting CI.",
-      "updated_at": "2026-09-18T14:36:46+00:00"
+      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance.",
+      "evidence": "docs/development/releases/0.0.1.md; CI 35358280423 and release 35358571786 passed; all ten assets uploaded.",
+      "updated_at": "2026-09-18T14:51:41+00:00"
     },
     "P01-01": {
       "status": "in_progress",
@@ -1138,8 +1138,8 @@
   },
   "releases": {
     "P00": {
-      "released_at": null,
-      "evidence": ""
+      "released_at": "2026-09-18T14:51:41+00:00",
+      "evidence": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
     },
     "P01": {
       "released_at": null,
@@ -1542,7 +1542,19 @@
       "id": "P00-05",
       "action": "done",
       "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
+    },
+    {
+      "at": "2026-09-18T14:51:41+00:00",
+      "id": "P00-08",
+      "action": "done",
+      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance."
+    },
+    {
+      "at": "2026-09-18T14:51:41+00:00",
+      "id": "P00",
+      "action": "release",
+      "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
     }
   ],
-  "updated_at": "2026-09-18T14:42:39+00:00"
+  "updated_at": "2026-09-18T14:51:41+00:00"
 }
