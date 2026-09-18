@@ -1,0 +1,50 @@
+# Synthetic prototype only. Secrets are supplied in the Render dashboard.
+services:
+  - type: web
+    name: lara-demo
+    runtime: docker
+    region: singapore
+    plan: standard
+    dockerfilePath: ./infra/containers/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health/ready
+    autoDeployTrigger: off
+    envVars:
+      - key: LARA_MODE
+        value: demo
+      - key: API_INTERNAL_URL
+        value: http://127.0.0.1:4000
+      - key: APP_BASE_URL
+        sync: false
+      - key: OIDC_REDIRECT_URI
+        sync: false
+      - key: OIDC_ISSUER
+        sync: false
+      - key: OIDC_CLIENT_ID
+        sync: false
+      - key: OIDC_CLIENT_SECRET
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: WORKER_DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET_REF
+        value: local-file
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: OBJECT_ADAPTER
+        value: filesystem
+      - key: OBJECT_BUCKET
+        value: /tmp/lara-demo
+      - key: OBJECT_REGION
+        value: singapore
+      - key: MAIL_ADAPTER
+        value: local
+      - key: EINVOICE_ADAPTER
+        value: fixture
+      - key: AI_ADAPTER
+        value: fixture
+      - key: RULE_PROFILE_ID
+        value: fixture-p01

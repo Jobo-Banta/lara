@@ -1,3 +1,2 @@
-import JourneyPage from "../../_components/journey-page";
-export default function Page() { return <JourneyPage config={{ eyebrow: "Scenarios", title: "Demo scenarios", endpoint: "/demo/scenarios" }} />; }
-
+import DemoWorkspace from "../../_components/demo-workspace";
+export default function Page(){return <DemoWorkspace/>;}

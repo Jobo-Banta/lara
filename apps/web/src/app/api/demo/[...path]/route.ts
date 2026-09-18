@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
+import { authConfig } from '../../../../lib/auth';
 import { scopedFetch } from '../../../../lib/api';
 async function handle(request: NextRequest, context: {params:Promise<{path:string[]}>}) {
-  if(request.method!=='GET' && request.headers.get('origin')!==request.nextUrl.origin) return Response.json({error:'Invalid request origin'},{status:403});
+  if(request.method!=='GET' && request.headers.get('origin')!==authConfig().appOrigin) return Response.json({error:'Invalid request origin'},{status:403});
   const {path}=await context.params;
   if(path.some(segment=>! /^[a-zA-Z0-9_-]+$/.test(segment))) return Response.json({error:'Invalid path'},{status:400});
   try {
