@@ -32,3 +32,11 @@ COPY --from=build --chown=node:node /app/apps/web/public ./apps/web/public
 EXPOSE 3000
 ENV HOSTNAME=0.0.0.0
 CMD ["node","apps/web/server.js"]
+
+# Single-service synthetic host: API stays on loopback; only Next.js is public.
+FROM api AS demo-host
+COPY --from=web --chown=node:node /app ./
+COPY --from=build --chown=node:node /app/apps/worker ./apps/worker
+COPY --from=build --chown=node:node /app/scripts/start-demo-host.mjs ./scripts/start-demo-host.mjs
+EXPOSE 3000
+CMD ["node","scripts/start-demo-host.mjs"]

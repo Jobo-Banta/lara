@@ -105,3 +105,5 @@ pre {white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;background:white;l
 .lara-nav :focus-visible {outline-color:#69d5c4;}
 .action-row {flex-wrap:wrap;margin:20px 0;}
 @media(max-width:760px){.workspace-page{padding:20px 16px;}.split-panel{grid-template-columns:1fr;}.filter-row{flex-direction:column;}.lara-nav nav a{white-space:nowrap;}.lara-header{flex-direction:row;}.lara-header p{font-size:.85rem;}.lara-nav{padding:16px;}}
+
+.workspace-actions {border:0;padding:0;margin:0;min-width:0;}

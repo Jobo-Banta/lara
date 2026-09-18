@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T15:55:53+00:00",
+  "updated_at": "2026-09-18T16:44:04+00:00",
   "releases": [
     {
       "id": "P00",
@@ -535,13 +535,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T01",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open.",
-      "evidence": "scripts/test-demo-workflows.mjs PASS 2026-09-18; migration 0008 applied; production build and 11 foundation tests passed.",
-      "updated_at": "2026-09-18T15:55:28+00:00"
+      "owner": "Claude Code",
+      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:03+00:00"
     },
     {
       "id": "P01-03",
@@ -553,13 +553,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T02",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Invoice API and screens added; DEMO-01 tax fixture yields PHP 11,200 and idempotent create plus submit/approve/post/collect transitions are exercised by smoke suite.",
-      "updated_at": "2026-09-18T15:55:52+00:00"
+      "owner": "Claude Code",
+      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-04",
@@ -571,13 +571,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T02",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Synthetic bill table and review screen added; low-confidence correction persists in Supabase and evidence id is exposed.",
-      "updated_at": "2026-09-18T15:55:52+00:00"
+      "owner": "Claude Code",
+      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-05",
@@ -589,13 +589,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T02",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Reconciliation table and screen added; exact and partial match endpoint exercised against statement fixtures.",
-      "updated_at": "2026-09-18T15:55:52+00:00"
+      "owner": "Claude Code",
+      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-06",
@@ -607,13 +607,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T02",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Compliance and close tables/screens added; required close task blocks lock preview until completion and endpoint is exercised.",
-      "updated_at": "2026-09-18T15:55:52+00:00"
+      "owner": "Claude Code",
+      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-07",
@@ -625,13 +625,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T04",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Evidence screen and synthetic evidence records added; all journey views expose simulation labels.",
-      "updated_at": "2026-09-18T15:55:52+00:00"
+      "owner": "Claude Code",
+      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-08",
@@ -643,13 +643,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T03/P01-T06/P01-T07",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
-      "evidence": "Scenario endpoint, reset action, scoped demo namespace and simulation labels added; reset smoke-tested.",
-      "updated_at": "2026-09-18T15:55:53+00:00"
+      "owner": "Claude Code",
+      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains.",
+      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P01-09",
@@ -679,13 +679,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T01..08",
-      "status": "in_review",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "owner": "Claude Code",
+      "note": "render.yaml, demo-host image target, loopback API supervisor and /api/health/ready prepared. Blocked: no hosting account, domain or dashboard secrets have been provisioned; deployment needs the owner.",
       "evidence": "Local production build passed with 18 routes; Supabase migration 0003/0004 applied; P01 API smoke suite passed. Hosted deployment and interactive eight-user gate remain release evidence.",
-      "updated_at": "2026-09-18T09:35:33+00:00"
+      "updated_at": "2026-09-18T16:44:04+00:00"
     },
     {
       "id": "P02-01",
@@ -5521,54 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T09:48:18+00:00",
-      "id": "P00-08",
-      "action": "in_progress",
-      "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain."
-    },
-    {
-      "at": "2026-09-18T09:54:43+00:00",
-      "id": "P00-03",
-      "action": "in_progress",
-      "note": "Migration 0006 applied; clean-schema upgrade, checksum rejection and runtime DDL negatives pass. Dedicated migrator provisioning and clean-database CI remain."
-    },
-    {
-      "at": "2026-09-18T09:54:44+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Signed BFF identity and forced subject-scoped RLS implemented. Seven tests and real Supabase cross-run read/write/insert/RLS-disable negatives pass. Real OIDC login/consent callback evidence remains."
-    },
-    {
-      "at": "2026-09-18T09:54:44+00:00",
-      "id": "P00-06",
-      "action": "in_progress",
-      "note": "Unassigned subjects denied; runs require operator assignment. Nine demo tables enforce RLS. Dedicated target checks and complete session reset remain."
-    },
-    {
-      "at": "2026-09-18T09:54:45+00:00",
-      "id": "P00-07",
-      "action": "in_progress",
-      "note": "Authenticated version API returns schema 0006; unsigned requests denied; readiness passes. Structured telemetry and alerts remain."
-    },
-    {
-      "at": "2026-09-18T09:54:45+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains."
-    },
-    {
-      "at": "2026-09-18T10:16:52+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review."
-    },
-    {
-      "at": "2026-09-18T11:22:27+00:00",
-      "id": "P00-01",
-      "action": "in_review",
-      "note": "Pinned toolchain, Supabase onboarding and full-stack dev launcher verified locally; clean-machine operator bootstrap review remains."
-    },
-    {
       "at": "2026-09-18T11:22:27+00:00",
       "id": "P00-03",
       "action": "done",
@@ -5699,6 +5651,54 @@ window.LARA_BUILD_STATUS = {
       "id": "P01-08",
       "action": "in_progress",
       "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T16:44:03+00:00",
+      "id": "P01-02",
+      "action": "in_review",
+      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-03",
+      "action": "in_review",
+      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-04",
+      "action": "in_review",
+      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-05",
+      "action": "in_review",
+      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-06",
+      "action": "in_review",
+      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-07",
+      "action": "in_review",
+      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-08",
+      "action": "in_review",
+      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
+    },
+    {
+      "at": "2026-09-18T16:44:04+00:00",
+      "id": "P01-10",
+      "action": "blocked",
+      "note": "render.yaml, demo-host image target, loopback API supervisor and /api/health/ready prepared. Blocked: no hosting account, domain or dashboard secrets have been provisioned; deployment needs the owner."
     }
   ]
 };

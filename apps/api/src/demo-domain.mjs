@@ -21,7 +21,7 @@ const line=(account,debit=0,credit=0)=>({account,debit:money(debit),credit:money
 function journal(s,source,kind,lines) {
  openPeriod(s);
  requireValue(lines.reduce((sum,l)=>sum+cents(l.debit)-cents(l.credit),0)===0,'Unbalanced simulation.');
- const entry={id:randomUUID(),number:`SIM-${String(s.journals.length+1).padStart(5,'0')}`,source,kind,lines,evidence:'evidence-source',date:today};s.journals.push(entry);return entry.number;
+ const entry={id:randomUUID(),number:`SIM-${String(s.journals.length+1).padStart(5,'0')}`,source,kind,lines,evidence:s.invoices.find(i=>i.id===source)?.evidence||s.bills.find(i=>i.id===source)?.evidence||(source.startsWith('bank-')?'evidence-bank':'evidence-source'),date:today};s.journals.push(entry);return entry.number;
 }
 export function seedWorkspace() {
  return {schema:1,run:randomUUID(),version:0,synthetic:true,actor:'Billing',branch:'HQ',company:'LARA Demo Finance',scenario:'DEMO-01',asOf:'2026-09-18T02:00:00Z',
@@ -37,7 +37,7 @@ export function balances(s) {
  const accounts={};for(const j of s.journals)for(const l of j.lines)accounts[l.account]=(accounts[l.account]||0)+cents(l.debit)-cents(l.credit);
  return Object.entries(accounts).map(([account,balance])=>({account,debit:money(Math.max(0,balance)),credit:money(Math.max(0,-balance)),balance:money(balance)}));
 }
-export function view(s) { const {receipts,...result}=s;return {...result,actors,scenarios,balances:balances(s)}; }
+export function view(s) { const {receipts,contexts,...result}=s;return {...result,actors,scenarios,balances:balances(s)}; }
 function editInvoice(b) {
  const customer=text(b.customer),issueDate=date(b.issueDate),dueDate=date(b.dueDate);requireValue(dueDate>=issueDate,'Due date must not precede issue date.');
  requireValue(Array.isArray(b.lines)&&b.lines.length>0&&b.lines.length<=30,'Add between one and thirty invoice lines.');
@@ -51,16 +51,18 @@ export function command(original,b) {
  const key=text(b.key,100);requireValue(/^[a-zA-Z0-9_-]+$/.test(key),'Invalid retry key.');
  if(b.run!==original.run)fail(409,'This demo run was reset. Reload before making another change.');
  const hash=createHash('sha256').update(JSON.stringify(b)).digest('hex');
- if(original.receipts[key]) {if(original.receipts[key].hash!==hash)fail(409,'Retry key already belongs to a different command.');return {state:original,result:original.receipts[key].result};}
+ if(Object.hasOwn(original.receipts,key)) {if(original.receipts[key].hash!==hash)fail(409,'Retry key already belongs to a different command.');return {state:original,result:original.receipts[key].result};}
  if(b.version!==original.version)fail(412,'Another action changed this workspace. Your draft is retained. Reload the latest version and merge explicitly.');
  const s=structuredClone(original),a=b.action;let source=b.id||'workspace',createdId;
  if(a==='switch-actor'){requireValue(actors.includes(b.actor),'Unknown demo identity.');s.actor=b.actor;}
- else if(a==='context'){requireValue(['HQ','Cebu'].includes(b.branch),'Unknown branch.');s.branch=b.branch;}
- else if(a==='reset') {requireValue(b.confirm==='RESET MY SYNTHETIC SESSION','Confirm the scope of this reset.');requireValue(scenarios.some(x=>x.id===b.scenario),'Select a scenario.');const fresh=seedWorkspace();fresh.scenario=b.scenario;fresh.version=s.version+1;return {state:fresh,result:{synthetic:true,run:fresh.run,version:fresh.version,message:'Only your demo session was reset.'}};}
+ else if(a==='context'){requireValue(['HQ','Cebu'].includes(b.branch),'Unknown branch.');const fields=['settings','invoices','bills','payments','lines','tasks','period','evidence','reporting','journals','events','comments','feedback'];
+   s.contexts ||= {};s.contexts[s.branch]=Object.fromEntries(fields.map(k=>[k,s[k]]));
+   const next=s.contexts[b.branch]||seedWorkspace();for(const k of fields)s[k]=next[k];s.branch=b.branch;}
+ else if(a==='reset') {requireValue(b.confirm==='RESET MY SYNTHETIC SESSION','Confirm the scope of this reset.');requireValue(scenarios.some(x=>x.id===b.scenario),'Select a scenario.');const fresh=seedScenario(b.scenario);fresh.version=s.version+1;return {state:fresh,result:{synthetic:true,run:fresh.run,version:fresh.version,message:'Only your demo session was reset.'}};}
  else if(a==='save-invoice') {
   allow(s,['Billing','Clerk']);const fields=editInvoice(b);
   if(b.id){const invoice=find(s.invoices,b.id);requireValue(['Draft','Submitted','Approved'].includes(invoice.status),'Posted sources are immutable. Create a linked correction.');Object.assign(invoice,fields,{status:'Draft',approvedBy:null});}
-  else {createdId=randomUUID();source=createdId;s.invoices.push({id:createdId,...fields,status:'Draft',creator:s.actor,approvedBy:null,delivery:'Not sent',reporting:'Not submitted',settlement:'Unpaid'});}
+  else {createdId=randomUUID();source=createdId;s.evidence.push({id:'invoice-evidence-'+createdId,title:'Synthetic invoice: '+fields.customer,status:'Available',related:'/sales/invoices/'+createdId,content:'SIMULATED — NOT A TAX DOCUMENT\n'+fields.customer+'\nTotal PHP '+fields.total});s.invoices.push({id:createdId,evidence:'invoice-evidence-'+createdId,...fields,status:'Draft',creator:s.actor,approvedBy:null,delivery:'Not sent',reporting:'Not submitted',settlement:'Unpaid'});}
  }
  else if(['submit-invoice','approve-invoice','post-invoice','collect-invoice','correct-invoice'].includes(a)) {
   const i=find(s.invoices,b.id);
@@ -75,7 +77,7 @@ export function command(original,b) {
   if(a==='save-bill'){allow(s,['Clerk']);requireValue(bill.status!=='Posted','Posted source is immutable.');bill.tin=text(b.tin);bill.correction=text(b.correction);requireValue(['PO','Non-PO'].includes(b.route),'Select the purchasing route.');bill.route=b.route;bill.status='Draft';bill.approvedBy=null;}
   if(a==='submit-bill'){allow(s,['Clerk']);requireValue(bill.status==='Draft'&&bill.tin&&bill.correction&&!bill.duplicate,'Correct the uncertain field and missing synthetic TIN before submitting.');requireValue(find(s.evidence,bill.evidence).status==='Available','Available evidence is required.');bill.status='Submitted';bill.submittedBy=s.actor;}
   if(a==='approve-bill'){allow(s,['Reviewer','Controller']);requireValue(bill.status==='Submitted','Submit this bill first.');if([bill.creator,bill.submittedBy].includes(s.actor))fail(403,'Self-approval is prohibited.');bill.status='Approved';bill.approvedBy=s.actor;}
-  if(a==='post-bill'){allow(s,['Reviewer','Controller']);requireValue(bill.status==='Approved','Approval required.');bill.number=journal(s,bill.id,'Supplier bill',[line('Expense',1000000),line('Test input VAT',120000),line('Accounts payable',0,1100000),line('Test withholding payable',0,20000)]);bill.status='Posted';s.payments.push({id:randomUUID(),bill:bill.id,beneficiary:bill.supplier,amount:'11000.00',authority:'Draft',release:'Not released',settlement:'Unpaid',changedBy:'Clerk',approvedBy:null});}
+  if(a==='post-bill'){allow(s,['Reviewer','Controller']);requireValue(bill.status==='Approved','Approval required.');bill.number=journal(s,bill.id,'Supplier bill',[line('Expense',1000000),line('Test input VAT',120000),line('Accounts payable',0,1100000),line('Test withholding payable',0,20000)]);bill.status='Posted';find(s.tasks,'review-bill').status='Complete';s.payments.push({id:randomUUID(),bill:bill.id,beneficiary:bill.supplier,amount:'11000.00',authority:'Draft',release:'Not released',settlement:'Unpaid',changedBy:'Clerk',approvedBy:null});}
  }
  else if(['save-payment','approve-payment','release-payment'].includes(a)) {
   const p=find(s.payments,b.id);requireValue(p.release==='Not released','Released payment is immutable.');
@@ -90,7 +92,7 @@ export function command(original,b) {
   l.allocations.push({id:randomUUID(),source:b.source||'explicit-fee',amount:money(amount),adjustment:!!b.adjustment});l.status=used+amount===cents(l.amount)?'Matched':'Partial';
  }
  else if(a==='resolve-reporting') {allow(s,['Tax']);const r=find(s.reporting,b.id);requireValue(r.status!=='Accepted','Already resolved.');r.history.push({status:r.status,reason:r.reason,repair:text(b.repair)});r.status='Accepted';r.reason='Simulated transport repair accepted; original source retained.';}
- else if(a==='complete-close') {allow(s,['Controller','Tax']);openPeriod(s);const t=find(s.period.tasks,b.id);requireValue(t.owner===s.actor,'Switch to the task owner.');requireValue(find(s.evidence,b.evidence).status==='Available','Available evidence is required.');if(t.id==='bank')requireValue(s.lines.every(x=>x.status==='Matched'),'Resolve all statement differences first.');if(t.id==='tax')requireValue(s.reporting.every(x=>x.status==='Accepted'),'Resolve rejected reporting first.');t.complete=true;t.evidence=b.evidence;}
+ else if(a==='complete-close') {allow(s,['Controller','Tax']);openPeriod(s);const t=find(s.period.tasks,b.id);requireValue(t.owner===s.actor,'Switch to the task owner.');requireValue(find(s.evidence,b.evidence).status==='Available','Available evidence is required.');if(t.id==='bank')requireValue(s.lines.every(x=>x.status==='Matched'),'Resolve all statement differences first.');if(t.id==='tax')requireValue(s.reporting.every(x=>x.status==='Accepted'),'Resolve rejected reporting first.');t.complete=true;t.evidence=b.evidence;if(t.id==='bank')find(s.tasks,'close-bank').status='Complete';}
  else if(a==='lock-period'){allow(s,['Reviewer','Controller']);openPeriod(s);requireValue(s.period.tasks.every(x=>x.complete&&x.evidence),'Complete required tasks and attach evidence first.');s.period.report=balances(s);s.period.locked=true;}
  else if(a==='assign-task'){allow(s,['Controller']);requireValue(actors.includes(b.owner),'Unknown owner.');find(s.tasks,b.id).owner=b.owner;}
  else if(a==='save-settings'){allow(s,['Controller']);s.settings={company:text(b.company),party:text(b.party),rolesReviewed:b.rolesReviewed===true};}
@@ -99,4 +101,26 @@ export function command(original,b) {
  else fail(404,'Unknown demo action.');
  event(s,source,a);s.version++;
  const result={synthetic:true,run:s.run,version:s.version,message:'Saved to your synthetic demo session.',...(createdId?{id:createdId}:{})};s.receipts[key]={hash,result};return {state:s,result};
+}
+
+export function seedScenario(scenario) {
+ let s=seedWorkspace();s.scenario=scenario;
+ const run=(action,fields={})=>{s=command(s,{action,...fields,run:s.run,version:s.version,key:randomUUID()}).state;};
+ const role=actor=>run('switch-actor',{actor});
+ if(scenario==='DEMO-02')s.actor='Clerk';
+ if(['DEMO-03','DEMO-04','DEMO-05','DEMO-06','DEMO-07','DEMO-08'].includes(scenario)){
+  run('save-invoice',{customer:'Northwind Services',issueDate:'2026-09-18',dueDate:'2026-10-18',terms:'30 days',lines:[{description:'Synthetic services',quantity:1,unitPrice:'10000.00'}]});
+  const id=s.invoices[0].id;
+  if(scenario!=='DEMO-08'){
+   run('submit-invoice',{id});role('Reviewer');run('approve-invoice',{id});
+   if(scenario!=='DEMO-03')run('post-invoice',{id});
+   if(['DEMO-05','DEMO-06'].includes(scenario)){role('Treasury');run('collect-invoice',{id});}
+   if(scenario==='DEMO-06'){
+    run('match-bank',{id:'bank-receipt',source:id,amount:'11200.00'});run('match-bank',{id:'bank-fee',amount:'50.00',adjustment:true});role('Tax');run('resolve-reporting',{id:s.reporting[0].id,repair:'Fixture buyer reference'});role('Controller');
+   }
+   if(scenario==='DEMO-04'){s.reporting.push({id:randomUUID(),source:id,status:'Unknown acknowledgement',reason:'Fixture transport timeout: verify receipt before retrying.',history:[]});role('Tax');}
+   if(scenario==='DEMO-07')role('Auditor');
+  }
+ }
+ s.version=0;s.receipts={};return s;
 }

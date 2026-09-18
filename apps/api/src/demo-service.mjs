@@ -1,4 +1,4 @@
-import {seedWorkspace,command,view,DemoError} from './demo-domain.mjs';
+import {seedWorkspace,command,view,balances,DemoError} from './demo-domain.mjs';
 
 export async function demoRequest(db,identity,method,path,body) {
  if(!identity.sid || !/^[a-zA-Z0-9_-]{16,100}$/.test(identity.sid))throw new DemoError(401,'A session-bound demo identity is required.');
@@ -11,6 +11,17 @@ export async function demoRequest(db,identity,method,path,body) {
   const {rows:[row]}=await db.query('select state from lara_demo.workspaces where owner_subject=$1 and session_id=$2 for update',[identity.sub,identity.sid]);
   let result;
   if(method==='GET'&&path==='/demo/workspace')result=view(row.state);
+  else if(method==='GET'&&path.startsWith('/demo/evidence/')) {
+   const evidence=row.state.evidence.find(e=>e.id===path.slice('/demo/evidence/'.length));
+   if(!evidence)throw new DemoError(404,'Evidence not found.');
+   if(evidence.status!=='Available')throw new DemoError(409,'Evidence is quarantined.');
+   result={synthetic:true,evidence};
+  }
+  else if(method==='GET'&&path==='/demo/export') {
+   if(!['Auditor','Controller'].includes(row.state.actor))throw new DemoError(403,'Auditor or Controller permission required.');
+   const rows=row.state.period.locked?row.state.period.report:balances(row.state);
+   result={synthetic:true,filename:'simulated-trial-balance.csv',content:'SIMULATED — NOT STATUTORY BOOKS\nAccount,Debit PHP,Credit PHP\n'+rows.map(r=>[r.account,r.debit,r.credit].join(',')).join('\n')};
+  }
   else if(method==='POST'&&path==='/demo/command') {
    const changed=command(row.state,body);
    await db.query('update lara_demo.workspaces set state=$3,updated_at=now() where owner_subject=$1 and session_id=$2',[identity.sub,identity.sid,changed.state]);result=changed.result;

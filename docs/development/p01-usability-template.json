@@ -1,0 +1,24 @@
+{
+  "status": "not_conducted",
+  "participants": [],
+  "openBlockingDefects": [],
+  "instructions": "Populate only after actual observed sessions; see P01-FACILITATOR.md.",
+  "participantShape": {
+    "code": "P01-U01",
+    "role": "Billing",
+    "inexperienced": true,
+    "observedAt": "",
+    "observer": "",
+    "tasks": [
+      {
+        "card": 1,
+        "completed": false,
+        "assisted": false,
+        "activeSeconds": null,
+        "rework": 0,
+        "helpRequests": 0,
+        "comment": ""
+      }
+    ]
+  }
+}

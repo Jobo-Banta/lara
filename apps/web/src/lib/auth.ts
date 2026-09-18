@@ -27,7 +27,7 @@ export function authConfig() {
   const redirectUri = env.OIDC_REDIRECT_URI || "http://localhost:3000/auth/callback";
   if (!issuer || !clientId || !clientSecret) throw new Error("OIDC configuration is incomplete");
   const keys = sessionKeys(env);
-  return { issuer, clientId, clientSecret, redirectUri, secret: keys.current, verificationKeys: keys.verification, publishableKey: env.SUPABASE_PUBLISHABLE_KEY };
+  return { appOrigin: new URL(env.APP_BASE_URL || redirectUri).origin, issuer, clientId, clientSecret, redirectUri, secret: keys.current, verificationKeys: keys.verification, publishableKey: env.SUPABASE_PUBLISHABLE_KEY };
 }
 
 export function stateToken() {

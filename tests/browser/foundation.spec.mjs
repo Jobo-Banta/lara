@@ -27,7 +27,7 @@ test('protected workspace does not silently display fallback data',async({page})
 test('seeded authenticated workspace is isolated in the clean CI database',async({page,context})=>{
  test.skip(!process.env.LARA_E2E_DATABASE_URL,'Requires the ephemeral CI database');
  const {seal}=await import('../../packages/config/src/session-cookie.mjs');
- await context.addCookies([{name:'lara_session',value:seal({sub:'ci-browser-subject',expiresAt:Date.now()+60000},'browser-fixture-session-key-32-characters'),url:'http://127.0.0.1:3015',httpOnly:true,sameSite:'Lax'}]);
+ await context.addCookies([{name:'lara_session',value:seal({sub:process.env.LARA_E2E_SUBJECT||'ci-browser-subject',expiresAt:Date.now()+60000},'browser-fixture-session-key-32-characters'),url:'http://127.0.0.1:3015',httpOnly:true,sameSite:'Lax'}]);
  await page.goto('/work');
  await expect(page.getByText('Review uncertain supplier bill')).toBeVisible();
  await expect(page.getByText('Harbor Cloud invoice fixture')).toHaveCount(0);
