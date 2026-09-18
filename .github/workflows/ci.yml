@@ -35,6 +35,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: node scripts/release-manifest.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: engineering-baseline
@@ -49,21 +50,44 @@ jobs:
             package.json
             pnpm-lock.yaml
             pnpm-workspace.yaml
-            docs/development/P00-REVIEW.md
+            docs/development
+            README.md
+            status
+            .local/release-manifest.json
             !**/node_modules/**
-            !**/.local/**
             !**/.env*
           include-hidden-files: true
 
   image:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [web, api, worker]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -f infra/containers/Dockerfile -t lara:engineering .
+      - run: docker build --build-arg BUILD_COMMIT=${{ github.sha }} -f infra/containers/Dockerfile --target ${{ matrix.target }} -t lara:${{ matrix.target }} .
       - uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: lara:engineering
+          image-ref: lara:${{ matrix.target }}
           format: table
           exit-code: '1'
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+
+      - uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: lara:${{ matrix.target }}
+          format: cyclonedx
+          output: ${{ matrix.target }}-sbom.json
+          skip-setup-trivy: true
+      - run: |
+          docker inspect --format '{{.Id}}' lara:${{ matrix.target }} > ${{ matrix.target }}-image-id.txt
+          docker save lara:${{ matrix.target }} | gzip > ${{ matrix.target }}-image.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ matrix.target }}
+          path: |
+            *-sbom.json
+            *-image-id.txt
+            *-image.tar.gz

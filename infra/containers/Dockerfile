@@ -11,6 +11,8 @@ RUN pnpm install --frozen-lockfile && pnpm build
 FROM node:24.16.0-bookworm-slim AS runtime
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 WORKDIR /app
+ARG BUILD_COMMIT=local-unreleased
+ENV LARA_COMMIT=$BUILD_COMMIT
 ENV NODE_ENV=production
 USER node
 FROM runtime AS api

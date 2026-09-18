@@ -1,6 +1,6 @@
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-const bytes=await readFile('docs/development/contracts/openapi.json');
+const bytes=(await readFile('docs/development/contracts/openapi.json','utf8')).replace(/\r\n/g,'\n');
 const source=JSON.parse(bytes);
 const operations=[];
 for(const [path,item] of Object.entries(source.paths))for(const [method,definition] of Object.entries(item))if(['get','post','put','patch','delete','head','options'].includes(method))operations.push({method:method.toUpperCase(),path,operationId:definition.operationId});

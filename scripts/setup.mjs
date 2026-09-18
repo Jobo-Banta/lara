@@ -1,11 +1,25 @@
-import { readFile, appendFile } from 'node:fs/promises';
+import {spawnSync} from 'node:child_process';
+import {createRequire} from 'node:module';
+import {connectionOptions} from '../packages/database/src/connection.mjs';
+import { appendFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { loadLocalEnv } from './local-env.mjs';
 import { loadConfig } from '../packages/config/src/env.mjs';
 loadLocalEnv();
+if(Number(process.versions.node.split('.')[0])<24)throw Error('Node 24 or newer is required');
+if(spawnSync(process.execPath,['scripts/python.mjs','--version'],{stdio:'inherit'}).status!==0)throw Error('Python 3 is required for build tracking');
 const defaults = { DATABASE_URL:process.env.SUPABASE_LARA_API_DATABASE_URL, LARA_MODE:'demo', APP_BASE_URL:'http://localhost:3000', API_INTERNAL_URL:'http://127.0.0.1:4000', SESSION_SECRET:randomBytes(48).toString('base64url'), OBJECT_ADAPTER:'filesystem', OBJECT_BUCKET:'.local/uploads', OBJECT_REGION:'local', MAIL_ADAPTER:'local', EINVOICE_ADAPTER:'fixture', AI_ADAPTER:'fixture', RULE_PROFILE_ID:'fixture-local', DEMO_RESET_ENABLED:'false' };
 const missing = Object.entries(defaults).filter(([key]) => !process.env[key] && defaults[key]);
 await appendFile(new URL('../.env.local',import.meta.url), '\n'+missing.map(([key,value])=>key+'='+value).join('\n')+'\n');
 for (const [key,value] of missing) process.env[key]=value;
 loadConfig();
+const pg=createRequire(new URL('../packages/database/package.json',import.meta.url))('pg');
+const db=new pg.Client({...connectionOptions(process.env.DATABASE_URL),connectionTimeoutMillis:5000});
+try{await db.connect();await db.query('select 1');}catch{throw Error('Runtime database is unavailable; check the configured role and TLS connection');}finally{await db.end();}
+const issuer=process.env.OIDC_ISSUER.replace(/\/$/,'');
+const response=await fetch(issuer+'/.well-known/openid-configuration',{signal:AbortSignal.timeout(10000)});
+if(!response.ok)throw Error('OIDC discovery unavailable');
+const discovery=await response.json();
+if(discovery.issuer?.replace(/\/$/,'')!==issuer || ['authorization_endpoint','token_endpoint','jwks_uri'].some(key=>!discovery[key]?.startsWith('https://')))throw Error('OIDC discovery does not match configured issuer');
+console.log('Node/Python, runtime database and OIDC discovery verified. Supabase supplies the database dependency.');
 console.log('Local configuration validated; generated secrets remain in ignored .env.local. Run pnpm db:migrate and pnpm dev.');
