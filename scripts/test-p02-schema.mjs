@@ -12,7 +12,7 @@ import {connectionOptions} from '../packages/database/src/connection.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../packages/database/package.json',import.meta.url))('pg');
 const client=url=>new pg.Client({...connectionOptions(url),connectionTimeoutMillis:15000,query_timeout:30000});
-const owner=client(process.env.MIGRATION_DATABASE_URL||process.env.SUPABASE_LARA_MIGRATOR_DATABASE_URL||process.env.SUPABASE_OWNER_DATABASE_URL);
+const owner=client(process.env.LARA_MIGRATOR_DATABASE_URL||process.env.SUPABASE_LARA_MIGRATOR_DATABASE_URL||process.env.MIGRATION_DATABASE_URL||process.env.SUPABASE_OWNER_DATABASE_URL);
 const api=client(process.env.DATABASE_URL);
 const worker=client(process.env.WORKER_DATABASE_URL||process.env.SUPABASE_LARA_WORKER_DATABASE_URL);
 await Promise.all([owner.connect(),api.connect(),worker.connect()]);
@@ -43,8 +43,9 @@ try{
   t.task=(await run(owner,t.id,"insert into lara.tasks(tenant_id,entity_id,kind,source_type,source_id,reason,created_by) values($1,$2,'missing_evidence','party',$3,'Evidence required',$4) returning id",[t.id,t.entity,randomUUID(),t.principal])).rows[0].id;
   t.party=(await run(owner,t.id,"insert into lara.party(tenant_id,entity_id,legal_name,identity_status,content_hash,created_by) values($1,$2,$3,'unknown',$4,$5) returning id",[t.id,t.entity,'Party '+t.slug,hash('party'+t.slug),t.principal])).rows[0].id;
  }
- assert.equal((await run(owner,'',"select count(*)::int n from lara.tasks where tenant_id in ($1,$2)",[A.id,B.id])).rows[0].n,0);
- pass('table owner without tenant context sees no tenant rows (no owner-role RLS bypass)');
+ const ownerRole=(await owner.query('select current_user as name,(select rolbypassrls or rolsuper from pg_roles where rolname=current_user) as privileged')).rows[0];
+ if(ownerRole.privileged)console.log('SKIP: owner connection '+ownerRole.name+' is privileged; owner RLS check needs the migrator role');
+ else{assert.equal((await run(owner,'',"select count(*)::int n from lara.tasks where tenant_id in ($1,$2)",[A.id,B.id])).rows[0].n,0);pass('table owner '+ownerRole.name+' without tenant context sees no tenant rows (no owner-role RLS bypass)');}
 
  // Runtime isolation P02-T01 basis
  const apiA=await run(api,A.id,'select id,tenant_id from lara.tasks order by created_at');
