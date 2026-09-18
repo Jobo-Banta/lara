@@ -191,11 +191,11 @@
       "updated_at": "2026-09-18T21:08:53+00:00"
     },
     "P03-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review.",
-      "evidence": "Local 2026-09-19: full browser suite 23/23 including the ledger journey on the LARA_MODE=local composition with axe scans; foundation 24/24; contracts and specification validation PASS (351 operations). CI pending push.",
-      "updated_at": "2026-09-18T21:31:16+00:00"
+      "evidence": "GitHub CI 35397177439 passed: ledger browser journey in tests/browser/workspace.spec.mjs (two-principal activation, chart, period, journal review and posting, close checklist, trial balance report, WCAG scans) on the production composition plus all P00-P03 suites in fresh and upgrade PostgreSQL 18, image scans. Local Supabase full browser suite 23/23 on 2026-09-19. Contract additions recorded in docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:36:00+00:00"
     },
     "P03-05": {
       "status": "in_review",
@@ -1878,7 +1878,13 @@
       "id": "P03-06",
       "action": "blocked",
       "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal."
+    },
+    {
+      "at": "2026-09-18T21:36:00+00:00",
+      "id": "P03-04",
+      "action": "done",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
     }
   ],
-  "updated_at": "2026-09-18T21:34:50+00:00"
+  "updated_at": "2026-09-18T21:36:00+00:00"
 }

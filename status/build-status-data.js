@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T21:34:50+00:00",
+  "updated_at": "2026-09-18T21:36:00+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1197,13 +1197,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review.",
-      "evidence": "Local 2026-09-19: full browser suite 23/23 including the ledger journey on the LARA_MODE=local composition with axe scans; foundation 24/24; contracts and specification validation PASS (351 operations). CI pending push.",
-      "updated_at": "2026-09-18T21:31:16+00:00"
+      "evidence": "GitHub CI 35397177439 passed: ledger browser journey in tests/browser/workspace.spec.mjs (two-principal activation, chart, period, journal review and posting, close checklist, trial balance report, WCAG scans) on the production composition plus all P00-P03 suites in fresh and upgrade PostgreSQL 18, image scans. Local Supabase full browser suite 23/23 on 2026-09-19. Contract additions recorded in docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:36:00+00:00"
     },
     {
       "id": "P03-05",
@@ -5522,12 +5522,6 @@ window.LARA_BUILD_STATUS = {
   "history": [
     {
       "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-08",
-      "action": "done",
-      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
       "id": "P01-09",
       "action": "in_review",
       "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
@@ -5699,6 +5693,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P03-06",
       "action": "blocked",
       "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal."
+    },
+    {
+      "at": "2026-09-18T21:36:00+00:00",
+      "id": "P03-04",
+      "action": "done",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
     }
   ]
 };
