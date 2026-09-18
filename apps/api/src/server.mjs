@@ -1,3 +1,5 @@
+import {demoRequest} from './demo-service.mjs';
+import {DemoError} from './demo-domain.mjs';
 import {requestTrace,exportTrace} from '../../../packages/config/src/telemetry.mjs';
 import {sessionKeys} from '../../../packages/config/src/session-keys.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -20,7 +22,7 @@ async function query(sql, params = []) {
  try {await db.query('begin');await db.query("select set_config('lara.subject',$1,true),set_config('lara.run_id',$2,true)",[scope.getStore()?.sub || '',scope.getStore()?.run || '']);const result=await db.query(sql,params);await db.query('commit');return result;}
  catch(error){await db.query('rollback');throw error;}finally{await db.end();}
 }
-async function body(request) { let text = ""; for await (const chunk of request) text += chunk; return text ? JSON.parse(text) : {}; }
+async function body(request) { let text = ""; for await (const chunk of request) {text += chunk;if(Buffer.byteLength(text)>65536)throw new DemoError(413,"Command is too large.");} try{return text ? JSON.parse(text) : {};}catch{throw new DemoError(400,"Invalid JSON.");} }
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
 async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0007_demo_target_marker")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer((request, response) => scope.run({}, async () => {
@@ -41,6 +43,9 @@ const server = http.createServer((request, response) => scope.run({}, async () =
       const versions=await query('select version from schema_migrations order by version');
       return send(response,200,{version:'0.0.1',commit:process.env.LARA_COMMIT || 'local-unreleased',schema:versions.rows.at(-1)?.version});
     }
+    if(path.startsWith('/demo/') && config.mode!=='demo')return send(response,404,{error:'NOT_FOUND'});
+    if(path==='/demo/workspace'||path==='/demo/command')return send(response,200,await demoRequest(database(),identity,method,path,method==='POST'?await body(request):{}));
+    if(path.startsWith('/demo/') && method!=='GET')return send(response,410,{error:'Use the session-bound demo command service.'});
     if(path.startsWith('/demo/')) {
       const runs=await query('select id from lara_demo.runs');
       if(!runs.rowCount) return send(response,403,{error:'DEMO_ACCESS_NOT_PROVISIONED'});
@@ -66,6 +71,6 @@ const server = http.createServer((request, response) => scope.run({}, async () =
     if (path === "/demo/reset" && method === "POST") return send(response, 501, { error: "SESSION_SCOPED_RESET_NOT_IMPLEMENTED" });
     if (path === "/demo/feedback" && method === "POST") { const b = await body(request); const r = await query("insert into lara_demo.feedback(run_id,scenario,route,severity,message) values(current_setting('lara.run_id'),$1,$2,$3,$4) returning id", [b.scenario || "Unspecified",b.route || "/",b.severity || "minor",b.message || ""]); return send(response, 201, { synthetic: true, feedbackId: r.rows[0].id }); }
     return send(response, 404, { error: "NOT_FOUND" });
-  } catch (error) { return send(response, 500, { error: safeConfigError(error) }); }
+  } catch (error) { return send(response, error instanceof DemoError?error.status:500, { error: error instanceof DemoError?error.message:safeConfigError(error) }); }
 }));
 server.listen(port, process.env.API_BIND_HOST || "127.0.0.1", () => console.log("LARA API listening on http://127.0.0.1:" + port));

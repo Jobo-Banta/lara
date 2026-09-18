@@ -30,7 +30,8 @@
     "test:e2e": "playwright test",
     "contracts:generate": "node scripts/generate-contracts.mjs",
     "contracts:check": "node scripts/generate-contracts.mjs --check",
-    "status:serve": "node scripts/serve-build-status.mjs"
+    "status:serve": "node scripts/serve-build-status.mjs",
+    "test:demo": "node scripts/test-demo-workflows.mjs"
   },
   "pnpm": {
     "overrides": {

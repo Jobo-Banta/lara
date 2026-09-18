@@ -60,58 +60,58 @@
     "P01-01": {
       "status": "in_progress",
       "owner": "Codex",
-      "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states.",
+      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open.",
       "evidence": "pnpm run build passed; home, /work, and /overview returned HTTP 200.",
-      "updated_at": "2026-09-18T09:19:23+00:00"
+      "updated_at": "2026-09-18T15:55:29+00:00"
     },
     "P01-02": {
       "status": "in_progress",
       "owner": "Codex",
-      "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains.",
-      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
-      "updated_at": "2026-09-18T09:54:45+00:00"
+      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open.",
+      "evidence": "scripts/test-demo-workflows.mjs PASS 2026-09-18; migration 0008 applied; production build and 11 foundation tests passed.",
+      "updated_at": "2026-09-18T15:55:28+00:00"
     },
     "P01-03": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Invoice API and screens added; DEMO-01 tax fixture yields PHP 11,200 and idempotent create plus submit/approve/post/collect transitions are exercised by smoke suite.",
-      "updated_at": "2026-09-18T09:35:29+00:00"
+      "updated_at": "2026-09-18T15:55:52+00:00"
     },
     "P01-04": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Synthetic bill table and review screen added; low-confidence correction persists in Supabase and evidence id is exposed.",
-      "updated_at": "2026-09-18T09:35:30+00:00"
+      "updated_at": "2026-09-18T15:55:52+00:00"
     },
     "P01-05": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Reconciliation table and screen added; exact and partial match endpoint exercised against statement fixtures.",
-      "updated_at": "2026-09-18T09:35:30+00:00"
+      "updated_at": "2026-09-18T15:55:52+00:00"
     },
     "P01-06": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Compliance and close tables/screens added; required close task blocks lock preview until completion and endpoint is exercised.",
-      "updated_at": "2026-09-18T09:35:31+00:00"
+      "updated_at": "2026-09-18T15:55:52+00:00"
     },
     "P01-07": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Evidence screen and synthetic evidence records added; all journey views expose simulation labels.",
-      "updated_at": "2026-09-18T09:35:31+00:00"
+      "updated_at": "2026-09-18T15:55:52+00:00"
     },
     "P01-08": {
-      "status": "in_review",
+      "status": "in_progress",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md.",
       "evidence": "Scenario endpoint, reset action, scoped demo namespace and simulation labels added; reset smoke-tested.",
-      "updated_at": "2026-09-18T09:35:32+00:00"
+      "updated_at": "2026-09-18T15:55:53+00:00"
     },
     "P01-09": {
       "status": "in_review",
@@ -1554,7 +1554,55 @@
       "id": "P00",
       "action": "release",
       "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
+    },
+    {
+      "at": "2026-09-18T15:55:28+00:00",
+      "id": "P01-02",
+      "action": "in_progress",
+      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open."
+    },
+    {
+      "at": "2026-09-18T15:55:29+00:00",
+      "id": "P01-01",
+      "action": "in_progress",
+      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open."
+    },
+    {
+      "at": "2026-09-18T15:55:52+00:00",
+      "id": "P01-03",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T15:55:52+00:00",
+      "id": "P01-04",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T15:55:52+00:00",
+      "id": "P01-05",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T15:55:52+00:00",
+      "id": "P01-06",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T15:55:52+00:00",
+      "id": "P01-07",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T15:55:53+00:00",
+      "id": "P01-08",
+      "action": "in_progress",
+      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
     }
   ],
-  "updated_at": "2026-09-18T15:17:19+00:00"
+  "updated_at": "2026-09-18T15:55:53+00:00"
 }

@@ -29,8 +29,8 @@ test('seeded authenticated workspace is isolated in the clean CI database',async
  const {seal}=await import('../../packages/config/src/session-cookie.mjs');
  await context.addCookies([{name:'lara_session',value:seal({sub:'ci-browser-subject',expiresAt:Date.now()+60000},'browser-fixture-session-key-32-characters'),url:'http://127.0.0.1:3015',httpOnly:true,sameSite:'Lax'}]);
  await page.goto('/work');
- await expect(page.getByText('CI seeded isolated task')).toBeVisible();
- await expect(page.getByText('Review uncertain supplier bill')).toHaveCount(0);
+ await expect(page.getByText('Review uncertain supplier bill')).toBeVisible();
+ await expect(page.getByText('Harbor Cloud invoice fixture')).toHaveCount(0);
  const storage=await page.evaluate(()=>({local:Object.keys(localStorage),session:Object.keys(sessionStorage),cookie:document.cookie}));
  expect(storage.cookie).not.toContain('lara_session');expect(storage.local).toEqual([]);expect(storage.session).toEqual([]);
 });

@@ -1,3 +1,2 @@
-import JourneyPage from "../_components/journey-page";
-export default function Page() { return <JourneyPage config={{ eyebrow: "Compliance", title: "Compliance readiness", endpoint: "/demo/compliance" }} />; }
-
+import DemoWorkspace from "../_components/demo-workspace";
+export default function Page(){return <DemoWorkspace/>;}

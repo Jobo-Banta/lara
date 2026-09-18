@@ -1,3 +1,2 @@
-import JourneyPage from "../_components/journey-page";
-export default function Page() { return <JourneyPage config={{ eyebrow: "Money out", title: "Payment authority", endpoint: "/demo/payments" }} />; }
-
+import DemoWorkspace from "../_components/demo-workspace";
+export default function Page(){return <DemoWorkspace/>;}

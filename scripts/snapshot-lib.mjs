@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-export const tables=['public.schema_migrations','lara.environment','lara.demo_seed_runs','lara_demo.runs','lara_demo.tasks','lara_demo.invoices','lara_demo.bills','lara_demo.reconciliation_lines','lara_demo.close_tasks','lara_demo.compliance_items','lara_demo.evidence','lara_demo.feedback'];
+export const tables=['public.schema_migrations','lara.environment','lara.demo_seed_runs','lara_demo.runs','lara_demo.tasks','lara_demo.invoices','lara_demo.bills','lara_demo.reconciliation_lines','lara_demo.close_tasks','lara_demo.compliance_items','lara_demo.evidence','lara_demo.feedback','lara_demo.workspaces'];
 export function digest(rows){return createHash('sha256').update(JSON.stringify(rows.map(row=>JSON.stringify(Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b))))).sort())).digest('hex');}
 export async function snapshot(db){
  await db.query('begin isolation level repeatable read read only');
