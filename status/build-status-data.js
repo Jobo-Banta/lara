@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T09:19:23+00:00",
+  "updated_at": "2026-09-18T09:24:33+00:00",
   "releases": [
     {
       "id": "P00",
@@ -535,13 +535,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T01",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Codex",
+      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented.",
+      "evidence": "0002_demo_work applied; API /demo/work and /demo/overview returned 200 from Supabase; /work returned 200.",
+      "updated_at": "2026-09-18T09:24:33+00:00"
     },
     {
       "id": "P01-03",
@@ -5597,6 +5597,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P01-01",
       "action": "in_progress",
       "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states."
+    },
+    {
+      "at": "2026-09-18T09:24:28+00:00",
+      "id": "P01-02",
+      "action": "in_progress",
+      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
+    },
+    {
+      "at": "2026-09-18T09:24:33+00:00",
+      "id": "P01-02",
+      "action": "in_progress",
+      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
     }
   ]
 };
