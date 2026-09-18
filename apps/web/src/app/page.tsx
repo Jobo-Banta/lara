@@ -10,11 +10,11 @@ export default async function HomePage() {
         <nav>
           <a className="active" href="/work">My work</a>
           <a href="/overview">Overview</a>
-          <span className="nav-disabled">Money in</span>
-          <span className="nav-disabled">Money out</span>
-          <span className="nav-disabled">Close</span>
-          <span className="nav-disabled">Compliance</span>
-        </nav>
+          <a href="/sales/invoices">Money in</a>
+          <a href="/purchases/bills">Money out</a>
+          <a href="/close">Close</a>
+          <a href="/compliance">Compliance</a>
+        <a href="/bank/reconcile">Reconcile</a><a href="/evidence">Evidence</a><a href="/demo/scenarios">Scenarios</a><a href="/feedback">Feedback</a></nav>
       </aside>
       <div className="lara-content">
         <header className="lara-header">

@@ -72,60 +72,60 @@
       "updated_at": "2026-09-18T09:24:33+00:00"
     },
     "P01-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Invoice API and screens added; DEMO-01 tax fixture yields PHP 11,200 and idempotent create plus submit/approve/post/collect transitions are exercised by smoke suite.",
+      "updated_at": "2026-09-18T09:35:29+00:00"
     },
     "P01-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Synthetic bill table and review screen added; low-confidence correction persists in Supabase and evidence id is exposed.",
+      "updated_at": "2026-09-18T09:35:30+00:00"
     },
     "P01-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Reconciliation table and screen added; exact and partial match endpoint exercised against statement fixtures.",
+      "updated_at": "2026-09-18T09:35:30+00:00"
     },
     "P01-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Compliance and close tables/screens added; required close task blocks lock preview until completion and endpoint is exercised.",
+      "updated_at": "2026-09-18T09:35:31+00:00"
     },
     "P01-07": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Evidence screen and synthetic evidence records added; all journey views expose simulation labels.",
+      "updated_at": "2026-09-18T09:35:31+00:00"
     },
     "P01-08": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Scenario endpoint, reset action, scoped demo namespace and simulation labels added; reset smoke-tested.",
+      "updated_at": "2026-09-18T09:35:32+00:00"
     },
     "P01-09": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Feedback screen and persisted feedback API added; feedback capture smoke-tested.",
+      "updated_at": "2026-09-18T09:35:32+00:00"
     },
     "P01-10": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "P01 implementation continued through local Supabase-backed prototype.",
+      "evidence": "Local production build passed with 18 routes; Supabase migration 0003/0004 applied; P01 API smoke suite passed. Hosted deployment and interactive eight-user gate remain release evidence.",
+      "updated_at": "2026-09-18T09:35:33+00:00"
     },
     "P02-01": {
       "status": "not_started",
@@ -1332,7 +1332,55 @@
       "id": "P01-02",
       "action": "in_progress",
       "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
+    },
+    {
+      "at": "2026-09-18T09:35:29+00:00",
+      "id": "P01-03",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:30+00:00",
+      "id": "P01-04",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:30+00:00",
+      "id": "P01-05",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:31+00:00",
+      "id": "P01-06",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:31+00:00",
+      "id": "P01-07",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:32+00:00",
+      "id": "P01-08",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:32+00:00",
+      "id": "P01-09",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:35:33+00:00",
+      "id": "P01-10",
+      "action": "in_review",
+      "note": "P01 implementation continued through local Supabase-backed prototype."
     }
   ],
-  "updated_at": "2026-09-18T09:24:33+00:00"
+  "updated_at": "2026-09-18T09:35:33+00:00"
 }
