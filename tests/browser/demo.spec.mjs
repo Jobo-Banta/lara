@@ -5,7 +5,7 @@ test.beforeEach(async({context})=>{
  test.skip(!process.env.LARA_E2E_DATABASE_URL,'Requires a provisioned synthetic PostgreSQL subject');
  await context.addCookies([{name:'lara_session',value:seal({sub:process.env.LARA_E2E_SUBJECT||'ci-browser-subject',expiresAt:Date.now()+3600000},'browser-fixture-session-key-32-characters'),url:'http://127.0.0.1:3015',httpOnly:true,sameSite:'Lax'}]);
 });
-const state=async p=>(await p.request.get('/api/demo/workspace')).json();
+const state=async p=>{const r=await p.request.get('/api/demo/workspace');expect(r.status(),await r.text()).toBe(200);return r.json();};
 async function command(p,action,fields={}){const s=await state(p);const response=await p.request.post('/api/demo/command',{headers:{origin:'http://127.0.0.1:3015'},data:{action,...fields,run:s.run,version:s.version,key:crypto.randomUUID()}});expect(response.status(),await response.text()).toBe(200);return response.json();}
 const role=(p,actor)=>command(p,'switch-actor',{actor});
 const reset=(p,scenario)=>command(p,'reset',{scenario,confirm:'RESET MY SYNTHETIC SESSION'});

@@ -18,5 +18,16 @@ try {
  assert.equal(version.status,200);assert.equal((await version.json()).schema,'0008_demo_workspaces');
  const denied=await fetch('http://127.0.0.1:4011/demo/work',{headers:{authorization:'Bearer '+signIdentity('unassigned-test-subject','GET','/demo/work',process.env.SESSION_SECRET)}});
  assert.equal(denied.status,401);
- console.log('PASS: live, ready, unsigned API denial, authenticated version, session-unbound demo identity denial');
+ // P01-T03: outside demo mode the synthetic routes are not registered at all, even for a signed identity.
+ const local=spawn(process.execPath,['apps/api/src/server.mjs'],{env:{...process.env,LARA_MODE:'local',DEMO_RESET_ENABLED:'false',API_PORT:'4012'},stdio:['ignore','pipe','pipe']});
+ let localErrors='';local.stderr.on('data',b=>localErrors+=b);
+ try{
+  let live;for(let i=0;i<50;i++){try{live=await fetch('http://127.0.0.1:4012/health/live');break;}catch{await new Promise(r=>setTimeout(r,100));}}
+  assert.equal(live?.status,200,localErrors);
+  for(const path of ['/demo/workspace','/demo/command','/demo/export']){
+   const absent=await fetch('http://127.0.0.1:4012'+path,{method:path==='/demo/command'?'POST':'GET',headers:{authorization:'Bearer '+signIdentity('unassigned-test-subject',path==='/demo/command'?'POST':'GET',path,process.env.SESSION_SECRET),'content-type':'application/json'},body:path==='/demo/command'?'{}':undefined});
+   assert.equal(absent.status,404,path);assert.deepEqual(await absent.json(),{error:'NOT_FOUND'});
+  }
+ }finally{local.kill();}
+ console.log('PASS: live, ready, unsigned API denial, authenticated version, session-unbound demo identity denial, demo routes absent outside demo mode');
 }finally{child.kill();}

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T16:44:04+00:00",
+  "updated_at": "2026-09-18T16:57:31+00:00",
   "releases": [
     {
       "id": "P00",
@@ -515,15 +515,15 @@
       "depends_on": [],
       "spec": "04-phase-01-prototype.md",
       "acceptance": "P01-T05",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [
         "P00"
       ],
       "spec_status": "ready_for_implementation",
-      "owner": "Codex",
-      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open.",
-      "evidence": "pnpm run build passed; home, /work, and /overview returned HTTP 200.",
-      "updated_at": "2026-09-18T15:55:29+00:00"
+      "owner": "Claude Code",
+      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright.",
+      "evidence": "Local 2026-09-19: tests/browser/accessibility.spec.mjs and demo.spec.mjs 17/17 passed against Supabase; CI 35370240350 verify/image jobs passed on prior commit; CI on this commit pending.",
+      "updated_at": "2026-09-18T16:57:31+00:00"
     },
     {
       "id": "P01-02",
@@ -5521,12 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T11:22:27+00:00",
-      "id": "P00-03",
-      "action": "done",
-      "note": "Dedicated migrator owns LARA objects; PostgreSQL 18 fresh/upgrade migration, checksums, rollback and runtime denial passed in CI."
-    },
-    {
       "at": "2026-09-18T11:22:28+00:00",
       "id": "P00-04",
       "action": "done",
@@ -5699,6 +5693,12 @@
       "id": "P01-10",
       "action": "blocked",
       "note": "render.yaml, demo-host image target, loopback API supervisor and /api/health/ready prepared. Blocked: no hosting account, domain or dashboard secrets have been provisioned; deployment needs the owner."
+    },
+    {
+      "at": "2026-09-18T16:57:31+00:00",
+      "id": "P01-01",
+      "action": "in_review",
+      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
     }
   ]
 }
