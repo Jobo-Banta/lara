@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T18:45:25+00:00",
+  "updated_at": "2026-09-18T20:02:55+00:00",
   "releases": [
     {
       "id": "P00",
@@ -850,13 +850,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck.",
-      "evidence": "Local 2026-09-19: scripts/test-p02-api.mjs 7 groups PASS with API and worker processes against Supabase; readiness, worker, restore, schema (15) and domain (10) tests PASS; foundation 23/23. CI pending push.",
-      "updated_at": "2026-09-18T18:45:25+00:00"
+      "evidence": "GitHub CI 35382047360 passed: scripts/test-p02-api.mjs 7 groups (API and worker processes, fresh and upgrade PostgreSQL 18), schema 15, domain 10, readiness, worker, restore with principal directory, foundation 23/23, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T18:51:28+00:00"
     },
     {
       "id": "P02-04",
@@ -907,13 +907,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review.",
+      "evidence": "Local 2026-09-19: tests/browser/workspace.spec.mjs 5 journeys plus full suite 22/22 on LARA_MODE=local and demo servers against Supabase; API 7 groups, domain 10, schema 15, foundation 23/23, contracts and specification validation PASS. CI pending push.",
+      "updated_at": "2026-09-18T20:02:55+00:00"
     },
     {
       "id": "P02-05",
@@ -5521,24 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-05",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-06",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-07",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
       "at": "2026-09-18T15:55:53+00:00",
       "id": "P01-08",
       "action": "in_progress",
@@ -5699,6 +5681,24 @@ window.LARA_BUILD_STATUS = {
       "id": "P02-03",
       "action": "in_review",
       "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
+    },
+    {
+      "at": "2026-09-18T18:51:28+00:00",
+      "id": "P02-03",
+      "action": "done",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
+    },
+    {
+      "at": "2026-09-18T18:51:28+00:00",
+      "id": "P02-04",
+      "action": "in_progress",
+      "note": "Implementing workspace screens over /v1 through a BFF proxy with mode-based composition (demo keeps the prototype), operator tenant provisioning and Playwright coverage."
+    },
+    {
+      "at": "2026-09-18T20:02:55+00:00",
+      "id": "P02-04",
+      "action": "in_review",
+      "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review."
     }
   ]
 };

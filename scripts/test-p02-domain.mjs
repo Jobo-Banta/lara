@@ -120,6 +120,8 @@ try{
  assert.equal((await identityTasks()).filter(t=>t.state!=='resolved').length,0,'identity task resolved by the update');
  const stored=(await run(prep,tx=>tx.query('select tax_id_encrypted from lara.party where id=$1',[party.id]))).rows[0].tax_id_encrypted;
  assert.ok(stored.startsWith('v1.')&&!stored.includes('123-456'));assert.equal(parties.decryptField(stored),'123-456-789-000');
+ const kept=await run(prep,tx=>parties.updateParty(tx,prep,entity.id,party.id,known.version,{legalName:'Northwind Services',roles:['customer','supplier'],identityStatus:'known',address:'Cebu City, Lapu-Lapu'}));
+ assert.equal(kept.taxIdMasked,'•••••••••000','known identity keeps its stored identifier when the edit omits it');
  const dup=await run(prep,tx=>parties.createParty(tx,prep,entity.id,{legalName:'North Wind Services',roles:['supplier'],identityStatus:'not_applicable',address:'Cebu'}));
  const search=await run(prep,tx=>parties.listParties(tx,prep,entity.id,{q:'northwind'}));
  assert.deepEqual(search.items.map(p=>p.id),[party.id]);

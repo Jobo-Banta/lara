@@ -60,8 +60,11 @@ export async function updateParty(tx,ctx,entityId,id,expectedVersion,input,env){
  const row=(await tx.query('select * from lara.party where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!row)fail('NOT_FOUND','Party not found.');expectVersion(row,expectedVersion);
  if(row.status==='archived')fail('STATE_CONFLICT','Archived parties cannot change; restore or create a new party.');
- const taxId=normalizeTaxId(input),m=material(input,taxId),hash=contentHash(m),changed=hash!==row.content_hash;
- const updated=(await tx.query('update lara.party set legal_name=$4,tax_id_encrypted=$5,identity_status=$6,address_json=$7,content_hash=$8,content_version=content_version+$9 where tenant_id=$1 and entity_id=$2 and id=$3 returning *',[ctx.tenantId,entityId,id,m.legalName,taxId?encryptField(taxId,env):null,m.identityStatus,JSON.stringify({text:m.address}),hash,changed?1:0])).rows[0];
+ // A known identity keeps its stored identifier unless the edit supplies a new one.
+ const keep=input.identityStatus==='known'&&!input.taxId?.trim()&&row.tax_id_encrypted;
+ const taxId=keep?decryptField(row.tax_id_encrypted,env):normalizeTaxId(input),m=material(input,taxId),hash=contentHash(m),changed=hash!==row.content_hash;
+ const encrypted=keep?row.tax_id_encrypted:(taxId?encryptField(taxId,env):null);
+ const updated=(await tx.query('update lara.party set legal_name=$4,tax_id_encrypted=$5,identity_status=$6,address_json=$7,content_hash=$8,content_version=content_version+$9 where tenant_id=$1 and entity_id=$2 and id=$3 returning *',[ctx.tenantId,entityId,id,m.legalName,encrypted,m.identityStatus,JSON.stringify({text:m.address}),hash,changed?1:0])).rows[0];
  const current=await rolesOf(tx,ctx,id);
  // Roles are added, never silently removed: a role with any history stays.
  for(const role of m.roles)if(!current.includes(role))await tx.query('insert into lara.party_roles(tenant_id,entity_id,party_id,role,created_by) values($1,$2,$3,$4,$5)',[ctx.tenantId,entityId,id,role,ctx.principalId]);

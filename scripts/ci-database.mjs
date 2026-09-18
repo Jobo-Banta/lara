@@ -30,7 +30,9 @@ try{
   if(!upgrade){
    const fixtures=new pg.Client({connectionString:ownerURL.toString()});await fixtures.connect();
    try{await fixtures.query("insert into lara_demo.runs(id,fixture_version,label,owner_subject) values('ci-browser','ci','CI browser','ci-browser-subject')");await fixtures.query("insert into lara_demo.tasks(id,run_id,title,area,status,due_date,owner,source) values('ci-browser-task','ci-browser','CI seeded isolated task','Demo','Open','2026-09-18','Test','Synthetic')");}finally{await fixtures.end();}
-   const result=spawnSync('pnpm',['test:e2e'],{env:{...env,LARA_E2E_DATABASE_URL:runtimeURL.toString()},stdio:'inherit'});if(result.status!==0)throw Error('Seeded browser test failed');
+   // Workspace tenant for the production-composition browser tests (LARA_MODE=local servers).
+   const provision=spawnSync(process.execPath,['scripts/provision-workspace-tenant.mjs','--slug','api-ci-workspace','--name','CI workspace','--mode','demo','--issuer','https://identity.invalid','--controller','ci-workspace-controller-ci','--security','ci-workspace-security-ci','--preparer','ci-workspace-preparer-ci','--clerk','ci-workspace-clerk-ci','--billing','ci-workspace-billing-ci'],{env,stdio:'inherit'});if(provision.status!==0)throw Error('Workspace provisioning failed');
+   const result=spawnSync('pnpm',['test:e2e'],{env:{...env,LARA_E2E_DATABASE_URL:runtimeURL.toString(),LARA_E2E_WORKSPACE_SUFFIX:'ci'},stdio:'inherit'});if(result.status!==0)throw Error('Seeded browser test failed');
   }
   console.log('PASS: '+name+' real database migration, permissions, RLS and restore');
  }

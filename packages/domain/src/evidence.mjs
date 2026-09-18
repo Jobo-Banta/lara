@@ -124,7 +124,7 @@ export async function readContent(tx,ctx,entityId,id,store){
 export async function listEvidence(tx,ctx,entityId,query){
  requirePermission(ctx,'evidence.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
- if(query?.status){params.push(String(query.status));where=' and status=$'+params.length;}
+ if(query?.status){params.push(String(query.status).split(','));where=' and status=any($'+params.length+'::text[])';}
  const rows=(await tx.query('select * from lara.evidence where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
  return page(rows,limit,evidenceResource);
 }

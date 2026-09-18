@@ -1,6 +1,6 @@
 # P02 implementation review — 19 September 2026
 
-P02 is in progress, not released. Build-order steps 1 (contracts and migrations), 2 (domain rules) and 3 (API, jobs and adapters) are implemented. No P02 screen exists yet, and nothing in this phase is activated for any tenant.
+P02 is in progress, not released. Build-order steps 1 (contracts and migrations), 2 (domain rules), 3 (API, jobs and adapters) and 4 (user journeys) are implemented. Nothing in this phase is activated for any live tenant.
 
 ## P02-01 contracts and migrations
 
@@ -52,7 +52,21 @@ Verification: `scripts/test-p02-api.mjs` (in CI for fresh and upgrade databases)
 
 Not yet: approval-policy endpoints return `FEATURE_NOT_ENABLED` until the ledger approval routing (P03) consumes them; delegation has no endpoint in the reviewed contract; the S3 evidence store and a production scanner adapter are qualification items for release.
 
+## P02-04 user journeys
+
+Composition: pages render per request (`force-dynamic`) through `Composition`, which selects the synthetic `DemoWorkspace` only when `LARA_MODE=demo` and the production `Workspace` otherwise; the demo adapter is unreachable from a production composition. The BFF proxies `/api/v1/*` to the API with the signed identity, forwarding only the contract headers (`X-Entity-Id`, `X-Tenant-Id`, `Idempotency-Key`, `If-Match`, `Content-Type`) and passing back ETag, content type and disposition for downloads.
+
+Screens (`apps/web/src/app/_components/workspace.tsx`): overview with activation state, counts and capability list; My work with owner/status/due filters in the URL, assignment from the entity's memberships and task detail (start, wait for information with a due date, resolve with available evidence, comments); parties directory with normalized search, role filter, create, detail edit with `If-Match`, masked tax identifier and archive; evidence upload (browser-side SHA-256, register, stream, complete) with status polling and authorized download; obligations calendar grouped by month with completion bound to available evidence; setup checklist (organization, branches, members and roles, activation request/approval) that resumes from server state; roadmap panels for modules of later releases; explicit forbidden, unknown-account, stale-version (draft kept, reload) and retry states. Every command reuses its idempotency key on retry.
+
+Contract additions made under the P02 rule that screens may add read/list endpoints to the reviewed OpenAPI before implementation (owner review requested): `GET /evidence` (EvidenceResourceList, `status` filter) and declared list filters on `GET /tasks` (`ownerId`, `status`, `dueBefore`, `sourceId`), `GET /parties` (`q`, `role`, `status`), `GET /obligations` (`status`, `from`, `to`) plus the `state` selector on `PATCH /tasks/{id}`. The operations catalog and generated contract were regenerated (348 operations).
+
+Operator provisioning: `scripts/provision-workspace-tenant.mjs` creates a tenant, its first principals (controller and security administrator must differ) and approved role templates so people can sign in and complete setup; it is also the CI fixture for the production-composition browser tests.
+
+Verification: `tests/browser/workspace.spec.mjs` runs against `LARA_MODE=local` servers (API 4015, web 3016) provisioned by `scripts/test-demo-browser.mjs` locally and by `scripts/ci-database.mjs` in CI: setup checklist with the independent-controller blocker, membership grant, self-approval refusal and approval by another principal; party creation raising one identity task, controller assignment, evidence upload through scan, resolution with evidence, known identity masked; stale-version recovery between two users; obligations completion with evidence; forbidden, roadmap and unknown-account states; WCAG 2.1 A/AA scans at 1440 and 390 and keyboard reach. Findings fixed on the way: activation re-request collided with the approval-request unique key (migration 0011 makes it pending-only and requests idempotent), tenant-wide memberships were missing from entity listings, and editing a known party required re-entering its tax identifier.
+
+Known gaps for the owner: no reviewed operation lists task comments (comments made in the session are shown; persisted ones are not listed), no invitation operation exists (principals are created by operator provisioning or by an existing tenant login), the audit view needs a reviewed read operation, and approval-policy screens wait for the routing that arrives with the ledger.
+
 ## Open for later P02 tickets
 
 - Outbox publication to consumers (notifications) is pending a consumer; events are written and published_at stays null until one exists.
-- P02-04: the workspace UI journey; P02-05 acceptance, runbooks and load; P02-06 release. Registration profile and retention policy tables are referenced by id but defined in their owning phases.
+- P02-05 acceptance, runbooks and load; P02-06 release. Registration profile and retention policy tables are referenced by id but defined in their owning phases.

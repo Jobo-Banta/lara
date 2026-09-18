@@ -124,7 +124,8 @@ export async function updateMembership(tx,ctx,entityId,id,expectedVersion,input)
  return membershipResource(updated);
 }
 export async function getMembership(tx,ctx,entityId,id){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.memberships where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Membership not found.');return membershipResource(row);}
-export async function listMemberships(tx,ctx,entityId,query){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.memberships where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,membershipResource);}
+// Tenant-wide memberships (no entity) apply to every entity and are listed with it.
+export async function listMemberships(tx,ctx,entityId,query){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.memberships where tenant_id=$1 and (entity_id=$2 or entity_id is null)'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,membershipResource);}
 
 // Any pending approval bound to an older content version is invalidated when
 // material content changes; the decision chain must restart on the new hash.

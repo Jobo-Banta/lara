@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "db7eb754e176728d05b091d7e954612ec67edc3814f781a49e9ab0c8b139e1ee",
+  "sha256": "18f75903c313c3f8ea64207f59ac595ac2a40f44abaf0d9b8df4109e8495f6a8",
   "operations": [
     {
       "method": "POST",
@@ -221,6 +221,11 @@
       "method": "POST",
       "path": "/obligations/{id}/complete",
       "operationId": "post_obligations_id_complete"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence",
+      "operationId": "get_evidence"
     },
     {
       "method": "POST",

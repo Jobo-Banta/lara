@@ -54,9 +54,10 @@ const handlers={
  get_entities_id:async(tx,ctx,{params})=>ok(await organization.getEntity(tx,ctx,params.id)),
  patch_entities_id:async(tx,ctx,{params,body,version})=>ok(await organization.updateEntity(tx,ctx,params.id,version,body)),
  post_entities_id_activate:async(tx,ctx,{params,body,version})=>{
-  // The preparer requests; a principal holding entity.activate approves.
-  const r=ctx.permissions.has('entity.activate')&&(await tx.query("select 1 from lara.approval_requests where tenant_id=$1 and resource_type='entity' and resource_id=$2 and status='pending' and created_by<>$3",[ctx.tenantId,params.id,ctx.principalId])).rowCount
-   ?await organization.activateEntity(tx,ctx,params.id,body,version):await organization.requestActivation(tx,ctx,params.id,body,version);
+  // Draft entities are requested; pending ones are approved. The domain
+  // refuses self-approval and rechecks the content version.
+  const state=(await tx.query('select status from lara.entities where tenant_id=$1 and id=$2',[ctx.tenantId,params.id])).rows[0]?.status;
+  const r=state==='pending_activation'?await organization.activateEntity(tx,ctx,params.id,body,version):await organization.requestActivation(tx,ctx,params.id,body,version);
   return result(ctx,r);},
  post_branches:async(tx,ctx,{entityId,body})=>created(await organization.createBranch(tx,ctx,entityId,body)),
  get_branches:async(tx,ctx,{entityId,query})=>list(await organization.listBranches(tx,ctx,entityId,query)),
@@ -98,6 +99,7 @@ const handlers={
   await store.dispose('staging/'+params.id);
   if(r.outcome==='rejected')return {status:422,body:{code:'VALIDATION_FAILED',message:'Upload rejected: '+r.reasons.join('; ')+'.',traceId:ctx.traceId,fieldErrors:r.reasons.map(m=>({path:'content',message:m})),retryable:false}};
   return {status:202,body:r.job};},
+ get_evidence:async(tx,ctx,{entityId,query})=>list(await evidence.listEvidence(tx,ctx,entityId,query)),
  get_evidence_id:async(tx,ctx,{entityId,params})=>ok(await evidence.getEvidence(tx,ctx,entityId,params.id)),
  get_evidence_id_content:async(tx,ctx,{entityId,params,store})=>{const r=await evidence.readContent(tx,ctx,entityId,params.id,store);return {status:200,raw:r.bytes,headers:{'content-type':r.evidence.mime,'content-disposition':'attachment; filename="'+r.evidence.filename.replace(/["\r\n]/g,'_')+'"','x-content-sha256':r.evidence.sha256}};},
  post_exports:async(tx,ctx,{entityId,body})=>{

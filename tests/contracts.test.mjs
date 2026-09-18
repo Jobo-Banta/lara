@@ -16,7 +16,7 @@ test('every operation names a published permission and a compilable input/respon
 
 test('P02 operations follow the mutation header conventions', () => {
   const p02=operationsForPhase('P02');
-  assert.equal(p02.length,51);
+  assert.equal(p02.length,52);
   for(const op of p02){
     if(op.method==='POST')assert.ok(op.requiresIdempotencyKey,op.operationId+' must require Idempotency-Key');
     if(op.method==='PATCH')assert.ok(op.requiresIfMatch,op.operationId+' must require If-Match');

@@ -82,8 +82,11 @@ export async function requestActivation(tx,ctx,id,input,expectedVersion){
  if(entity.status==='archived')fail('STATE_CONFLICT','Archived entities cannot activate.');
  const blockers=await activationBlockers(tx,ctx,entity);
  if(blockers.length)fail('STATE_CONFLICT','Setup is incomplete: '+blockers.join(', ')+'.',{fieldErrors:blockers.map(b=>({path:b,message:'Required before activation'}))});
- await tx.query("update lara.approval_requests set status='invalidated' where tenant_id=$1 and entity_id=$2 and resource_type='entity' and resource_id=$2 and status='pending'",[ctx.tenantId,id]);
- const request=(await tx.query("insert into lara.approval_requests(tenant_id,entity_id,resource_type,resource_id,content_version,content_hash,policy_version,step,created_by) values($1,$2,'entity',$2,$3,$4,1,1,$5) returning id",[ctx.tenantId,id,entity.content_version,entity.content_hash,ctx.principalId])).rows[0];
+ // Re-requesting the same content version is idempotent; a pending request
+ // for an older version is invalidated first.
+ await tx.query("update lara.approval_requests set status='invalidated' where tenant_id=$1 and entity_id=$2 and resource_type='entity' and resource_id=$2 and status='pending' and content_version<>$3",[ctx.tenantId,id,entity.content_version]);
+ const pending=(await tx.query("select id from lara.approval_requests where tenant_id=$1 and entity_id=$2 and resource_type='entity' and resource_id=$2 and status='pending' and content_version=$3",[ctx.tenantId,id,entity.content_version])).rows[0];
+ const request=pending||(await tx.query("insert into lara.approval_requests(tenant_id,entity_id,resource_type,resource_id,content_version,content_hash,policy_version,step,created_by) values($1,$2,'entity',$2,$3,$4,1,1,$5) returning id",[ctx.tenantId,id,entity.content_version,entity.content_hash,ctx.principalId])).rows[0];
  const updated=(await tx.query("update lara.entities set status='pending_activation' where tenant_id=$1 and id=$2 returning version",[ctx.tenantId,id])).rows[0];
  await audit(tx,ctx,{entityId:id,action:'entity.request_activation',resourceType:'entity',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});
  return {resourceType:'entity',resourceId:id,version:Number(updated.version),state:'pending_activation',approvalRequestId:request.id};

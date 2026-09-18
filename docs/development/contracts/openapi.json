@@ -1516,6 +1516,41 @@
               "maximum": 200,
               "default": 50
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            },
+            "description": "Normalized legal-name search."
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer",
+                "supplier",
+                "employee",
+                "bank"
+              ]
+            },
+            "description": "Parties holding this role."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "active",
+                "archived"
+              ]
+            },
+            "description": "Party state."
           }
         ],
         "responses": {
@@ -5004,6 +5039,38 @@
               "maximum": 200,
               "default": 50
             }
+          },
+          {
+            "name": "ownerId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            },
+            "description": "Tasks owned by this principal."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            },
+            "description": "Comma separated task states."
+          },
+          {
+            "name": "dueBefore",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            "description": "Tasks due on or before this instant."
+          },
+          {
+            "name": "sourceId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            },
+            "description": "Tasks raised for this source record."
           }
         ],
         "responses": {
@@ -5291,6 +5358,19 @@
               "type": "string",
               "pattern": "^\"[1-9][0-9]*\"$"
             }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "in_progress",
+                "waiting_for_information"
+              ]
+            },
+            "description": "Optional task state transition applied with the edit."
           }
         ],
         "responses": {
@@ -6100,6 +6180,30 @@
               "maximum": 200,
               "default": 50
             }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            },
+            "description": "Comma separated obligation states."
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            "description": "Due on or after."
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Timestamp"
+            },
+            "description": "Due on or before."
           }
         ],
         "responses": {
@@ -6673,6 +6777,169 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ReasonAction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evidence": {
+      "get": {
+        "operationId": "get_evidence",
+        "summary": "evidence read",
+        "tags": [
+          "P02"
+        ],
+        "x-delivery-phase": "P02",
+        "x-required-permission": "evidence.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "quarantined",
+                "scanning",
+                "available",
+                "rejected"
+              ]
+            },
+            "description": "Filter by evidence state; several states may be comma separated."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceResourceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
@@ -61489,6 +61756,29 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ToolGrantResource"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "EvidenceResourceList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceResource"
             },
             "minItems": 0
           },

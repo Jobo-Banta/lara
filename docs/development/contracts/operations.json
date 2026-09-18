@@ -396,6 +396,15 @@
     "response": "CommandResult"
   },
   {
+    "operationId": "get_evidence",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/evidence",
+    "permission": "evidence.read",
+    "input": null,
+    "response": "EvidenceResourceList"
+  },
+  {
     "operationId": "post_evidence_uploads",
     "phase": "P02",
     "method": "POST",
