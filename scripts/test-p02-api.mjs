@@ -128,7 +128,14 @@ try{
  r=await call(A,'clerk','POST','/tasks/'+task.id+'/resolve',{body:{reason:'Done'},headers:{...key(),...eh,...im(assigned.version)}});assert.equal(r.status,409);assert.equal((await json(r)).code,'EVIDENCE_NOT_READY');
  r=await call(A,'clerk','POST','/tasks/'+task.id+'/resolve',{body:{reason:'Attached',evidenceIds:[up.evidenceId]},headers:{...key(),...eh,...im(assigned.version)}});assert.equal(r.status,200);const res=await json(r);contract('post_tasks_id_resolve',res);assert.equal(res.state,'resolved');
  r=await call(A,'clerk','GET','/tasks?ownerId='+A.principals.clerk+'&status=resolved',{headers:eh});const tl=await json(r);contract('get_tasks',tl);assert.deepEqual(tl.items.map(t=>t.id),[task.id]);
- pass('tasks open once per cause, assign, refuse resolution without available evidence and list by owner and status');
+ // Cursors bind scope and filters: a cursor issued for one filter set is refused under another, and a forged scope is refused.
+ for(let i=0;i<2;i++)await call(A,'preparer','POST','/tasks',{body:{...taskBody,sourceId:randomUUID()},headers:{...key(),...eh}});
+ r=await call(A,'preparer','GET','/tasks?limit=1&status=open',{headers:eh});const page1=await json(r);assert.ok(page1.nextCursor,'a continuation cursor is issued');
+ r=await call(A,'preparer','GET','/tasks?limit=1&status=open&cursor='+encodeURIComponent(page1.nextCursor),{headers:eh});assert.equal(r.status,200);
+ r=await call(A,'preparer','GET','/tasks?limit=1&status=resolved&cursor='+encodeURIComponent(page1.nextCursor),{headers:eh});assert.equal(r.status,422,'cursor reused with a different filter');
+ const forged=Buffer.from(JSON.stringify({...JSON.parse(Buffer.from(page1.nextCursor,'base64url').toString()),scope:'0000000000000000'})).toString('base64url');
+ r=await call(A,'preparer','GET','/tasks?limit=1&status=open&cursor='+encodeURIComponent(forged),{headers:eh});assert.equal(r.status,422,'forged cursor scope');
+ pass('tasks open once per cause, assign, refuse resolution without available evidence, list by owner and status, and cursors are bound to their scope and filters');
 
  // Exports and revocation (CORE-14): queue while the worker is stopped
  await stop(worker);worker=null;

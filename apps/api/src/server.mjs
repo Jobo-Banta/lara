@@ -6,6 +6,7 @@ import {requestTrace,exportTrace} from '../../../packages/config/src/telemetry.m
 import {sessionKeys} from '../../../packages/config/src/session-keys.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { verifyIdentity } from './identity.mjs';
+import * as identityModule from './identity.mjs';
 const scope = new AsyncLocalStorage();
 import { connectionOptions } from '../../../packages/database/src/connection.mjs';
 import http from "node:http";
@@ -42,7 +43,7 @@ const server = http.createServer((request, response) => scope.run({}, async () =
     if (path === "/health/live") return send(response, 200, { ok: true });
     if (path === "/health/ready") { const state = await ready(); return send(response, state.ok ? 200 : 503, state); }
     const identity=verifyIdentity((request.headers.authorization || '').replace(/^Bearer /,''),method,path,sessionKeys().verification);
-    if(!identity) return send(response,401,{error:'AUTHENTICATION_REQUIRED'});
+    if(!identity) return send(response,401,{error:'AUTHENTICATION_REQUIRED',...(config.mode==='production'||config.mode==='staging'?{}:{reason:identityModule.lastRejection})});
     scope.getStore().sub=identity.sub;
     if (path === "/ops/version") {
       const versions=await query('select version from schema_migrations order by version');

@@ -1,7 +1,7 @@
 // Workflow module: tasks, comments, obligations and the shared approval
 // engine. Every module raises tasks and approvals through these functions so
 // there is one task table, one approval chain and one place for maker-checker.
-import {assertInput,audit,cursorClause,emit,expectVersion,fail,isUuid,page,pageArgs,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,cursorClause,emit,expectVersion,fail,isUuid,page,pageArgs,requireEntity,requirePermission,resource,cursorScope} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 
 const taskFields=t=>({kind:t.kind,sourceType:t.source_type,sourceId:t.source_id,...(t.owner_id?{ownerId:t.owner_id}:{}),...(t.due_at?{dueAt:t.due_at.toISOString()}:{}),reason:t.reason});
@@ -83,14 +83,14 @@ export async function commentTask(tx,ctx,entityId,id,input,expectedVersion){
 export async function getTask(tx,ctx,entityId,id){requirePermission(ctx,'task.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.tasks where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Task not found.');return taskResource(row);}
 // My work: filtered by owner, status and due window; ordering is stable.
 export async function listTasks(tx,ctx,entityId,query){
- requirePermission(ctx,'task.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);
+ requirePermission(ctx,'task.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
  if(query?.ownerId){if(!isUuid(query.ownerId))fail('VALIDATION_FAILED','ownerId must be a UUID.',{fieldErrors:[{path:'ownerId',message:'UUID'}]});params.push(query.ownerId);where+=' and owner_id=$'+params.length;}
  if(query?.status){params.push(String(query.status).split(','));where+=' and status=any($'+params.length+'::text[])';}
  if(query?.dueBefore){params.push(String(query.dueBefore));where+=' and due_at<=$'+params.length+'::timestamptz';}
  if(query?.sourceId){if(!isUuid(query.sourceId))fail('VALIDATION_FAILED','sourceId must be a UUID.',{fieldErrors:[{path:'sourceId',message:'UUID'}]});params.push(query.sourceId);where+=' and source_id=$'+params.length;}
  const rows=(await tx.query('select * from lara.tasks where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
- return page(rows,limit,taskResource);
+ return page(rows,limit,taskResource,scope);
 }
 export async function taskComments(tx,ctx,entityId,id){
  requirePermission(ctx,'task.read');requireEntity(ctx,entityId);
@@ -141,13 +141,13 @@ export async function completeObligation(tx,ctx,entityId,id,input,expectedVersio
 }
 export async function getObligation(tx,ctx,entityId,id){requirePermission(ctx,'obligation.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.obligations where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Obligation not found.');return obligationResource(row);}
 export async function listObligations(tx,ctx,entityId,query){
- requirePermission(ctx,'obligation.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);
+ requirePermission(ctx,'obligation.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
  if(query?.status){params.push(String(query.status).split(','));where+=' and status=any($'+params.length+'::text[])';}
  if(query?.from){params.push(String(query.from));where+=' and due_at>=$'+params.length+'::timestamptz';}
  if(query?.to){params.push(String(query.to));where+=' and due_at<=$'+params.length+'::timestamptz';}
  const rows=(await tx.query('select * from lara.obligations where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
- return page(rows,limit,obligationResource);
+ return page(rows,limit,obligationResource,scope);
 }
 
 // Approval engine shared by every controlled resource. A request binds the

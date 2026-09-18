@@ -34,7 +34,8 @@
     "test:demo": "node scripts/test-demo-workflows.mjs",
     "test:p02-schema": "node scripts/test-p02-schema.mjs",
     "test:p02-domain": "node scripts/test-p02-domain.mjs",
-    "test:p02-api": "node scripts/test-p02-api.mjs"
+    "test:p02-api": "node scripts/test-p02-api.mjs",
+    "test:p02-load": "node scripts/test-p02-load.mjs"
   },
   "pnpm": {
     "overrides": {

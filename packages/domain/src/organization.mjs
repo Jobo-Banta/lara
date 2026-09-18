@@ -2,7 +2,7 @@
 // capability activation. Activation is a maker-checker flow bound to the
 // entity content version; the database re-validates profile and onboarding
 // gates for live tenants.
-import {assertInput,audit,contentHash,cursorClause,emit,expectVersion,fail,page,pageArgs,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,contentHash,cursorClause,emit,expectVersion,fail,page,pageArgs,requireEntity,requirePermission,resource,cursorScope} from './core.mjs';
 import {invalidatePendingApprovals} from './identity.mjs';
 
 // Provisioning a tenant is an operator action outside membership scope: the
@@ -40,11 +40,11 @@ export async function updateEntity(tx,ctx,id,expectedVersion,input){
 }
 export async function getEntity(tx,ctx,id){requirePermission(ctx,'entity.read');requireEntity(ctx,id);const row=(await tx.query('select * from lara.entities where tenant_id=$1 and id=$2',[ctx.tenantId,id])).rows[0];if(!row)fail('NOT_FOUND','Entity not found.');return entityResource(row);}
 export async function listEntities(tx,ctx,query){
- requirePermission(ctx,'entity.read');const {limit,after}=pageArgs(query);
+ requirePermission(ctx,'entity.read');const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const ids=[...ctx.entityIds];if(!ids.length)return {items:[],nextCursor:null};
  const params=[ctx.tenantId,ids,limit+1];
  const rows=(await tx.query('select * from lara.entities where tenant_id=$1 and id=any($2::uuid[])'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
- return page(rows,limit,entityResource);
+ return page(rows,limit,entityResource,scope);
 }
 
 // Setup completeness rule from the P02 specification.
@@ -133,7 +133,7 @@ export async function updateBranch(tx,ctx,entityId,id,expectedVersion,input){
  return branchResource(updated);
 }
 export async function getBranch(tx,ctx,entityId,id){requirePermission(ctx,'branch.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.branches where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Branch not found.');return branchResource(row);}
-export async function listBranches(tx,ctx,entityId,query){requirePermission(ctx,'branch.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.branches where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,branchResource);}
+export async function listBranches(tx,ctx,entityId,query){requirePermission(ctx,'branch.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.branches where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,branchResource,scope);}
 
 // Settings versions (P02-T03): a draft carries a payload hash; approval by a
 // different principal binds that hash; a material change creates the next

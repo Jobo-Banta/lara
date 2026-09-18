@@ -1,7 +1,7 @@
 // Identity module: principals, roles, memberships, delegation, actor context
 // and revocation checks. Tenant and permissions are derived from committed
 // membership rows, never from request payloads.
-import {assertInput,audit,contentHash,emit,expectVersion,fail,isUuid,page,pageArgs,cursorClause,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,contentHash,emit,expectVersion,fail,isUuid,page,pageArgs,cursorClause,requireEntity,requirePermission,resource,cursorScope} from './core.mjs';
 
 // OIDC issuer/subject is the durable identity. Invitation acceptance resolves
 // the principal inside the tenant that issued the invitation.
@@ -81,7 +81,7 @@ export async function approveRole(tx,ctx,id,input,expectedVersion){
  return {resourceType:'role',resourceId:id,version:Number(updated.version),state:updated.status};
 }
 export async function getRole(tx,ctx,id){requirePermission(ctx,'role.read');const row=(await tx.query('select * from lara.roles where tenant_id=$1 and id=$2',[ctx.tenantId,id])).rows[0];if(!row)fail('NOT_FOUND','Role not found.');return roleResource(row);}
-export async function listRoles(tx,ctx,query){requirePermission(ctx,'role.read');const {limit,after}=pageArgs(query);const params=[ctx.tenantId,limit+1];const rows=(await tx.query('select * from lara.roles where tenant_id=$1'+cursorClause(after,params)+' order by created_at,id limit $2',params)).rows;return page(rows,limit,roleResource);}
+export async function listRoles(tx,ctx,query){requirePermission(ctx,'role.read');const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,limit+1];const rows=(await tx.query('select * from lara.roles where tenant_id=$1'+cursorClause(after,params)+' order by created_at,id limit $2',params)).rows;return page(rows,limit,roleResource,scope);}
 
 const membershipFields=m=>({principalId:m.principal_id,roleId:m.role_id,branchIds:m.branch_id?[m.branch_id]:[],...(m.valid_to?{validUntil:m.valid_to.toISOString()}:{})});
 export const membershipResource=m=>resource(m,membershipFields(m));
@@ -125,7 +125,7 @@ export async function updateMembership(tx,ctx,entityId,id,expectedVersion,input)
 }
 export async function getMembership(tx,ctx,entityId,id){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.memberships where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Membership not found.');return membershipResource(row);}
 // Tenant-wide memberships (no entity) apply to every entity and are listed with it.
-export async function listMemberships(tx,ctx,entityId,query){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.memberships where tenant_id=$1 and (entity_id=$2 or entity_id is null)'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,membershipResource);}
+export async function listMemberships(tx,ctx,entityId,query){requirePermission(ctx,'membership.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.memberships where tenant_id=$1 and (entity_id=$2 or entity_id is null)'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,membershipResource,scope);}
 
 // Any pending approval bound to an older content version is invalidated when
 // material content changes; the decision chain must restart on the new hash.

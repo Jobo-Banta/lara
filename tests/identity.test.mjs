@@ -9,3 +9,10 @@ test('signed BFF identity binds subject, audience, path, method and expiry',()=>
  assert.equal(verifyIdentity(token+'x','GET','/demo/work',secret,now),null);
  assert.equal(verifyIdentity('forged','GET','/demo/work',secret,now),null);
 });
+test('a fresh token survives small clock skew between issuer and verifier but not a forged far-future expiry',()=>{
+ const token=signIdentity('actor-a','GET','/v1/me',secret,now);
+ assert.equal(verifyIdentity(token,'GET','/v1/me',secret,now-1)?.sub,'actor-a','verifier clock 1ms behind the issuer');
+ assert.equal(verifyIdentity(token,'GET','/v1/me',secret,now-4999)?.sub,'actor-a');
+ assert.equal(verifyIdentity(token,'GET','/v1/me',secret,now-5001),null,'beyond the tolerated skew');
+ assert.equal(verifyIdentity(token,'GET','/v1/me',secret,now+30000),null,'expired exactly at exp');
+});

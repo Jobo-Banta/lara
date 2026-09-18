@@ -3,7 +3,7 @@
 // state an approval may bind to. Storage and scanning are adapters owned by
 // LARA; the fixture scanner flags the EICAR test string.
 import {createHash,randomUUID} from 'node:crypto';
-import {assertInput,audit,cursorClause,emit,enqueueJob,expectVersion,fail,page,pageArgs,requireEntity,requirePermission} from './core.mjs';
+import {assertInput,audit,cursorClause,emit,enqueueJob,expectVersion,fail,page,pageArgs,requireEntity,requirePermission,cursorScope} from './core.mjs';
 
 export const allowedMime=new Set(['application/pdf','image/jpeg','image/png','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
 export const maxBytes=20971520;
@@ -122,11 +122,11 @@ export async function readContent(tx,ctx,entityId,id,store){
  return {evidence:e,bytes:await store.get(row.object_key)};
 }
 export async function listEvidence(tx,ctx,entityId,query){
- requirePermission(ctx,'evidence.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);
+ requirePermission(ctx,'evidence.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
  if(query?.status){params.push(String(query.status).split(','));where=' and status=any($'+params.length+'::text[])';}
  const rows=(await tx.query('select * from lara.evidence where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
- return page(rows,limit,evidenceResource);
+ return page(rows,limit,evidenceResource,scope);
 }
 // Link available evidence to a resource version; the caller has already
 // authorized the target resource.

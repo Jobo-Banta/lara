@@ -1,6 +1,6 @@
 # P02 implementation review — 19 September 2026
 
-P02 is in progress, not released. Build-order steps 1 (contracts and migrations), 2 (domain rules), 3 (API, jobs and adapters) and 4 (user journeys) are implemented. Nothing in this phase is activated for any live tenant.
+P02 is in progress, not released. Build-order steps 1 (contracts and migrations), 2 (domain rules), 3 (API, jobs and adapters), 4 (user journeys) and 5 (acceptance and operations) are implemented. Nothing in this phase is activated for any live tenant.
 
 ## P02-01 contracts and migrations
 
@@ -66,7 +66,14 @@ Verification: `tests/browser/workspace.spec.mjs` runs against `LARA_MODE=local` 
 
 Known gaps for the owner: no reviewed operation lists task comments (comments made in the session are shown; persisted ones are not listed), no invitation operation exists (principals are created by operator provisioning or by an existing tenant login), the audit view needs a reviewed read operation, and approval-policy screens wait for the routing that arrives with the ledger.
 
+## P02-05 acceptance and operations
+
+- Runbooks: `P02-RUNBOOK.md` covers start/stop/readiness, deploy/rollback, failed migration, queue replay and dead letter, restore, scope revocation, evidence scan failure, export failure, provider outage, module corrections and escalation, each with evidence to preserve and prohibited actions.
+- Security negative matrix additions: cursors now bind tenant, entity and filter set (a cursor reused under another filter or with a forged scope is refused, `scripts/test-p02-api.mjs`); the identity check reports its rejection reason outside production and tolerates bounded clock skew on the upper bound (a 1 ms clock-read difference between the BFF and API processes rejected fresh tokens intermittently; `tests/identity.test.mjs`).
+- Load: `scripts/test-p02-load.mjs` measures p50/p95/max and errors for reads, commands and a mixed profile through the HTTP API; CI asserts p95 under 2 s and command p95 under 1 s on its local database. Against the remote engineering database from a developer machine the run reports (concurrency 4): reads p95 1.47 s, commands p95 1.94 s, mixed p95 1.46 s, zero errors — network-bound, reported not asserted.
+- Regression: the P00 and P01 suites (foundation, workflow, demo browser, accessibility) run unchanged alongside the P02 suites in CI for both fresh and upgrade databases; restore rehearsal covers all P02 tables.
+
 ## Open for later P02 tickets
 
 - Outbox publication to consumers (notifications) is pending a consumer; events are written and published_at stays null until one exists.
-- P02-05 acceptance, runbooks and load; P02-06 release. Registration profile and retention policy tables are referenced by id but defined in their owning phases.
+- P02-06 release: RG-01–08 evidence record, per-profile activation decision and tagged deployment are owner actions; the first live activation additionally needs the S3-compatible evidence store and a production scanner adapter qualified, and the owner's review of the contract additions. Registration profile and retention policy tables are referenced by id but defined in their owning phases.

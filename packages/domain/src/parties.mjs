@@ -2,7 +2,7 @@
 // archive and reviewed merge. Merging links the source to the target and
 // archives it; nothing referenced by a posted snapshot is rewritten.
 import {createCipheriv,createDecipheriv,randomBytes} from 'node:crypto';
-import {assertInput,audit,contentHash,cursorClause,emit,expectVersion,fail,page,pageArgs,requireEntity,requirePermission,resource} from './core.mjs';
+import {assertInput,audit,contentHash,cursorClause,emit,expectVersion,fail,page,pageArgs,requireEntity,requirePermission,resource,cursorScope} from './core.mjs';
 import {invalidatePendingApprovals} from './identity.mjs';
 
 // Field encryption for tax identifiers. The key comes from the deployment
@@ -111,7 +111,7 @@ export async function getParty(tx,ctx,entityId,id,env){
  return {...partyResource(row,await rolesOf(tx,ctx,id),env),...(row.merged_into?{mergedInto:row.merged_into}:{})};
 }
 export async function listParties(tx,ctx,entityId,query,env){
- requirePermission(ctx,'party.read');requireEntity(ctx,entityId);const {limit,after}=pageArgs(query);
+ requirePermission(ctx,'party.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];
  let where='';
  if(query?.q){params.push('%'+String(query.q).toLowerCase().replace(/\s+/g,' ').trim()+'%');where+=' and normalized_name like $'+params.length;}
@@ -119,5 +119,5 @@ export async function listParties(tx,ctx,entityId,query,env){
  if(query?.status){params.push(String(query.status));where+=' and status=$'+params.length;}
  const rows=(await tx.query('select * from lara.party where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
  const roles=rows.length?(await tx.query('select party_id,role from lara.party_roles where tenant_id=$1 and party_id=any($2::uuid[]) order by role',[ctx.tenantId,rows.map(r=>r.id)])).rows:[];
- return page(rows,limit,p=>partyResource(p,roles.filter(r=>r.party_id===p.id).map(r=>r.role),env));
+ return page(rows,limit,p=>partyResource(p,roles.filter(r=>r.party_id===p.id).map(r=>r.role),env),scope);
 }

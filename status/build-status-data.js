@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T20:02:55+00:00",
+  "updated_at": "2026-09-18T20:16:03+00:00",
   "releases": [
     {
       "id": "P00",
@@ -907,13 +907,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review.",
-      "evidence": "Local 2026-09-19: tests/browser/workspace.spec.mjs 5 journeys plus full suite 22/22 on LARA_MODE=local and demo servers against Supabase; API 7 groups, domain 10, schema 15, foundation 23/23, contracts and specification validation PASS. CI pending push.",
-      "updated_at": "2026-09-18T20:02:55+00:00"
+      "evidence": "GitHub CI 35389296479 passed: tests/browser/workspace.spec.mjs five journeys on the LARA_MODE=local composition plus demo/accessibility/foundation suites (22 browser tests), API 7 groups, domain 10, schema 15 in fresh and upgrade PostgreSQL 18, foundation 23/23, specification validation 348 operations, image scans. Local Supabase full browser run 22/22 on 2026-09-19. Contract additions (GET /evidence, list filters) recorded in docs/development/P02-REVIEW.md for owner review.",
+      "updated_at": "2026-09-18T20:07:47+00:00"
     },
     {
       "id": "P02-05",
@@ -964,13 +964,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases.",
+      "evidence": "Local 2026-09-19: load report reads p95 1.47 s, commands p95 1.94 s, mixed 1.46 s, zero errors against Supabase (concurrency 4); API 7 groups PASS; foundation 24/24; identity skew unit test. CI assertion pending push.",
+      "updated_at": "2026-09-18T20:16:03+00:00"
     },
     {
       "id": "P02-06",
@@ -5521,24 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T15:55:53+00:00",
-      "id": "P01-08",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T16:44:03+00:00",
-      "id": "P01-02",
-      "action": "in_review",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-03",
-      "action": "in_review",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
-    },
-    {
       "at": "2026-09-18T16:44:04+00:00",
       "id": "P01-04",
       "action": "in_review",
@@ -5699,6 +5681,24 @@ window.LARA_BUILD_STATUS = {
       "id": "P02-04",
       "action": "in_review",
       "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review."
+    },
+    {
+      "at": "2026-09-18T20:07:47+00:00",
+      "id": "P02-04",
+      "action": "done",
+      "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review."
+    },
+    {
+      "at": "2026-09-18T20:07:47+00:00",
+      "id": "P02-05",
+      "action": "in_progress",
+      "note": "Acceptance and operations: security negative matrix additions (cursor scope binding), load measurement script, runbooks for start/stop, deploy/rollback, failed migration, dead-letter replay, restore, revocation, scan and export failure, and diagnostics for an intermittent identity verification failure."
+    },
+    {
+      "at": "2026-09-18T20:16:03+00:00",
+      "id": "P02-05",
+      "action": "in_review",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
     }
   ]
 };

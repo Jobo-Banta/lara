@@ -109,16 +109,20 @@ export const iso=v=>v==null?v:(v instanceof Date?v.toISOString():v);
 export function resource(row,fields){
  return {id:row.id,version:Number(row.version),contentVersion:Number(row.content_version??1),state:row.status,createdAt:iso(row.created_at),updatedAt:iso(row.updated_at),simulation:false,...fields};
 }
-export function pageArgs(query){
+// Cursors bind the scope they were issued for (tenant, entity and filters);
+// a cursor presented under a different scope is rejected, never reinterpreted.
+export const cursorScope=(ctx,entityId,query={})=>createHash('sha256').update(canonical({tenant:ctx.tenantId,entity:entityId||null,filters:Object.fromEntries(Object.entries(query).filter(([k])=>!['cursor','limit'].includes(k)))})).digest('hex').slice(0,16);
+export function pageArgs(query,scope){
  const limit=query?.limit===undefined?50:Number(query.limit);
  if(!Number.isInteger(limit)||limit<1||limit>200)fail('VALIDATION_FAILED','limit must be an integer from 1 to 200.',{fieldErrors:[{path:'limit',message:'1 to 200'}]});
  let after=null;
- if(query?.cursor){try{const d=JSON.parse(Buffer.from(String(query.cursor),'base64url').toString('utf8'));if(!d.createdAt||!isUuid(d.id))throw 0;after=d;}catch{fail('VALIDATION_FAILED','Invalid cursor.',{fieldErrors:[{path:'cursor',message:'Invalid'}]});}}
+ if(query?.cursor){try{const d=JSON.parse(Buffer.from(String(query.cursor),'base64url').toString('utf8'));if(!d.createdAt||!isUuid(d.id))throw 0;after=d;}catch{fail('VALIDATION_FAILED','Invalid cursor.',{fieldErrors:[{path:'cursor',message:'Invalid'}]});}
+  if(scope!==undefined&&after.scope!==scope)fail('VALIDATION_FAILED','Cursor does not belong to this scope or filter set.',{fieldErrors:[{path:'cursor',message:'Scope mismatch'}]});}
  return {limit,after};
 }
-export function page(rows,limit,map){
+export function page(rows,limit,map,scope=null){
  const items=rows.slice(0,limit).map(map);
  const last=rows.length>limit?rows[limit-1]:null;
- return {items,nextCursor:last?Buffer.from(JSON.stringify({createdAt:iso(last.created_at),id:last.id,scope:last.tenant_id})).toString('base64url'):null};
+ return {items,nextCursor:last?Buffer.from(JSON.stringify({createdAt:iso(last.created_at),id:last.id,scope:scope??last.tenant_id})).toString('base64url'):null};
 }
 export const cursorClause=(after,params)=>after?` and (created_at,id) > ($${params.push(after.createdAt)}::timestamptz,$${params.push(after.id)}::uuid)`:'';
