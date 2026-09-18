@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T21:36:00+00:00",
+  "updated_at": "2026-09-18T21:39:28+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1241,13 +1241,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases.",
-      "evidence": "Local 2026-09-19: load posting profile p95 1.83 s remote with zero errors; browser suite 23/23; API/domain/schema suites PASS. CI pending push.",
-      "updated_at": "2026-09-18T21:34:50+00:00"
+      "evidence": "GitHub CI 35397473671 (push) and 35397578851 (pull request) passed: posting load profile asserted on PostgreSQL 18 (post p95 under 1 s), P00-P03 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook docs/development/P03-RUNBOOK.md; remote load report in docs/development/P03-REVIEW.md. One pull-request-event run (35397477270) failed only in the gitleaks git range scan while the base moved; the same commit's push run passed.",
+      "updated_at": "2026-09-18T21:39:28+00:00"
     },
     {
       "id": "P03-06",
@@ -5521,12 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-09",
-      "action": "in_review",
-      "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
-    },
-    {
       "at": "2026-09-18T17:03:09+00:00",
       "id": "P02-01",
       "action": "in_progress",
@@ -5699,6 +5693,12 @@ window.LARA_BUILD_STATUS = {
       "id": "P03-04",
       "action": "done",
       "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
+    },
+    {
+      "at": "2026-09-18T21:39:28+00:00",
+      "id": "P03-05",
+      "action": "done",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
     }
   ]
 };
