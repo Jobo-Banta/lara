@@ -163,11 +163,11 @@
       "updated_at": "2026-09-18T20:16:03+00:00"
     },
     "P02-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T20:17:48+00:00"
     },
     "P03-01": {
       "status": "not_started",
@@ -1794,7 +1794,13 @@
       "id": "P02-05",
       "action": "in_review",
       "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T20:17:48+00:00",
+      "id": "P02-06",
+      "action": "blocked",
+      "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions."
     }
   ],
-  "updated_at": "2026-09-18T20:16:03+00:00"
+  "updated_at": "2026-09-18T20:17:48+00:00"
 }
