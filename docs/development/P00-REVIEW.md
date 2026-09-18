@@ -28,10 +28,10 @@ Supabase is the requested database platform. The inspected instance runs Postgre
 | P00-01 | Clean-clone full-stack bootstrap, worker/toolchain manifest and runtime/image pinning. setup validates existing credentials but does not provision all dependencies. |
 | P00-02 | Startup missing-secret gate now verified. Secret-manager integration and key rotation remain outside the tested local-file baseline. |
 | P00-03 | Script migrator/runtime role provisioning; test genuine clean/prior-release databases in CI. Current rehearsal isolates schemas in one rollback-only Supabase transaction. |
-| P00-04 | Complete OIDC provider login proof, server-to-server authenticated scoped API identity, tenant policies and cross-tenant negative tests. Nine existing demo tables lack RLS. Non-superuser roles alone do not prove isolation. |
+| P00-04 | Scoped signed BFF identity and forced RLS on all nine demo tables are now implemented and verified with cross-run negative tests. Real Supabase OIDC login/consent callback still needs end-to-end provider evidence. |
 | P00-05 | Publish and run CI, enforce required checks on main, add dependency/secret/image scans and contract-generation drift evidence. Remote had no main branch when inspected. |
 | P00-06 | Enforce dedicated demo target identity and per-session entitlement. Mode guards alone are insufficient. Production registration guard is implemented; reset remains intentionally unavailable. |
-| P00-07 | Authenticated version response, structured operational events, telemetry/alert routing and negative readiness recovery. Anonymous version denial alone is not a finished authenticated endpoint. |
+| P00-07 | Authenticated version response and schema version verified. Structured operational events, telemetry/alert routing and negative readiness recovery remain. |
 | P00-08 | Broader backup/restore rehearsal with nonempty fixtures, reproducible artifact delivery, signed release tag and release gate report. Prior metadata-only snapshot with zero seed rows is insufficient evidence for a shipped baseline. |
 
 No P00 release is attested. Previous in-review labels are not proof of completed acceptance. This report distinguishes code fixes from gates that still require implementation.
@@ -46,3 +46,11 @@ No P00 release is attested. Previous in-review labels are not proof of completed
 - pnpm release:check — fail closed on incomplete tickets; never deploys or attests a release.
 
 Keep credentials in ignored .env.local. Migration commands accept MIGRATION_DATABASE_URL or the existing SUPABASE_OWNER_DATABASE_URL; only operators run them. Runtime uses DATABASE_URL. Run API and web with pnpm api and pnpm dev in separate terminals.
+
+## Follow-up: authenticated scope and database policies
+
+Migration 0006 enables and forces RLS on all nine demo tables. Requests carry a signed, 30-second BFF identity bound to method and path, derived only from the encrypted login session. Each SQL transaction sets a verified subject and run; connection scope clears at commit. The API rejects absent or tampered signatures and denies unassigned subjects. Browser clients use same-origin /api/demo routes; POST requests require matching Origin. API tokens never enter browser storage.
+
+Seven foundation/identity tests pass. scripts/test-subject-isolation.mjs proved missing-scope, cross-run read/write/insert, RLS alteration denial and scope cleanup against Supabase, then removed its synthetic records. scripts/test-api-readiness.mjs proved unsigned API denial, authenticated version access and unassigned-subject denial. These tests mint server identities locally; they do not claim a real provider login occurred.
+
+Operator boundary: node scripts/provision-demo-subject.mjs <verified-oidc-subject> assigns a new empty isolated demo run. Obtain the subject from a verified provider login; do not use an email or invented subject. Existing shared fixtures remain unassigned and invisible. No existing user was provisioned by this review. Full per-session scenario seeding/reset is still P01 work.

@@ -21,7 +21,8 @@
     "db:restore:snapshot": "node scripts/restore-snapshot.mjs",
     "release:manifest": "node scripts/release-manifest.mjs",
     "setup": "node scripts/setup.mjs",
-    "test:foundation": "node --test tests/foundation.test.mjs",
-    "verify": "pnpm test:foundation && pnpm status:check && pnpm build"
+    "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs",
+    "verify": "pnpm test:foundation && pnpm status:check && pnpm build",
+    "test:isolation": "node scripts/test-subject-isolation.mjs"
   }
 }

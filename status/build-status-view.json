@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T09:48:18+00:00",
+  "updated_at": "2026-09-18T09:54:45+00:00",
   "releases": [
     {
       "id": "P00",
@@ -413,9 +413,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Real Supabase rollback-only clean-schema/upgrade/no-op/checksum/failure tests and runtime DDL denial pass. Scripted migrator role provisioning and independent clean-database CI rehearsal remain.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:16+00:00"
+      "note": "Migration 0006 applied; clean-schema upgrade, checksum rejection and runtime DDL negatives pass. Dedicated migrator provisioning and clean-database CI remain.",
+      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
+      "updated_at": "2026-09-18T09:54:43+00:00"
     },
     {
       "id": "P00-04",
@@ -427,13 +427,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T04",
-      "status": "in_progress",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Fixed callback nonce and session fallback. Scoped API identity, tenant RLS and cross-tenant tests remain; role flags alone do not pass T04.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:16+00:00"
+      "note": "Signed BFF identity and forced subject-scoped RLS implemented. Seven tests and real Supabase cross-run read/write/insert/RLS-disable negatives pass. Real OIDC login/consent callback evidence remains.",
+      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
+      "updated_at": "2026-09-18T09:54:44+00:00"
     },
     {
       "id": "P00-05",
@@ -467,9 +467,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Production mode rejects fixtures, non-demo API routes denied, seed requires explicit demo confirmation. Dedicated target and per-session entitlement enforcement remain.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:17+00:00"
+      "note": "Unassigned subjects denied; runs require operator assignment. Nine demo tables enforce RLS. Dedicated target checks and complete session reset remain.",
+      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
+      "updated_at": "2026-09-18T09:54:44+00:00"
     },
     {
       "id": "P00-07",
@@ -485,9 +485,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Readiness now returns 200 with schema verification after migration 0005; verified database TLS and request IDs added. Authenticated version response and telemetry/alerts remain.",
-      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
-      "updated_at": "2026-09-18T09:48:18+00:00"
+      "note": "Authenticated version API returns schema 0006; unsigned requests denied; readiness passes. Structured telemetry and alerts remain.",
+      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
+      "updated_at": "2026-09-18T09:54:45+00:00"
     },
     {
       "id": "P00-08",
@@ -539,9 +539,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented.",
-      "evidence": "0002_demo_work applied; API /demo/work and /demo/overview returned 200 from Supabase; /work returned 200.",
-      "updated_at": "2026-09-18T09:24:33+00:00"
+      "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains.",
+      "evidence": "docs/development/P00-REVIEW.md; pnpm verify; scripts/test-subject-isolation.mjs; scripts/test-api-readiness.mjs; scripts/test-foundation-db.mjs all passed.",
+      "updated_at": "2026-09-18T09:54:45+00:00"
     },
     {
       "id": "P01-03",
@@ -5521,36 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T08:53:12+00:00",
-      "id": "P00-02",
-      "action": "done",
-      "note": ""
-    },
-    {
-      "at": "2026-09-18T08:53:13+00:00",
-      "id": "P00-03",
-      "action": "in_review",
-      "note": "Checksum-verified migration runner applied 0001_phase0 to Supabase and rerun was a no-op."
-    },
-    {
-      "at": "2026-09-18T08:53:13+00:00",
-      "id": "P00-04",
-      "action": "blocked",
-      "note": "OIDC issuer and client credentials are not available; identity provider integration cannot be verified."
-    },
-    {
-      "at": "2026-09-18T08:53:14+00:00",
-      "id": "P00-05",
-      "action": "in_review",
-      "note": "CI workflow and build-tracker check added."
-    },
-    {
-      "at": "2026-09-18T08:53:15+00:00",
-      "id": "P00-06",
-      "action": "in_review",
-      "note": "Demo-only seed guard and local PostgreSQL compose target added."
-    },
-    {
       "at": "2026-09-18T08:53:15+00:00",
       "id": "P00-07",
       "action": "done",
@@ -5699,6 +5669,36 @@
       "id": "P00-08",
       "action": "in_progress",
       "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain."
+    },
+    {
+      "at": "2026-09-18T09:54:43+00:00",
+      "id": "P00-03",
+      "action": "in_progress",
+      "note": "Migration 0006 applied; clean-schema upgrade, checksum rejection and runtime DDL negatives pass. Dedicated migrator provisioning and clean-database CI remain."
+    },
+    {
+      "at": "2026-09-18T09:54:44+00:00",
+      "id": "P00-04",
+      "action": "in_review",
+      "note": "Signed BFF identity and forced subject-scoped RLS implemented. Seven tests and real Supabase cross-run read/write/insert/RLS-disable negatives pass. Real OIDC login/consent callback evidence remains."
+    },
+    {
+      "at": "2026-09-18T09:54:44+00:00",
+      "id": "P00-06",
+      "action": "in_progress",
+      "note": "Unassigned subjects denied; runs require operator assignment. Nine demo tables enforce RLS. Dedicated target checks and complete session reset remain."
+    },
+    {
+      "at": "2026-09-18T09:54:45+00:00",
+      "id": "P00-07",
+      "action": "in_progress",
+      "note": "Authenticated version API returns schema 0006; unsigned requests denied; readiness passes. Structured telemetry and alerts remain."
+    },
+    {
+      "at": "2026-09-18T09:54:45+00:00",
+      "id": "P01-02",
+      "action": "in_progress",
+      "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains."
     }
   ]
 }
