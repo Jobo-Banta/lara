@@ -198,18 +198,18 @@
       "updated_at": "2026-09-18T21:31:16+00:00"
     },
     "P03-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases.",
+      "evidence": "Local 2026-09-19: load posting profile p95 1.83 s remote with zero errors; browser suite 23/23; API/domain/schema suites PASS. CI pending push.",
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     "P03-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     "P04-01": {
       "status": "not_started",
@@ -1866,7 +1866,19 @@
       "id": "P03-04",
       "action": "in_review",
       "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-05",
+      "action": "in_review",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-06",
+      "action": "blocked",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal."
     }
   ],
-  "updated_at": "2026-09-18T21:31:16+00:00"
+  "updated_at": "2026-09-18T21:34:50+00:00"
 }

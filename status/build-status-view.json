@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T21:31:16+00:00",
+  "updated_at": "2026-09-18T21:34:50+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1241,13 +1241,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases.",
+      "evidence": "Local 2026-09-19: load posting profile p95 1.83 s remote with zero errors; browser suite 23/23; API/domain/schema suites PASS. CI pending push.",
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     {
       "id": "P03-06",
@@ -1285,13 +1285,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     {
       "id": "P04-01",
@@ -5522,18 +5522,6 @@
   "history": [
     {
       "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-06",
-      "action": "done",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-07",
-      "action": "done",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
       "id": "P01-08",
       "action": "done",
       "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
@@ -5699,6 +5687,18 @@
       "id": "P03-04",
       "action": "in_review",
       "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-05",
+      "action": "in_review",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-06",
+      "action": "blocked",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal."
     }
   ]
 }

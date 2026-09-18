@@ -40,6 +40,15 @@ Verification: the ledger journey in `tests/browser/workspace.spec.mjs` (producti
 
 Known gaps for the owner: no reviewed operation lists posted journal lines by account (ledger drill-down shows posted journals instead), import row errors are not listed by a reviewed operation (the validate response carries counts; rows stay staged), and the fiscal-year close has no operation in the contract (domain command only).
 
+## P03-05 acceptance and operations
+
+- Runbook: `P03-RUNBOOK.md` adds posting-integrity response, period close/reopen, fiscal-year close, opening import failures, report snapshots, chart corrections and evidence to preserve.
+- Load: `scripts/test-p02-load.mjs` gains a posting profile (prepare, submit, approve by a second principal, post) measured on the post step; CI asserts p95 under 1 s for commands and posts on its local database. Remote engineering database from a developer machine (concurrency 4): post p95 1.83 s, reads 1.51 s, commands 2.25 s, zero errors.
+- Regression and security: P00–P02 suites plus P03 schema, domain and API suites run in CI for fresh and upgrade databases; the database refuses direct journal writes and posted-row mutation for every role, and cross-entity account references fail as not found.
+
+## P03-06 release
+
+Blocked on the P02 release (release-plan dependency), the owner's tag and deployment, review of the contract additions, and the controller sign-off on account mapping, openings, source ownership and a close rehearsal for each activated entity. `docs/development/releases/0.3.0-draft.md` maps the gate evidence.
+
 ## Open for later P03 tickets
 
-- P03-05/06 acceptance, runbook and release; activation requires the controller's sign-off on mapping, openings, source ownership and a close rehearsal.
