@@ -1,6 +1,6 @@
 # P04 implementation review — 19 September 2026
 
-P04 is in progress, not released. Build-order steps 1 (contracts, migration, permission and capability definitions) and 2 (domain and accounting rules) are implemented; no `sales` capability is activated for a live tenant and no tax rule version is active anywhere.
+P04 is in progress, not released. Build-order steps 1 (contracts, migration, permission and capability definitions), 2 (domain and accounting rules) and 3 (API and jobs) are implemented; no `sales` capability is activated for a live tenant and no tax rule version is active anywhere.
 
 ## P04-01 contracts and migration
 
@@ -35,9 +35,19 @@ Follow-up migrations: `0017_p04_credit_allocations.sql` aligns `documents.settle
 
 Verification: `scripts/test-p04-domain.mjs` (nine groups, also in CI for fresh and upgrade databases) covers capability and profile gates, the tax rule lifecycle, the rounding kernel (P04-T04), AC-01 issuance with exact journal lines (P04-T01), failed and concurrent numbering (P04-T02), the reporting-required block (P04-T05), partial credit and eligibility (P04-T03, AC-06), receipts with withholding, double allocation, allocation and receipt reversals with a balanced trial balance (AC-02, AC-05), credit limits, order conversion, delivery jobs and aging. `tests/domain.test.mjs` unit-tests the kernel.
 
+## P04-03 API and jobs
+
+The 34 P04 operations are served by `apps/api/src/workspace-api.mjs` through `@lara/contracts` with the shared conventions (X-Entity-Id, Idempotency-Key with request-hash receipts, If-Match on edits and actions, ETag on resources, typed errors): `/tax-rules` (create with the accounting-cases catalog as the golden-case registry, list, get, edit, approve, activate), `/invoices` (invoices and credit notes: create, list with `state`/`partyId` filters, get, edit, submit, approve, post, correct, deliver), `/sales-orders` (sales orders and quotations: create, list, get, edit, submit, approve, convert), `/collections` (create, list, get, edit, submit, approve, post, reverse, allocations), `POST /allocations/{id}/reverse` and `GET /open-items` (`partyId`, `side`, `open=true`). A document is addressable only through the family its kind belongs to (an invoice is 404 under `/sales-orders`). `POST /reports` accepts `reportType=aging`; `ledger.snapshotReport` gained pluggable builders so the aging report snapshots through the same immutable, checksummed path and renders to CSV. The P05 `/settlements` operations stay `FEATURE_NOT_ENABLED`.
+
+Worker: `document.deliver` rechecks the requester's `invoice.deliver`, records the delivery as `sent` with a `<MAIL_ADAPTER>:<jobId>` provider reference (the mail adapter is local in this release; a qualified delivery adapter is an activation gate) and sets the document's `delivery_state` projection; the worker role can update only those columns. `report.generate` handles `aging`.
+
+Verification: `scripts/test-p04-api.mjs` (six groups, API and worker as processes, also in CI for fresh and upgrade databases) covers the tax rule lifecycle over HTTP, invoice creation with server totals and contract rejection of client totals, idempotent replay, ETag/If-Match, forbidden and stale approvals, versioned issuance, posted immutability, filtered listing, correction eligibility and posting, collections with withholding and allocations, `ALLOCATION_EXCEEDS_BALANCE`, allocation and receipt reversals, delivery and aging jobs, and 404 isolation for unknown documents, foreign entities and mismatched kinds. `scripts/test-p02-api.mjs` now probes the later-phase gate with a P05 operation.
+
 ## Open items for the owner
 
-- The P04 specification lists `payment_terms`, `credit_limits`, `deliveries` and `party_snapshot` but the reviewed OpenAPI has no operations for payment terms, series management, credit limits or delivery listing; the P04-03 API will need these added to the contract before the invoice editor can pick a series or terms, or they stay controller-configured through settings.
+- The P04 specification lists `payment_terms`, `credit_limits`, `deliveries` and `party_snapshot` but the reviewed OpenAPI has no operations for payment terms, numbering series, credit limits or delivery listing; the tests seed series and limits directly and the P04-04 screens will need read/list and versioned-mutation operations added to the contract for them (series and the `sales_profile` settings at minimum), following the phase rule.
+- `DocumentResource.lines` has no room for the computed per-line tax (`additionalProperties: false`); the screens show header totals only until the contract adds line results.
+- `POST /invoices/{id}/deliver` carries no recipient; delivery uses the party's `address_json.email` when present and otherwise records a copy for manual handover.
 - No seeded role template holds `sales_order.approve` or `sales_order.convert`; tenants must create a role for order approval (the domain test does). Consider adding them to `controller` or `billing` in a later seed migration.
 - Tax rules and the kernel treat `applicabilityProfileId` as an opaque approved-profile reference; the P07 profile registry will bind it.
 - `ADR 001` still names NestJS/Vitest; the codebase remains plain Node + `node:test` (see `P02-REVIEW.md`).

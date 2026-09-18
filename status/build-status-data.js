@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T22:22:08+00:00",
+  "updated_at": "2026-09-18T22:34:12+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1401,13 +1401,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
-      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI.",
-      "evidence": "scripts/test-p04-domain.mjs passed locally against Supabase (9 groups); tests/domain.test.mjs kernel unit test; CI run pending",
-      "updated_at": "2026-09-18T22:22:08+00:00"
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI.",
+      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T22:34:12+00:00"
     },
     {
       "id": "P04-03",
@@ -1459,13 +1459,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "scripts/test-p04-api.mjs passed locally (6 groups, API+worker processes); P02/P03 API suites pass; CI run pending",
+      "updated_at": "2026-09-18T22:34:12+00:00"
     },
     {
       "id": "P04-04",
@@ -5521,18 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T17:44:47+00:00",
-      "id": "P02-02",
-      "action": "in_review",
-      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer."
-    },
-    {
-      "at": "2026-09-18T17:48:26+00:00",
-      "id": "P02-02",
-      "action": "done",
-      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer."
-    },
-    {
       "at": "2026-09-18T17:48:26+00:00",
       "id": "P02-03",
       "action": "in_progress",
@@ -5699,6 +5687,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P04-02",
       "action": "in_review",
       "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-02",
+      "action": "done",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-03",
+      "action": "in_review",
+      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
     }
   ]
 };

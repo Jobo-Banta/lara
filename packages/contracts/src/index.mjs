@@ -10,6 +10,7 @@ const addFormats=require('ajv-formats').default;
 const source=new URL('../../../docs/development/contracts/openapi.json',import.meta.url);
 export const openapi=JSON.parse(readFileSync(source,'utf8'));
 export const permissions=Object.freeze(JSON.parse(readFileSync(new URL('../../../docs/development/contracts/permissions.json',import.meta.url),'utf8')).permissions);
+export const accountingCases=Object.freeze(new Set(JSON.parse(readFileSync(new URL('../../../docs/development/contracts/accounting-cases.json',import.meta.url),'utf8')).cases.map(c=>c.id)));
 export const stateMachines=Object.freeze(JSON.parse(readFileSync(new URL('../../../docs/development/contracts/state-machines.json',import.meta.url),'utf8')).machines);
 
 const ajv=new Ajv({strict:false,allErrors:true,coerceTypes:false,useDefaults:false,removeAdditional:false});

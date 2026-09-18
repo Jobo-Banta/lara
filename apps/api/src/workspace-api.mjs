@@ -2,8 +2,8 @@
 // actor is resolved from committed memberships, headers follow the mutation
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
-import {findOperation,operations,validateInput} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger} from '@lara/domain';
+import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales} from '@lara/domain';
 
 const MAX_JSON=1048576,MAX_UPLOAD=20971520;
 const buckets=new Map();
@@ -160,9 +160,43 @@ Object.assign(handlers,{
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
+ // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
+ post_tax_rules:async(tx,ctx,{entityId,body})=>created(await sales.createTaxRule(tx,ctx,entityId,body,{goldenCases:accountingCases})),
+ get_tax_rules:async(tx,ctx,{entityId,query})=>list(await sales.listTaxRules(tx,ctx,entityId,query)),
+ get_tax_rules_id:async(tx,ctx,{entityId,params})=>ok(await sales.getTaxRule(tx,ctx,entityId,params.id)),
+ patch_tax_rules_id:async(tx,ctx,{entityId,params,body,version})=>ok(await sales.updateTaxRule(tx,ctx,entityId,params.id,version,body,{goldenCases:accountingCases})),
+ post_tax_rules_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.approveTaxRule(tx,ctx,entityId,params.id,body,version)),
+ post_tax_rules_id_activate:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.activateTaxRule(tx,ctx,entityId,params.id,body,version)),
+ post_invoices:async(tx,ctx,{entityId,body})=>{if(!['invoice','credit_note'].includes(body.kind))fail('VALIDATION_FAILED','This operation creates invoices and credit notes.',{fieldErrors:[{path:'kind',message:'invoice or credit_note'}]});return created(await sales.createDocument(tx,ctx,entityId,body));},
+ get_invoices:async(tx,ctx,{entityId,query})=>list(await sales.listDocuments(tx,ctx,entityId,query,{kinds:['invoice','credit_note']})),
+ get_invoices_id:async(tx,ctx,{entityId,params})=>ok(await sales.getDocument(tx,ctx,entityId,params.id,{kinds:['invoice','credit_note']})),
+ patch_invoices_id:async(tx,ctx,{entityId,params,body,version})=>ok(await sales.updateDocument(tx,ctx,entityId,params.id,version,body)),
+ post_invoices_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.submitDocument(tx,ctx,entityId,params.id,body,version)),
+ post_invoices_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.approveDocument(tx,ctx,entityId,params.id,body,version)),
+ post_invoices_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await sales.postDocument(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds||[]}};},
+ post_invoices_id_correct:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.correctDocument(tx,ctx,entityId,params.id,body,version)),
+ post_invoices_id_deliver:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.deliverDocument(tx,ctx,entityId,params.id,body,version)),
+ post_sales_orders:async(tx,ctx,{entityId,body})=>{if(!['sales_order','quotation'].includes(body.kind))fail('VALIDATION_FAILED','This operation creates sales orders and quotations.',{fieldErrors:[{path:'kind',message:'sales_order or quotation'}]});return created(await sales.createDocument(tx,ctx,entityId,body));},
+ get_sales_orders:async(tx,ctx,{entityId,query})=>list(await sales.listDocuments(tx,ctx,entityId,query,{kinds:['sales_order','quotation']})),
+ get_sales_orders_id:async(tx,ctx,{entityId,params})=>ok(await sales.getDocument(tx,ctx,entityId,params.id,{kinds:['sales_order','quotation']})),
+ patch_sales_orders_id:async(tx,ctx,{entityId,params,body,version})=>ok(await sales.updateDocument(tx,ctx,entityId,params.id,version,body)),
+ post_sales_orders_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.submitDocument(tx,ctx,entityId,params.id,body,version)),
+ post_sales_orders_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.approveDocument(tx,ctx,entityId,params.id,body,version)),
+ post_sales_orders_id_convert:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.convertDocument(tx,ctx,entityId,params.id,body,version)),
+ post_collections:async(tx,ctx,{entityId,body})=>created(await sales.createCollection(tx,ctx,entityId,body)),
+ get_collections:async(tx,ctx,{entityId,query})=>list(await sales.listCollections(tx,ctx,entityId,query)),
+ get_collections_id:async(tx,ctx,{entityId,params})=>ok(await sales.getCollection(tx,ctx,entityId,params.id)),
+ patch_collections_id:async(tx,ctx,{entityId,params,body,version})=>ok(await sales.updateCollection(tx,ctx,entityId,params.id,version,body)),
+ post_collections_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.submitCollection(tx,ctx,entityId,params.id,body,version)),
+ post_collections_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.approveCollection(tx,ctx,entityId,params.id,body,version)),
+ post_collections_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await sales.postCollection(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds||[]}};},
+ post_collections_id_reverse:async(tx,ctx,{entityId,params,body,version})=>{const r=await sales.reverseCollection(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds||[]}};},
+ post_collections_id_allocations:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.allocateCollection(tx,ctx,entityId,params.id,body,version)),
+ post_allocations_id_reverse:async(tx,ctx,{entityId,params,body})=>result(ctx,await sales.reverseAllocation(tx,ctx,entityId,params.id,body)),
+ get_open_items:async(tx,ctx,{entityId,query})=>list(await sales.listOpenItems(tx,ctx,entityId,query)),
 });
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 

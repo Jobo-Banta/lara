@@ -219,18 +219,18 @@
       "updated_at": "2026-09-18T21:57:19+00:00"
     },
     "P04-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
-      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI.",
-      "evidence": "scripts/test-p04-domain.mjs passed locally against Supabase (9 groups); tests/domain.test.mjs kernel unit test; CI run pending",
-      "updated_at": "2026-09-18T22:22:08+00:00"
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI.",
+      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T22:34:12+00:00"
     },
     "P04-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "scripts/test-p04-api.mjs passed locally (6 groups, API+worker processes); P02/P03 API suites pass; CI run pending",
+      "updated_at": "2026-09-18T22:34:12+00:00"
     },
     "P04-04": {
       "status": "not_started",
@@ -1914,7 +1914,19 @@
       "id": "P04-02",
       "action": "in_review",
       "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-02",
+      "action": "done",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-03",
+      "action": "in_review",
+      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
     }
   ],
-  "updated_at": "2026-09-18T22:22:08+00:00"
+  "updated_at": "2026-09-18T22:34:12+00:00"
 }

@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -35,10 +35,10 @@ export const handlers={
  'report.generate':async(tx,ctx,job)=>{
   const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
   const actor={...current,traceId:ctx.traceId};
-  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref);
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd})}});
   const format=job.payload_ref.format||'json';
   let content,mime;
-  if(format==='csv'){const cols=['code','name','category','debit','credit','balance'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...snap.payload.lines.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}
+  if(format==='csv'){const rows=snap.payload.lines||snap.payload.parties.flatMap(p=>p.items.map(i=>({party:p.legalName,...i})));const cols=snap.payload.lines?['code','name','category','debit','credit','balance']:['party','officialNumber','dueDate','daysPastDue','outstanding'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...rows.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}
   else if(format==='json'){content=Buffer.from(JSON.stringify(snap,null,1));mime='application/json';}
   else throw new DomainError('FEATURE_NOT_ENABLED','PDF reports arrive with the reporting module.');
   const sha256=createHash('sha256').update(content).digest('hex');
@@ -49,6 +49,16 @@ export const handlers={
   await tx.query("update lara.evidence set status='available' where id=$1",[row.id]);
   await audit(tx,{...ctx,principalId:job.requested_by},{entityId:job.entity_id,action:'report.generate',resourceType:'report_snapshot',resourceId:snap.id,resourceVersion:snap.versionNumber,afterRef:snap.checksum,reason:snap.reportType+' '+format});
   return {resourceType:'evidence',resourceId:row.id,state:'available',snapshotId:snap.id,checksum:snap.checksum};},
+ // Invoice delivery: the mail adapter is local in this release, so the delivery is recorded as sent with a local reference; the document keeps only the projection.
+ 'document.deliver':async(tx,ctx,job)=>{
+  await identity.assertJobStillAuthorized(tx,job,'invoice.deliver');
+  const delivery=(await tx.query('select * from lara.deliveries where tenant_id=$1 and id=$2',[job.tenant_id,job.payload_ref.deliveryId])).rows[0];
+  if(!delivery)throw new DomainError('NOT_FOUND','Delivery not found.');
+  const reference=(process.env.MAIL_ADAPTER||'local')+':'+job.id;
+  await tx.query("update lara.deliveries set state='sent',attempt=attempt+1,provider_reference=$3 where tenant_id=$1 and id=$2",[job.tenant_id,delivery.id,reference]);
+  await tx.query("update lara.documents set delivery_state='sent' where tenant_id=$1 and id=$2",[job.tenant_id,delivery.document_id]);
+  await audit(tx,{...ctx,principalId:job.requested_by},{entityId:job.entity_id,action:'invoice.delivered',resourceType:'delivery',resourceId:delivery.id,resourceVersion:Number(delivery.version)+1,afterRef:reference});
+  return {resourceType:'delivery',resourceId:delivery.id,state:'sent',reference};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){

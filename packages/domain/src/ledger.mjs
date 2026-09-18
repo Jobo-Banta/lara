@@ -295,11 +295,12 @@ export async function statements(tx,ctx,entityId,{bookId,periodStart,periodEnd,a
  const cumIncome=signedMicros(csum(['income']))-signedMicros(csum(['expense']));
  return {reportType:'statements',label:'Management statements — not statutory presentation',bookId,periodStart,periodEnd,asOf,incomeStatement:{income:sum(['income']),expense:sum(['expense']),netIncome},balanceSheet:{assets:csum(['asset']),liabilities:csum(['liability']),equity:csum(['equity']),currentEarnings:decimal(cumIncome),balanced:signedMicros(csum(['asset']))===signedMicros(csum(['liability']))+signedMicros(csum(['equity']))+cumIncome},lines:cumulative.lines.filter(l=>['asset','liability','equity'].includes(l.category)).concat(tb.lines.filter(l=>['income','expense'].includes(l.category)))};
 }
-export async function snapshotReport(tx,ctx,entityId,input,{ruleVersion='p03.1'}={}){
+// Later modules register report builders (P04 aging) without a second snapshot model.
+export async function snapshotReport(tx,ctx,entityId,input,{ruleVersion='p03.1',builders={}}={}){
  requirePermission(ctx,'report.generate');requireEntity(ctx,entityId);assertInput('ReportRequest',input);
- if(!['trial_balance','statements'].includes(input.reportType))fail('FEATURE_NOT_ENABLED','Report type '+input.reportType+' arrives with a later module.');
+ if(!['trial_balance','statements'].includes(input.reportType)&&!builders[input.reportType])fail('FEATURE_NOT_ENABLED','Report type '+input.reportType+' arrives with a later module.');
  if(input.currency&&input.currency!=='PHP')fail('FEATURE_NOT_ENABLED','Reporting currencies other than PHP arrive with P09.');
- const payload=input.reportType==='trial_balance'?await trialBalance(tx,ctx,entityId,{bookId:input.bookId,periodStart:input.periodStart,periodEnd:input.periodEnd,asOf:input.asOf}):await statements(tx,ctx,entityId,{bookId:input.bookId,periodStart:input.periodStart,periodEnd:input.periodEnd,asOf:input.asOf});
+ const payload=builders[input.reportType]?await builders[input.reportType](tx,ctx,entityId,input):input.reportType==='trial_balance'?await trialBalance(tx,ctx,entityId,{bookId:input.bookId,periodStart:input.periodStart,periodEnd:input.periodEnd,asOf:input.asOf}):await statements(tx,ctx,entityId,{bookId:input.bookId,periodStart:input.periodStart,periodEnd:input.periodEnd,asOf:input.asOf});
  const checksum=sha(JSON.stringify(payload));
  const periodKey=input.periodStart.slice(0,7)===input.periodEnd.slice(0,7)?input.periodStart.slice(0,7):input.periodStart.slice(0,4);
  const version=((await tx.query('select coalesce(max(version_number),0)::int v from lara.report_snapshots where tenant_id=$1 and entity_id=$2 and book_id=$3 and report_type=$4 and period_key=$5',[ctx.tenantId,entityId,input.bookId,input.reportType,periodKey])).rows[0].v)+1;
