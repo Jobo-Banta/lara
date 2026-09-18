@@ -13,7 +13,7 @@ Node 24.16.0, pnpm 9.15.5, Python 3.12, Git, and a dedicated Supabase demo proje
 3. Run `node scripts/provision-roles.mjs` to create missing runtime and migrator roles and store generated local connections. Existing passwords are preserved.
 4. Run `pnpm setup`, then `pnpm db:migrate`. For an existing operator-owned installation, run `node scripts/assign-migrator.mjs` once.
 5. Set `DEMO_DATABASE_CONFIRMED=true` in the ignored file and run `pnpm db:seed:demo`. The mode and database marker must both identify a demo target.
-6. Run `pnpm dev`. This starts the API, checks readiness, then starts the worker and web application. Open http://localhost:3000.
+6. Run `pnpm dev`. This starts the API, checks readiness, then starts the worker and web application. Open http://localhost:3000. The live build tracker runs at http://127.0.0.1:8765/build-status.html; start it independently with `pnpm status:serve`.
 7. Create an auto-confirmed Supabase Auth demo user, complete sign-in and consent, then assign its verified subject with `node scripts/provision-demo-subject.mjs <subject>`. Each subject receives an empty isolated workspace; canonical fixtures are never implicitly shared.
 
 ## Verification
