@@ -170,18 +170,18 @@
       "updated_at": "2026-09-18T20:17:48+00:00"
     },
     "P03-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts.",
-      "evidence": "Local 2026-09-19: scripts/test-p03-schema.mjs 7 groups PASS on Supabase PostgreSQL 17.6 through the runtime role; migration applied; foundation 24/24; restore rehearsal includes ledger tables. CI pending push.",
-      "updated_at": "2026-09-18T20:25:59+00:00"
+      "evidence": "GitHub CI 35391416551 passed: migration 0012 fresh and upgrade on PostgreSQL 18, scripts/test-p03-schema.mjs 7 groups in both databases, restore rehearsal with ledger tables, P00-P02 regression suites, image scans. Applied to engineering Supabase (17.6) 2026-09-19. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T20:31:20+00:00"
     },
     "P03-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
+      "evidence": "Local 2026-09-19: scripts/test-p03-domain.mjs 8 groups PASS (P03-T01..T05 at domain level) on Supabase; P03 schema 7, P02 schema 15, P02 domain 10, P02 API 7, foundation 24/24, restore PASS. CI pending push.",
+      "updated_at": "2026-09-18T20:56:03+00:00"
     },
     "P03-03": {
       "status": "not_started",
@@ -1818,7 +1818,25 @@
       "id": "P03-01",
       "action": "in_review",
       "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
+    },
+    {
+      "at": "2026-09-18T20:27:23+00:00",
+      "id": "P03-02",
+      "action": "in_progress",
+      "note": "Implementing the ledger domain: chart and dimension rules, periods (soft close, lock with close-task gate, reopen), journal drafts with independent approval and posting through the database function, reversals as linked drafts, opening imports (validate, tie control accounts, approve, commit), trial balance and statements with snapshots, retained-earnings close once per fiscal year."
+    },
+    {
+      "at": "2026-09-18T20:31:20+00:00",
+      "id": "P03-01",
+      "action": "done",
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
+    },
+    {
+      "at": "2026-09-18T20:56:03+00:00",
+      "id": "P03-02",
+      "action": "in_review",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
     }
   ],
-  "updated_at": "2026-09-18T20:25:59+00:00"
+  "updated_at": "2026-09-18T20:56:03+00:00"
 }

@@ -1,6 +1,6 @@
 # P03 implementation review — 19 September 2026
 
-P03 is in progress, not released. Only the first build-order step (typed contracts, SQL migration and permission/capability definitions) is implemented; no ledger domain service, controller or screen exists yet, and no book is activated.
+P03 is in progress, not released. Build-order steps 1 (contracts and migration) and 2 (domain rules) are implemented; no ledger controller or screen exists yet, and no book is activated.
 
 ## P03-01 contracts and migration
 
@@ -10,9 +10,22 @@ Migration `0012_p03_ledger_schema.sql` adds the ledger tables from the shared da
 
 Verification: `scripts/test-p03-schema.mjs` (also in `scripts/ci-database.mjs` for fresh and upgrade databases): seven groups against real PostgreSQL through the runtime role covering chart integrity, period rules, every refusal path of the posting function (CORE-01–09 at the database layer: balance, idempotent retry, duplicate source, immutability for all roles, period race via locks, foreign tenant), balances, soft-close adjustments, lock and reopen, reversal uniqueness, openings, snapshots and close support. Applied to the engineering Supabase database (PostgreSQL 17.6) on 19 September 2026; CI applies it on PostgreSQL 18.
 
+## P03-02 domain and accounting rules
+
+`packages/domain/src/ledger.mjs` implements the P03 rules over the schema, gated on the `general_ledger` capability:
+
+- Books and chart: PHP books; accounts with category-derived normal side, hierarchy, control types, required dimension rules (append-only history) and freeze/archive (accounts with postings freeze rather than archive).
+- Periods: create/edit (dates change only while open and unposted), soft close, lock only when every required close task of the current close version is complete and all substantiations reviewed, reopen as a new close version unless the approved `ledger_profile` settings forbid it, close tasks with evidence or waiver of non-required tasks.
+- Journals: drafts validated for balance in integer micros, submit, independent approval bound to the content version (material edits return the draft to draft and invalidate approval), posting through `lara.post_journal_entry` (single effect; a second post is a state conflict), immutability after posting, reversal as a linked draft with swapped sides that travels through the same review.
+- Reports: trial balance from `lara.account_balances`, management statements (period income statement, cumulative balance sheet with current earnings), immutable snapshots with checksum and version per report type and period key.
+- Opening imports: CSV evidence with `source_key, account_code, branch_code, accounting_date, debit, credit[, dim_*]`; staged rows validated against the chart and branches; control-account detail totals recorded; balance required; independent approval; commit posts one `opening` entry; a replayed commit returns the prior entry; the same external batch with a changed checksum conflicts; a second committed openings load for the same cutoff is refused.
+- Fiscal-year close: after every period of the year is locked, income and expense balances transfer to a chosen active equity account exactly once (stable source id; a repeated close returns the same entry). Migrations `0013`–`0015` add the reversal link on drafts and let the posting function accept the closing entry into the locked year-end period without dimension rules.
+- Driver: `date` columns now return as ISO strings (`packages/database/src/connection.mjs`) so business dates never shift across time zones.
+
+Verification: `scripts/test-p03-domain.mjs` (eight groups, also in CI for fresh and upgrade databases) covers the capability gate, chart, periods, the journal lifecycle with refusals (P03-T01, P03-T04), reports reconciling to lines across a reversal with the original snapshot checksum unchanged (P03-T03), opening imports with replay and changed-hash conflict (P03-T02) and the fiscal-year close once with a balanced new-year balance sheet (P03-T05).
+
 ## Open for later P03 tickets
 
-- P03-02 domain: journal draft lifecycle with independent approval and posting through the function; reversal command; period soft-close/lock/reopen with close tasks and substantiations; opening import validation (detail ties to control accounts, no overlapping loads) and commit; trial balance and basic statements with snapshot checksums; retained-earnings close once per fiscal year.
 - P03-03 API: the P03 operations already in the reviewed OpenAPI (`/accounts`, `/journals`, `/periods`, `/imports`, `/reports`) over `@lara/contracts`.
 - P03-04 screens: chart tree, journal editor with running difference, import staging, ledger drill-down, trial balance and statements, close checklist.
 - P03-05/06 acceptance, runbook and release; activation requires the controller's sign-off on mapping, openings, source ownership and a close rehearsal.

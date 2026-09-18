@@ -58,7 +58,7 @@ export async function inTransaction(db,ctx,fn,{isolation='read committed'}={}) {
 // Database-raised rule violations carry their code as a message prefix.
 export function translate(error){
  if(error instanceof DomainError)return error;
- const m=/^(SELF_APPROVAL|STATE_CONFLICT|FEATURE_NOT_ENABLED|RULE_PROFILE_NOT_APPROVED|VALIDATION_FAILED|NOT_FOUND|APPEND_ONLY):\s*(.*)$/.exec(error.message||'');
+ const m=/^(SELF_APPROVAL|STATE_CONFLICT|FEATURE_NOT_ENABLED|RULE_PROFILE_NOT_APPROVED|VALIDATION_FAILED|NOT_FOUND|APPEND_ONLY|PERIOD_LOCKED|UNBALANCED_ENTRY|DUPLICATE_SOURCE|ALLOCATION_EXCEEDS_BALANCE|EVIDENCE_NOT_READY|FORBIDDEN):\s*(.*)$/.exec(error.message||'');
  if(m)return new DomainError(m[1]==='APPEND_ONLY'?'STATE_CONFLICT':m[1],m[2]);
  if(error.code==='23505')return new DomainError('STATE_CONFLICT','A record with the same unique key already exists.');
  if(error.code==='23514'||error.code==='23502')return new DomainError('VALIDATION_FAILED','The change violates a database rule: '+(error.constraint||error.column||'constraint'));
