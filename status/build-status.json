@@ -212,11 +212,11 @@
       "updated_at": "2026-09-18T21:34:50+00:00"
     },
     "P04-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
-      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md.",
-      "evidence": "scripts/test-p04-schema.mjs passed locally against Supabase (8 groups); scripts/test-foundation-db.mjs and scripts/test-restore.mjs pass; CI run pending",
-      "updated_at": "2026-09-18T21:53:17+00:00"
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "GitHub Actions CI run 35398987989 (push, be097cd) and 35398990518 (pull_request) succeeded: verify + images; includes scripts/test-p04-schema.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T21:57:19+00:00"
     },
     "P04-02": {
       "status": "not_started",
@@ -1902,7 +1902,13 @@
       "id": "P04-01",
       "action": "in_review",
       "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T21:57:19+00:00",
+      "id": "P04-01",
+      "action": "done",
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
     }
   ],
-  "updated_at": "2026-09-18T21:53:17+00:00"
+  "updated_at": "2026-09-18T21:57:19+00:00"
 }

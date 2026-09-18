@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T21:53:17+00:00",
+  "updated_at": "2026-09-18T21:57:19+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1341,15 +1341,15 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P03"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
-      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md.",
-      "evidence": "scripts/test-p04-schema.mjs passed locally against Supabase (8 groups); scripts/test-foundation-db.mjs and scripts/test-restore.mjs pass; CI run pending",
-      "updated_at": "2026-09-18T21:53:17+00:00"
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "GitHub Actions CI run 35398987989 (push, be097cd) and 35398990518 (pull_request) succeeded: verify + images; includes scripts/test-p04-schema.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T21:57:19+00:00"
     },
     {
       "id": "P04-02",
@@ -5522,12 +5522,6 @@
   "history": [
     {
       "at": "2026-09-18T17:34:29+00:00",
-      "id": "P02-01",
-      "action": "done",
-      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata."
-    },
-    {
-      "at": "2026-09-18T17:34:29+00:00",
       "id": "P02-02",
       "action": "in_progress",
       "note": "Implementing @lara/domain: identity (actor context, memberships, revocation), organization (entity activation maker-checker, settings versions, capabilities), parties (encrypted tax ids, merge), evidence (verify, scan) and workflow (tasks, obligations, approval engine) with a real-database test."
@@ -5699,6 +5693,12 @@
       "id": "P04-01",
       "action": "in_review",
       "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T21:57:19+00:00",
+      "id": "P04-01",
+      "action": "done",
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
     }
   ]
 }
