@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T17:00:58+00:00",
+  "updated_at": "2026-09-18T23:40:31+00:00",
   "releases": [
     {
       "id": "P00",
@@ -734,15 +734,15 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P01"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata.",
+      "evidence": "GitHub CI 35374766881 (0ba6b7a-range, branch feat/p02-contracts-migrations) passed: migration 0009 fresh and upgrade on PostgreSQL 18, scripts/test-p02-schema.mjs 15 groups in both databases, tests/contracts.test.mjs, restore rehearsal with new tables, image scans. Applied to engineering Supabase (PostgreSQL 17.6) 2026-09-19. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:34:29+00:00"
     },
     {
       "id": "P02-02",
@@ -793,13 +793,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer.",
+      "evidence": "GitHub CI 35376135655 passed: scripts/test-p02-domain.mjs 10 groups in fresh and upgrade PostgreSQL 18 databases through the runtime role, tests/domain.test.mjs, foundation 22/22, image scans. Local Supabase run 2026-09-19 PASS with test tenants removed. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:48:26+00:00"
     },
     {
       "id": "P02-03",
@@ -850,13 +850,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck.",
+      "evidence": "GitHub CI 35382047360 passed: scripts/test-p02-api.mjs 7 groups (API and worker processes, fresh and upgrade PostgreSQL 18), schema 15, domain 10, readiness, worker, restore with principal directory, foundation 23/23, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T18:51:28+00:00"
     },
     {
       "id": "P02-04",
@@ -907,13 +907,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review.",
+      "evidence": "GitHub CI 35389296479 passed: tests/browser/workspace.spec.mjs five journeys on the LARA_MODE=local composition plus demo/accessibility/foundation suites (22 browser tests), API 7 groups, domain 10, schema 15 in fresh and upgrade PostgreSQL 18, foundation 23/23, specification validation 348 operations, image scans. Local Supabase full browser run 22/22 on 2026-09-19. Contract additions (GET /evidence, list filters) recorded in docs/development/P02-REVIEW.md for owner review.",
+      "updated_at": "2026-09-18T20:07:47+00:00"
     },
     {
       "id": "P02-05",
@@ -964,13 +964,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases.",
+      "evidence": "GitHub CI 35390504685 passed: load profile asserted (p95 under 2 s, command p95 under 1 s) on PostgreSQL 18, cursor scope negatives in scripts/test-p02-api.mjs, identity skew unit test, P00/P01/P02 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook: docs/development/P02-RUNBOOK.md. Local remote-database load report recorded in docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T20:19:44+00:00"
     },
     {
       "id": "P02-06",
@@ -1021,13 +1021,13 @@ window.LARA_BUILD_STATUS = {
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T20:17:48+00:00"
     },
     {
       "id": "P03-01",
@@ -1063,15 +1063,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P02"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts.",
+      "evidence": "GitHub CI 35391416551 passed: migration 0012 fresh and upgrade on PostgreSQL 18, scripts/test-p03-schema.mjs 7 groups in both databases, restore rehearsal with ledger tables, P00-P02 regression suites, image scans. Applied to engineering Supabase (17.6) 2026-09-19. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T20:31:20+00:00"
     },
     {
       "id": "P03-02",
@@ -1109,13 +1109,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
+      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:00:24+00:00"
     },
     {
       "id": "P03-03",
@@ -1153,13 +1153,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book.",
+      "evidence": "GitHub CI 35394822049 passed: scripts/test-p03-api.mjs 6 groups with API and worker processes (fresh and upgrade PostgreSQL 18), P03 schema and domain, P02 suites, restore, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:08:53+00:00"
     },
     {
       "id": "P03-04",
@@ -1197,13 +1197,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review.",
+      "evidence": "GitHub CI 35397177439 passed: ledger browser journey in tests/browser/workspace.spec.mjs (two-principal activation, chart, period, journal review and posting, close checklist, trial balance report, WCAG scans) on the production composition plus all P00-P03 suites in fresh and upgrade PostgreSQL 18, image scans. Local Supabase full browser suite 23/23 on 2026-09-19. Contract additions recorded in docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:36:00+00:00"
     },
     {
       "id": "P03-05",
@@ -1241,13 +1241,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases.",
+      "evidence": "GitHub CI 35397473671 (push) and 35397578851 (pull request) passed: posting load profile asserted on PostgreSQL 18 (post p95 under 1 s), P00-P03 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook docs/development/P03-RUNBOOK.md; remote load report in docs/development/P03-REVIEW.md. One pull-request-event run (35397477270) failed only in the gitleaks git range scan while the base moved; the same commit's push run passed.",
+      "updated_at": "2026-09-18T21:39:28+00:00"
     },
     {
       "id": "P03-06",
@@ -1285,13 +1285,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     {
       "id": "P04-01",
@@ -1341,15 +1341,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P03"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "GitHub Actions CI run 35398987989 (push, be097cd) and 35398990518 (pull_request) succeeded: verify + images; includes scripts/test-p04-schema.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T21:57:19+00:00"
     },
     {
       "id": "P04-02",
@@ -1401,13 +1401,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI.",
+      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T22:34:12+00:00"
     },
     {
       "id": "P04-03",
@@ -1459,13 +1459,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35402118677 (push, 91e86fe) and 35402121963 (pull_request) succeeded: verify + images incl. scripts/test-p04-api.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P04-04",
@@ -1517,13 +1517,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded: seeded browser suite incl. the sales journey on the production composition, verify + images",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     {
       "id": "P04-05",
@@ -1575,13 +1575,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded with LARA_LOAD_ASSERT=1 (issuance profile) and fresh/upgrade migration and restore checks",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     {
       "id": "P04-06",
@@ -1633,13 +1633,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Owner",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter.",
+      "evidence": "docs/development/releases/0.4.0-draft.md",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P05-01",
@@ -5521,184 +5521,184 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-01",
-      "action": "done",
-      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented."
-    },
-    {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-05",
-      "action": "done",
-      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
-    },
-    {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00-08",
-      "action": "done",
-      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance."
-    },
-    {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00",
-      "action": "release",
-      "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
-    },
-    {
-      "at": "2026-09-18T15:55:28+00:00",
-      "id": "P01-02",
+      "at": "2026-09-18T20:07:47+00:00",
+      "id": "P02-05",
       "action": "in_progress",
-      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open."
+      "note": "Acceptance and operations: security negative matrix additions (cursor scope binding), load measurement script, runbooks for start/stop, deploy/rollback, failed migration, dead-letter replay, restore, revocation, scan and export failure, and diagnostics for an intermittent identity verification failure."
     },
     {
-      "at": "2026-09-18T15:55:29+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-03",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-04",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-05",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-06",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-07",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:53+00:00",
-      "id": "P01-08",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T16:44:03+00:00",
-      "id": "P01-02",
+      "at": "2026-09-18T20:16:03+00:00",
+      "id": "P02-05",
       "action": "in_review",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
     },
     {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-03",
-      "action": "in_review",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-04",
-      "action": "in_review",
-      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-05",
-      "action": "in_review",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-06",
-      "action": "in_review",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-07",
-      "action": "in_review",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-08",
-      "action": "in_review",
-      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-10",
+      "at": "2026-09-18T20:17:48+00:00",
+      "id": "P02-06",
       "action": "blocked",
-      "note": "render.yaml, demo-host image target, loopback API supervisor and /api/health/ready prepared. Blocked: no hosting account, domain or dashboard secrets have been provisioned; deployment needs the owner."
+      "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions."
     },
     {
-      "at": "2026-09-18T16:57:31+00:00",
-      "id": "P01-01",
+      "at": "2026-09-18T20:19:21+00:00",
+      "id": "P03-01",
+      "action": "in_progress",
+      "note": "Designing ledger schema: accounts (cycle prevention, control types, dimension rules), dimensions, periods (non-overlap, open/soft_closed/locked), append-only journal entries/lines inserted only through a granted posting function enforcing balance and account/period rules, opening batches and staged rows, control balances, report snapshots, close tasks, substantiations, statement mappings and journal templates."
+    },
+    {
+      "at": "2026-09-18T20:19:44+00:00",
+      "id": "P02-05",
+      "action": "done",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T20:25:59+00:00",
+      "id": "P03-01",
       "action": "in_review",
-      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-01",
+      "at": "2026-09-18T20:27:23+00:00",
+      "id": "P03-02",
+      "action": "in_progress",
+      "note": "Implementing the ledger domain: chart and dimension rules, periods (soft close, lock with close-task gate, reopen), journal drafts with independent approval and posting through the database function, reversals as linked drafts, opening imports (validate, tie control accounts, approve, commit), trial balance and statements with snapshots, retained-earnings close once per fiscal year."
+    },
+    {
+      "at": "2026-09-18T20:31:20+00:00",
+      "id": "P03-01",
       "action": "done",
-      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-02",
-      "action": "done",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-03",
-      "action": "done",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-04",
-      "action": "done",
-      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-05",
-      "action": "done",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-06",
-      "action": "done",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-07",
-      "action": "done",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-08",
-      "action": "done",
-      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
-    },
-    {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-09",
+      "at": "2026-09-18T20:56:03+00:00",
+      "id": "P03-02",
       "action": "in_review",
-      "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:00:24+00:00",
+      "id": "P03-02",
+      "action": "done",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:04:02+00:00",
+      "id": "P03-03",
+      "action": "in_review",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
+    },
+    {
+      "at": "2026-09-18T21:08:53+00:00",
+      "id": "P03-03",
+      "action": "done",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
+    },
+    {
+      "at": "2026-09-18T21:08:53+00:00",
+      "id": "P03-04",
+      "action": "in_progress",
+      "note": "Ledger screens: chart tree, journal editor with running difference and review actions, imports staging, periods with close checklist, reports from snapshots, capability activation; close-task operations added to the reviewed contract."
+    },
+    {
+      "at": "2026-09-18T21:31:16+00:00",
+      "id": "P03-04",
+      "action": "in_review",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-05",
+      "action": "in_review",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:34:50+00:00",
+      "id": "P03-06",
+      "action": "blocked",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal."
+    },
+    {
+      "at": "2026-09-18T21:36:00+00:00",
+      "id": "P03-04",
+      "action": "done",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
+    },
+    {
+      "at": "2026-09-18T21:39:28+00:00",
+      "id": "P03-05",
+      "action": "done",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:40:19+00:00",
+      "id": "P04-01",
+      "action": "in_progress",
+      "note": "Designing the sales and tax-kernel schema: documents and lines with server-computed tax snapshots, relations, series with single-use official numbering, tax rule versions and tax events, open items with derived outstanding, settlements with append-only allocation events, payment terms, credit limits, deliveries and party snapshots."
+    },
+    {
+      "at": "2026-09-18T21:53:17+00:00",
+      "id": "P04-01",
+      "action": "in_review",
+      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T21:57:19+00:00",
+      "id": "P04-01",
+      "action": "done",
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
+    },
+    {
+      "at": "2026-09-18T22:22:08+00:00",
+      "id": "P04-02",
+      "action": "in_review",
+      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-02",
+      "action": "done",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
+    },
+    {
+      "at": "2026-09-18T22:34:12+00:00",
+      "id": "P04-03",
+      "action": "in_review",
+      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-03",
+      "action": "done",
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-04",
+      "action": "in_review",
+      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-05",
+      "action": "in_review",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft."
+    },
+    {
+      "at": "2026-09-18T23:17:39+00:00",
+      "id": "P04-06",
+      "action": "blocked",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter."
+    },
+    {
+      "at": "2026-09-18T23:40:31+00:00",
+      "id": "P04-04",
+      "action": "done",
+      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-18T23:40:31+00:00",
+      "id": "P04-05",
+      "action": "done",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft."
     }
   ]
 };

@@ -1,4 +1,9 @@
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+// Business dates are date-only values: the driver hands them back as ISO
+// strings instead of local-midnight Date objects, which shift across zones.
+const pg=createRequire(import.meta.url)('pg');
+pg.types.setTypeParser(1082,value=>value);
 export function connectionOptions(value) {
   if(!value) throw new Error('Database URL is required');
   const url=new URL(value);

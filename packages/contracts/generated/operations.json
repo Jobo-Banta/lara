@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "db7eb754e176728d05b091d7e954612ec67edc3814f781a49e9ab0c8b139e1ee",
+  "sha256": "4ea321765949f06c2cd78e52511964d38b7e310660e5e897038b17a431b8c1a3",
   "operations": [
     {
       "method": "POST",
@@ -223,6 +223,11 @@
       "operationId": "post_obligations_id_complete"
     },
     {
+      "method": "GET",
+      "path": "/evidence",
+      "operationId": "get_evidence"
+    },
+    {
       "method": "POST",
       "path": "/evidence/uploads",
       "operationId": "post_evidence_uploads"
@@ -351,6 +356,21 @@
       "method": "POST",
       "path": "/periods/{id}/reopen",
       "operationId": "post_periods_id_reopen"
+    },
+    {
+      "method": "GET",
+      "path": "/periods/{id}/close-tasks",
+      "operationId": "get_periods_id_close_tasks"
+    },
+    {
+      "method": "POST",
+      "path": "/periods/{id}/close-tasks",
+      "operationId": "post_periods_id_close_tasks"
+    },
+    {
+      "method": "POST",
+      "path": "/close-tasks/{id}/complete",
+      "operationId": "post_close_tasks_id_complete"
     },
     {
       "method": "POST",

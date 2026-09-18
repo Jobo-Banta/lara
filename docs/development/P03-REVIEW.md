@@ -1,0 +1,54 @@
+# P03 implementation review — 19 September 2026
+
+P03 is in progress, not released. Build-order steps 1 (contracts and migration), 2 (domain rules), 3 (API and jobs) and 4 (user journeys) are implemented; no book is activated for a live tenant.
+
+## P03-01 contracts and migration
+
+Migration `0012_p03_ledger_schema.sql` adds the ledger tables from the shared data contract and the P03 specification: `accounts` (category-derived normal side, parent hierarchy with cycle prevention, control types that never accept manual postings, frozen/archived states), `account_dimension_rules`, `dimensions`, `periods` (non-overlapping per book; open → soft_closed → locked; reopening requires a new close version; dates freeze once posted), `journal_entries` and `journal_lines` (append-only for every role; unique source type/id/version/purpose; one reversal per entry; header totals equal to line sums enforced by a deferred constraint trigger), `opening_batches` (unique source/checksum/cutoff; same external batch with a different checksum is a conflict; staged → validated → approved → committed with independent approval), `opening_rows` (unique source keys), `source_control_balances`, `report_snapshots` (immutable), `close_tasks` (required tasks cannot be waived), `substantiations` (independent reviewer), `statement_mappings` (versioned, independently approved), `journal_templates` and `journal_drafts` (the published document state machine; material edits return a draft).
+
+`lara.post_journal_entry(jsonb)` is the PostingService write path: a SECURITY DEFINER function the runtime roles may execute while holding no INSERT on the journal tables. Inside one transaction it binds the tenant, locks the covering period `FOR SHARE`, refuses locked periods and admits soft-closed periods only for flagged adjustments, validates each line (exactly one positive side, active leaf account, manual-posting ban on control accounts, active branch, required dimensions present and active), computes totals server-side, requires a balanced single-currency entry, and returns the existing entry for a retry of the same source version with identical lines while raising `DUPLICATE_SOURCE` for different lines. `lara.account_balances` sums posted functional lines by account for a date range and posting cutoff. The `books` kinds now match the reviewed `BookCreate` schema.
+
+Verification: `scripts/test-p03-schema.mjs` (also in `scripts/ci-database.mjs` for fresh and upgrade databases): seven groups against real PostgreSQL through the runtime role covering chart integrity, period rules, every refusal path of the posting function (CORE-01–09 at the database layer: balance, idempotent retry, duplicate source, immutability for all roles, period race via locks, foreign tenant), balances, soft-close adjustments, lock and reopen, reversal uniqueness, openings, snapshots and close support. Applied to the engineering Supabase database (PostgreSQL 17.6) on 19 September 2026; CI applies it on PostgreSQL 18.
+
+## P03-02 domain and accounting rules
+
+`packages/domain/src/ledger.mjs` implements the P03 rules over the schema, gated on the `general_ledger` capability:
+
+- Books and chart: PHP books; accounts with category-derived normal side, hierarchy, control types, required dimension rules (append-only history) and freeze/archive (accounts with postings freeze rather than archive).
+- Periods: create/edit (dates change only while open and unposted), soft close, lock only when every required close task of the current close version is complete and all substantiations reviewed, reopen as a new close version unless the approved `ledger_profile` settings forbid it, close tasks with evidence or waiver of non-required tasks.
+- Journals: drafts validated for balance in integer micros, submit, independent approval bound to the content version (material edits return the draft to draft and invalidate approval), posting through `lara.post_journal_entry` (single effect; a second post is a state conflict), immutability after posting, reversal as a linked draft with swapped sides that travels through the same review.
+- Reports: trial balance from `lara.account_balances`, management statements (period income statement, cumulative balance sheet with current earnings), immutable snapshots with checksum and version per report type and period key.
+- Opening imports: CSV evidence with `source_key, account_code, branch_code, accounting_date, debit, credit[, dim_*]`; staged rows validated against the chart and branches; control-account detail totals recorded; balance required; independent approval; commit posts one `opening` entry; a replayed commit returns the prior entry; the same external batch with a changed checksum conflicts; a second committed openings load for the same cutoff is refused.
+- Fiscal-year close: after every period of the year is locked, income and expense balances transfer to a chosen active equity account exactly once (stable source id; a repeated close returns the same entry). Migrations `0013`–`0015` add the reversal link on drafts and let the posting function accept the closing entry into the locked year-end period without dimension rules.
+- Driver: `date` columns now return as ISO strings (`packages/database/src/connection.mjs`) so business dates never shift across time zones.
+
+Verification: `scripts/test-p03-domain.mjs` (eight groups, also in CI for fresh and upgrade databases) covers the capability gate, chart, periods, the journal lifecycle with refusals (P03-T01, P03-T04), reports reconciling to lines across a reversal with the original snapshot checksum unchanged (P03-T03), opening imports with replay and changed-hash conflict (P03-T02) and the fiscal-year close once with a balanced new-year balance sheet (P03-T05).
+
+## P03-03 API and jobs
+
+The 27 P03 operations in the reviewed OpenAPI are served by `apps/api/src/workspace-api.mjs` through `@lara/contracts`: accounts (create/list/get/edit), journals (create/list/get/edit, submit, approve, post, reverse), periods (create/list/get/edit, soft-close, lock, reopen) and imports (create/list/get/edit, validate, approve, commit) run as idempotent commands with the `If-Match` version on every `{id}` action; `POST /reports` queues a `report.generate` job. The worker handler rechecks the requester's revocation version, snapshots the trial balance or statements with a checksum and stores the CSV or JSON rendering as restricted evidence, downloadable through the authenticated content endpoint. Activating the `general_ledger` capability opens the primary PHP book (`MAIN`) owned by LARA; separate books arrive with P09's `/books` operations. Operations of later phases still answer `FEATURE_NOT_ENABLED`.
+
+Verification: `scripts/test-p03-api.mjs` (in CI for fresh and upgrade databases) runs the API and worker as processes: chart with role checks and versioned edits, period overlap conflict, the journal lifecycle with unbalanced and self-approval refusals, single-effect posting, immutability, manual control-account refusal and reversal drafting, an opening import from scanned CSV evidence validated, independently approved and committed once (idempotent replay), a trial balance report job stored as evidence with `report.generate` enforced, and soft close/lock/late-posting refusal/reopen with permissions.
+
+## P03-04 user journeys
+
+Screens in `apps/web/src/app/_components/workspace-ledger.tsx`, gated on the `general_ledger` capability with an explicit not-enabled panel: capabilities (request and independent approval with evidence), chart of accounts as an indented tree with create form (category, parent, control type, required dimensions), journal editor with dynamic lines, running debit/credit difference and a save button that stays disabled until balanced, journal detail with submit/approve/request-changes/post/reverse actions and an edit form for drafts, opening imports (stage from CSV evidence, validate, approve, commit), periods with soft close/lock/reopen and a close checklist (add requirements, complete with evidence or waive non-required), and reports generated as jobs and rendered from the stored snapshot with checksum. The primary book is resolved through `GET /books` (a reviewed P09 read operation served early; book creation stays disabled) or from the first visible account or period.
+
+Contract additions under the P03 rule (owner review requested): `GET /periods/{id}/close-tasks`, `POST /periods/{id}/close-tasks` (CloseTaskCreate) and `POST /close-tasks/{id}/complete` (ReasonAction) with `CloseTaskResource`/`CloseTaskResourceList`; catalog and generated contract regenerated (351 operations).
+
+Verification: the ledger journey in `tests/browser/workspace.spec.mjs` (production composition, CI and local): two-principal capability activation, period creation, chart with hierarchy, journal editor difference states, save, submit, self-approval refused, approval by the controller, posting, immutability notice, close checklist blocking the lock until the required task is completed with evidence, lock, trial balance report job rendered with the posted balance, and WCAG scans on the ledger routes. Full browser suite 23/23 locally.
+
+Known gaps for the owner: no reviewed operation lists posted journal lines by account (ledger drill-down shows posted journals instead), import row errors are not listed by a reviewed operation (the validate response carries counts; rows stay staged), and the fiscal-year close has no operation in the contract (domain command only).
+
+## P03-05 acceptance and operations
+
+- Runbook: `P03-RUNBOOK.md` adds posting-integrity response, period close/reopen, fiscal-year close, opening import failures, report snapshots, chart corrections and evidence to preserve.
+- Load: `scripts/test-p02-load.mjs` gains a posting profile (prepare, submit, approve by a second principal, post) measured on the post step; CI asserts p95 under 1 s for commands and posts on its local database. Remote engineering database from a developer machine (concurrency 4): post p95 1.83 s, reads 1.51 s, commands 2.25 s, zero errors.
+- Regression and security: P00–P02 suites plus P03 schema, domain and API suites run in CI for fresh and upgrade databases; the database refuses direct journal writes and posted-row mutation for every role, and cross-entity account references fail as not found.
+
+## P03-06 release
+
+Blocked on the P02 release (release-plan dependency), the owner's tag and deployment, review of the contract additions, and the controller sign-off on account mapping, openings, source ownership and a close rehearsal for each activated entity. `docs/development/releases/0.3.0-draft.md` maps the gate evidence.
+
+## Open for later P03 tickets
+
