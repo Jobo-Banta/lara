@@ -212,11 +212,11 @@
       "updated_at": "2026-09-18T21:34:50+00:00"
     },
     "P04-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "scripts/test-p04-schema.mjs passed locally against Supabase (8 groups); scripts/test-foundation-db.mjs and scripts/test-restore.mjs pass; CI run pending",
+      "updated_at": "2026-09-18T21:53:17+00:00"
     },
     "P04-02": {
       "status": "not_started",
@@ -1890,7 +1890,19 @@
       "id": "P03-05",
       "action": "done",
       "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:40:19+00:00",
+      "id": "P04-01",
+      "action": "in_progress",
+      "note": "Designing the sales and tax-kernel schema: documents and lines with server-computed tax snapshots, relations, series with single-use official numbering, tax rule versions and tax events, open items with derived outstanding, settlements with append-only allocation events, payment terms, credit limits, deliveries and party snapshots."
+    },
+    {
+      "at": "2026-09-18T21:53:17+00:00",
+      "id": "P04-01",
+      "action": "in_review",
+      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
     }
   ],
-  "updated_at": "2026-09-18T21:39:28+00:00"
+  "updated_at": "2026-09-18T21:53:17+00:00"
 }

@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T21:39:28+00:00",
+  "updated_at": "2026-09-18T21:53:17+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1341,15 +1341,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P03"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "scripts/test-p04-schema.mjs passed locally against Supabase (8 groups); scripts/test-foundation-db.mjs and scripts/test-restore.mjs pass; CI run pending",
+      "updated_at": "2026-09-18T21:53:17+00:00"
     },
     {
       "id": "P04-02",
@@ -5521,18 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T17:03:09+00:00",
-      "id": "P02-01",
-      "action": "in_progress",
-      "note": "Designing production workspace schema (tenant/entity tables, approval, evidence, tasks, obligations, durable operation tables), RLS, immutable audit chain, permission and role template seeds, typed contract validators."
-    },
-    {
-      "at": "2026-09-18T17:21:53+00:00",
-      "id": "P02-01",
-      "action": "in_review",
-      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata."
-    },
-    {
       "at": "2026-09-18T17:34:29+00:00",
       "id": "P02-01",
       "action": "done",
@@ -5699,6 +5687,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P03-05",
       "action": "done",
       "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases."
+    },
+    {
+      "at": "2026-09-18T21:40:19+00:00",
+      "id": "P04-01",
+      "action": "in_progress",
+      "note": "Designing the sales and tax-kernel schema: documents and lines with server-computed tax snapshots, relations, series with single-use official numbering, tax rule versions and tax events, open items with derived outstanding, settlements with append-only allocation events, payment terms, credit limits, deliveries and party snapshots."
+    },
+    {
+      "at": "2026-09-18T21:53:17+00:00",
+      "id": "P04-01",
+      "action": "in_review",
+      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
     }
   ]
 };
