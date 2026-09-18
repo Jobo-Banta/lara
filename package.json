@@ -8,7 +8,7 @@
   },
   "scripts": {
     "assets:build": "node scripts/copy-brand-assets.mjs",
-    "status:check": "py -3.12 scripts/build_status.py check",
+    "status:check": "node scripts/python.mjs scripts/build_status.py check",
     "dev": "pnpm --filter @lara/web dev",
     "build": "pnpm assets:build && pnpm --filter @lara/web build",
     "config:check": "node scripts/config-check.mjs",
@@ -19,6 +19,9 @@
     "release:check": "node scripts/release-check.mjs",
     "db:backup:snapshot": "node scripts/backup-snapshot.mjs",
     "db:restore:snapshot": "node scripts/restore-snapshot.mjs",
-    "release:manifest": "node scripts/release-manifest.mjs"
+    "release:manifest": "node scripts/release-manifest.mjs",
+    "setup": "node scripts/setup.mjs",
+    "test:foundation": "node --test tests/foundation.test.mjs",
+    "verify": "pnpm test:foundation && pnpm status:check && pnpm build"
   }
 }

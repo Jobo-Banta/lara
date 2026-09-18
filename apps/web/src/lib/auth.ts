@@ -24,7 +24,9 @@ export function authConfig() {
   const clientSecret = env.OIDC_CLIENT_SECRET;
   const redirectUri = env.OIDC_REDIRECT_URI || "http://localhost:3000/auth/callback";
   if (!issuer || !clientId || !clientSecret) throw new Error("OIDC configuration is incomplete");
-  return { issuer, clientId, clientSecret, redirectUri, secret: env.SESSION_SECRET_REF || "local-development-secret" };
+  const secret = env.SESSION_SECRET;
+  if (!secret || secret.length < 32) throw new Error("Session secret is missing or too short");
+  return { issuer, clientId, clientSecret, redirectUri, secret };
 }
 
 export function stateToken() {

@@ -1,1 +1,14 @@
-import{createHash}from "node:crypto";import{readdir,readFile}from "node:fs/promises";import pg from "pg";const u=process.env.MIGRATION_DATABASE_URL;if(!u)throw new Error("MIGRATION_DATABASE_URL is required");const dir=new URL("../migrations/",import.meta.url);const db=new pg.Client({connectionString:u});await db.connect();try{await db.query("begin");await db.query("select pg_advisory_xact_lock(hashtext('lara:migrations'))");await db.query("create table if not exists schema_migrations(version text primary key,sha256 char(64) not null,applied_at timestamptz not null default now(),release text not null)");for(const n of(await readdir(dir)).filter(x=>x.endsWith(".sql")).sort()){const sql=await readFile(new URL(n,dir),"utf8"),v=n.replace(/\.sql$/,""),h=createHash("sha256").update(sql).digest("hex"),old=await db.query("select sha256 from schema_migrations where version=$1",[v]);if(old.rowCount&&old.rows[0].sha256!==h)throw new Error("Migration checksum mismatch: "+v);if(!old.rowCount){await db.query(sql);await db.query("insert into schema_migrations(version,sha256,release) values($1,$2,$3)",[v,h,"0.0.1"]);console.log("Applied "+v);}else console.log("Skipped "+v);}await db.query("commit");}catch(e){await db.query("rollback");throw e;}finally{await db.end();}
+import { connectionOptions } from './connection.mjs';
+import { readdir,readFile } from 'node:fs/promises';
+import pg from 'pg';
+import { loadLocalEnv } from '../../../scripts/local-env.mjs';
+import { applyMigrations } from './runner.mjs';
+loadLocalEnv();
+const url=process.env.MIGRATION_DATABASE_URL || process.env.SUPABASE_OWNER_DATABASE_URL;
+if(!url) throw new Error('MIGRATION_DATABASE_URL is required');
+const dir=new URL('../migrations/',import.meta.url);
+const files=await Promise.all((await readdir(dir)).filter(n=>n.endsWith('.sql')).sort().map(async n=>({version:n.slice(0,-4),sql:await readFile(new URL(n,dir),'utf8')})));
+const db=new pg.Client(connectionOptions(url));
+await db.connect();
+try { const applied=await applyMigrations(db,files); for(const f of files) console.log((applied.includes(f.version)?'Applied ':'Skipped ')+f.version); }
+finally {await db.end();}

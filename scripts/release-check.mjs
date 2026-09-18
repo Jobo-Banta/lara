@@ -1,1 +1,8 @@
-import{access}from "node:fs/promises";import{loadConfig}from "../packages/config/src/env.mjs";await access("pnpm-lock.yaml");await access("apps/web/public/assets/lara/asset-manifest.json");loadConfig();console.log("Phase 0 release prerequisites are present.");
+import { readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+const result=spawnSync(process.platform==='win32'?'pnpm.cmd':'pnpm',['verify'],{stdio:'inherit',shell:process.platform==='win32'});
+if(result.status!==0) process.exit(result.status ?? 1);
+const status=JSON.parse(await readFile('status/build-status.json','utf8'));
+const open=Object.entries(status.tickets).filter(([id,t])=>id.startsWith('P00-')&&t.status!=='done').map(([id])=>id);
+if(open.length) { console.error('Release blocked by incomplete P00 tickets: '+open.join(', ')); process.exit(1); }
+console.log('Local checks passed. Actual signed tag, artifact delivery and external gates must still be attested before release.');

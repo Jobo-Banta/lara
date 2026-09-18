@@ -6,3 +6,6 @@ node_modules/
 .next/
 .local/
 coverage/
+
+__pycache__/
+*.pyc

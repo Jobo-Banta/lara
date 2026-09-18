@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
   if (!tokens.id_token) return NextResponse.json({ error: "OIDC response did not contain an ID token" }, { status: 502 });
   const verified = await jwtVerify(tokens.id_token, createRemoteJWKSet(new URL(config.issuer + "/.well-known/jwks.json")), { issuer: config.issuer, audience: config.clientId });
   const claims = verified.payload;
+  if (!claims.sub || claims.nonce !== stored.split(".")[1]) return NextResponse.json({ error: "Invalid OIDC identity or nonce" }, { status: 400 });
   const session = seal({ sub: String(claims.sub), email: typeof claims.email === "string" ? claims.email : undefined, name: typeof claims.name === "string" ? claims.name : undefined, expiresAt: Date.now() + 12 * 60 * 60 * 1000 }, config.secret);
   const response = NextResponse.redirect(new URL("/", request.url));
   response.cookies.set("lara_session", session, { httpOnly: true, secure: url.protocol === "https:", sameSite: "lax", maxAge: 12 * 60 * 60, path: "/" });

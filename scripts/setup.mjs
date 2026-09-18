@@ -1,0 +1,11 @@
+import { readFile, appendFile } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
+import { loadLocalEnv } from './local-env.mjs';
+import { loadConfig } from '../packages/config/src/env.mjs';
+loadLocalEnv();
+const defaults = { LARA_MODE:'demo', APP_BASE_URL:'http://localhost:3000', API_INTERNAL_URL:'http://127.0.0.1:4000', SESSION_SECRET:randomBytes(48).toString('base64url'), OBJECT_ADAPTER:'filesystem', OBJECT_BUCKET:'.local/uploads', OBJECT_REGION:'local', MAIL_ADAPTER:'local', EINVOICE_ADAPTER:'fixture', AI_ADAPTER:'fixture', RULE_PROFILE_ID:'fixture-local', DEMO_RESET_ENABLED:'false' };
+const missing = Object.entries(defaults).filter(([key]) => !process.env[key]);
+await appendFile(new URL('../.env.local',import.meta.url), '\n'+missing.map(([key,value])=>key+'='+value).join('\n')+'\n');
+for (const [key,value] of missing) process.env[key]=value;
+loadConfig();
+console.log('Local configuration validated; generated secrets remain in ignored .env.local. Run pnpm db:migrate, pnpm api and pnpm dev.');

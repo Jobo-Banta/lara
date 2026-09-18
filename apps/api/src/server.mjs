@@ -1,24 +1,32 @@
+import { connectionOptions } from '../../../packages/database/src/connection.mjs';
 import http from "node:http";
+import { loadLocalEnv as loadRootEnv } from "../../../scripts/local-env.mjs";
+import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createRequire } from "node:module";
 import { loadConfig, safeConfigError } from "../../../packages/config/src/env.mjs";
 const pg = createRequire(import.meta.url)("pg");
 function loadLocalEnv() { try { for (const line of readFileSync(join(process.cwd(), "..", "..", ".env.local"), "utf8").split(/\r?\n/)) { const i = line.indexOf("="); if (i > 0 && !line.startsWith("#")) process.env[line.slice(0, i)] ??= line.slice(i + 1); } } catch {} }
-loadLocalEnv();
+loadRootEnv();
+let config;
+try { config = loadConfig(); } catch (error) { console.error(safeConfigError(error)); process.exit(1); }
 const port = Number(process.env.API_PORT || 4000);
-function database() { const url = new URL(process.env.DATABASE_URL); url.search = ""; return new pg.Client({ connectionString: url.toString(), ssl: url.hostname.includes("supabase") ? { rejectUnauthorized: false } : undefined }); }
+function database() { return new pg.Client(connectionOptions(process.env.DATABASE_URL)); }
 async function query(sql, params = []) { const db = database(); await db.connect(); try { return await db.query(sql, params); } finally { await db.end(); } }
 async function body(request) { let text = ""; for await (const chunk of request) text += chunk; return text ? JSON.parse(text) : {}; }
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
-async function ready() { try { const config = loadConfig(); await query("select 1"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
+async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0004_phase1_runtime_grants")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer(async (request, response) => {
   response.setHeader("content-type", "application/json; charset=utf-8");
+  response.setHeader("x-request-id", randomUUID());
+  response.setHeader("cache-control", "no-store");
   try {
     const url = new URL(request.url, "http://localhost"); const path = url.pathname; const method = request.method;
     if (path === "/health/live") return send(response, 200, { ok: true });
     if (path === "/health/ready") { const state = await ready(); return send(response, state.ok ? 200 : 503, state); }
-    if (path === "/ops/version") return send(response, 200, { version: "0.1.0", schema: "0003_phase1_journeys", synthetic: true });
+    if (path === "/ops/version") return send(response, 401, { error: "AUTHENTICATION_REQUIRED" });
+    if (path.startsWith("/demo/") && config.mode !== "demo") return send(response, 404, { error: "NOT_FOUND" });
     if (path === "/demo/work") { const r = await query("select id,title,area,status,due_date,owner,source,amount::text from lara_demo.tasks order by due_date,id"); return send(response, 200, { run: "demo-run-001", synthetic: true, tasks: r.rows }); }
     if (path === "/demo/overview") { const r = await query("select count(*)::int as tasks, coalesce(sum(amount),0)::text as amount from lara_demo.tasks"); return send(response, 200, { run: "demo-run-001", synthetic: true, asOf: "2026-09-18", tasks: r.rows[0].tasks, amount: r.rows[0].amount }); }
     if (path === "/demo/invoices" && method === "GET") { const r = await query("select id,customer,issue_date,due_date,subtotal::text,tax::text,total::text,status from lara_demo.invoices order by created_at desc"); return send(response, 200, { synthetic: true, invoices: r.rows }); }
@@ -35,12 +43,9 @@ const server = http.createServer(async (request, response) => {
     if (path === "/demo/compliance" && method === "GET") { const r = await query("select id,obligation,status,next_action from lara_demo.compliance_items"); return send(response, 200, { synthetic: true, items: r.rows }); }
     if (path === "/demo/evidence" && method === "GET") { const r = await query("select id,title,kind,related_to,status from lara_demo.evidence"); return send(response, 200, { synthetic: true, evidence: r.rows }); }
     if (path === "/demo/scenarios" && method === "GET") return send(response, 200, { synthetic: true, scenarios: [{ id: "DEMO-01", title: "Direct invoice" }, { id: "DEMO-02", title: "Uncertain bill" }, { id: "DEMO-05", title: "Cash match" }, { id: "DEMO-06", title: "Period close" }] });
-    if (path === "/demo/reset" && method === "POST") return send(response, 200, { synthetic: true, reset: true, run: "demo-run-001", message: "This prototype keeps the seeded run and scopes all data to the demo namespace." });
+    if (path === "/demo/reset" && method === "POST") return send(response, 501, { error: "SESSION_SCOPED_RESET_NOT_IMPLEMENTED" });
     if (path === "/demo/feedback" && method === "POST") { const b = await body(request); const r = await query("insert into lara_demo.feedback(run_id,scenario,route,severity,message) values('demo-run-001',$1,$2,$3,$4) returning id", [b.scenario || "Unspecified",b.route || "/",b.severity || "minor",b.message || ""]); return send(response, 201, { synthetic: true, feedbackId: r.rows[0].id }); }
     return send(response, 404, { error: "NOT_FOUND" });
   } catch (error) { return send(response, 500, { error: safeConfigError(error) }); }
 });
 server.listen(port, "127.0.0.1", () => console.log("LARA API listening on http://127.0.0.1:" + port));
-
-
-

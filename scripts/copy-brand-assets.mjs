@@ -17,11 +17,11 @@ async function walk(dir) {
     if (entry.isDirectory()) await walk(path);
     else {
       const bytes = await readFile(path);
-      manifest[relative(target, path).replaceAll("\\", "/")] = createHash("sha256").update(bytes).digest("hex");
+      manifest[relative(source, path).replaceAll("\\", "/")] = createHash("sha256").update(bytes).digest("hex");
     }
   }
 }
 
-await walk(target);
+await walk(source);
 await writeFile(join(target, "asset-manifest.json"), JSON.stringify({ source: "images/branding/ledger-l/web", files: manifest }, null, 2) + "\n");
 console.log(`Packaged ${Object.keys(manifest).length} approved Ledger-L assets.`);

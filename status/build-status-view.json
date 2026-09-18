@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T09:35:33+00:00",
+  "updated_at": "2026-09-18T09:48:18+00:00",
   "releases": [
     {
       "id": "P00",
@@ -377,9 +377,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Workspace baseline created; approved Ledger-L assets packaged; pnpm build and localhost smoke check passed.",
-      "evidence": "",
-      "updated_at": "2026-09-18T08:40:39+00:00"
+      "note": "Fixed deterministic branding assets and cross-platform verify/setup. Clean-clone full stack, worker and version manifest remain.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:15+00:00"
     },
     {
       "id": "P00-02",
@@ -395,9 +395,9 @@
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "",
-      "evidence": "Strict configuration validator added; secret-free local validation passed.",
-      "updated_at": "2026-09-18T08:53:12+00:00"
+      "note": "Generated local session secret, removed fallback; strict runtime configuration validated at startup. Local-file baseline; external secret-manager rotation remains a deployment concern.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:15+00:00"
     },
     {
       "id": "P00-03",
@@ -409,13 +409,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T03/P00-T05",
-      "status": "in_review",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Supabase migration runner applied and reran cleanly; lara_api pooler role provisioned and verified over TLS. Clean/prior-release database rehearsal remains.",
-      "evidence": "Applied 0001_phase0; rerun skipped it; runtime query returned lara_api.",
-      "updated_at": "2026-09-18T09:02:06+00:00"
+      "note": "Real Supabase rollback-only clean-schema/upgrade/no-op/checksum/failure tests and runtime DDL denial pass. Scripted migrator role provisioning and independent clean-database CI rehearsal remain.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:16+00:00"
     },
     {
       "id": "P00-04",
@@ -427,13 +427,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T04",
-      "status": "in_review",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login.",
-      "evidence": "OIDC discovery returned 200; /api/auth/login returned 307 with state/nonce and callback rejected invalid state with 400.",
-      "updated_at": "2026-09-18T09:16:16+00:00"
+      "note": "Fixed callback nonce and session fallback. Scoped API identity, tenant RLS and cross-tenant tests remain; role flags alone do not pass T04.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:16+00:00"
     },
     {
       "id": "P00-05",
@@ -445,13 +445,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T07",
-      "status": "in_review",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "CI workflow and build-tracker check added.",
-      "evidence": "Build and tracker tests passed locally.",
-      "updated_at": "2026-09-18T08:53:14+00:00"
+      "note": "Fixed Linux Python execution, added foundation/asset/spec checks and fail-closed release checker. Remote main, enforced checks and scan gates still need implementation.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:17+00:00"
     },
     {
       "id": "P00-06",
@@ -463,13 +463,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T06",
-      "status": "in_review",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Supabase demo schema is live; local seed remains demo-mode guarded.",
-      "evidence": "Supabase lara_api read succeeded; schema mutation was denied.",
-      "updated_at": "2026-09-18T09:03:37+00:00"
+      "note": "Production mode rejects fixtures, non-demo API routes denied, seed requires explicit demo confirmation. Dedicated target and per-session entitlement enforcement remain.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:17+00:00"
     },
     {
       "id": "P00-07",
@@ -481,13 +481,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T01",
-      "status": "done",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "",
-      "evidence": "API /health/live returned 200; /health/ready returned 503 with secret-free Invalid LARA_MODE when configuration was absent.",
-      "updated_at": "2026-09-18T08:53:15+00:00"
+      "note": "Readiness now returns 200 with schema verification after migration 0005; verified database TLS and request IDs added. Authenticated version response and telemetry/alerts remain.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:18+00:00"
     },
     {
       "id": "P00-08",
@@ -499,13 +499,13 @@
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T08",
-      "status": "done",
+      "status": "in_progress",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target.",
-      "evidence": "Supabase logical snapshot and restore rehearsal passed: 1 migration row and 0 seed rows restored and verified; release manifest generated; source commit f247097.",
-      "updated_at": "2026-09-18T09:06:05+00:00"
+      "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain.",
+      "evidence": "docs/development/P00-REVIEW.md; six foundation tests, migration rehearsal, API readiness and production build results recorded; outstanding gates explicit.",
+      "updated_at": "2026-09-18T09:48:18+00:00"
     },
     {
       "id": "P01-01",
@@ -5521,12 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T08:40:39+00:00",
-      "id": "P00-01",
-      "action": "in_progress",
-      "note": "Workspace baseline created; approved Ledger-L assets packaged; pnpm build and localhost smoke check passed."
-    },
-    {
       "at": "2026-09-18T08:53:12+00:00",
       "id": "P00-02",
       "action": "done",
@@ -5657,6 +5651,54 @@
       "id": "P01-10",
       "action": "in_review",
       "note": "P01 implementation continued through local Supabase-backed prototype."
+    },
+    {
+      "at": "2026-09-18T09:48:15+00:00",
+      "id": "P00-01",
+      "action": "in_progress",
+      "note": "Fixed deterministic branding assets and cross-platform verify/setup. Clean-clone full stack, worker and version manifest remain."
+    },
+    {
+      "at": "2026-09-18T09:48:15+00:00",
+      "id": "P00-02",
+      "action": "done",
+      "note": "Generated local session secret, removed fallback; strict runtime configuration validated at startup. Local-file baseline; external secret-manager rotation remains a deployment concern."
+    },
+    {
+      "at": "2026-09-18T09:48:16+00:00",
+      "id": "P00-03",
+      "action": "in_progress",
+      "note": "Real Supabase rollback-only clean-schema/upgrade/no-op/checksum/failure tests and runtime DDL denial pass. Scripted migrator role provisioning and independent clean-database CI rehearsal remain."
+    },
+    {
+      "at": "2026-09-18T09:48:16+00:00",
+      "id": "P00-04",
+      "action": "in_progress",
+      "note": "Fixed callback nonce and session fallback. Scoped API identity, tenant RLS and cross-tenant tests remain; role flags alone do not pass T04."
+    },
+    {
+      "at": "2026-09-18T09:48:17+00:00",
+      "id": "P00-05",
+      "action": "in_progress",
+      "note": "Fixed Linux Python execution, added foundation/asset/spec checks and fail-closed release checker. Remote main, enforced checks and scan gates still need implementation."
+    },
+    {
+      "at": "2026-09-18T09:48:17+00:00",
+      "id": "P00-06",
+      "action": "in_progress",
+      "note": "Production mode rejects fixtures, non-demo API routes denied, seed requires explicit demo confirmation. Dedicated target and per-session entitlement enforcement remain."
+    },
+    {
+      "at": "2026-09-18T09:48:18+00:00",
+      "id": "P00-07",
+      "action": "in_progress",
+      "note": "Readiness now returns 200 with schema verification after migration 0005; verified database TLS and request IDs added. Authenticated version response and telemetry/alerts remain."
+    },
+    {
+      "at": "2026-09-18T09:48:18+00:00",
+      "id": "P00-08",
+      "action": "in_progress",
+      "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain."
     }
   ]
 }
