@@ -58,67 +58,67 @@
       "updated_at": "2026-09-18T14:51:41+00:00"
     },
     "P01-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright.",
-      "evidence": "Local 2026-09-19: tests/browser/accessibility.spec.mjs and demo.spec.mjs 17/17 passed against Supabase; CI 35370240350 verify/image jobs passed on prior commit; CI on this commit pending.",
-      "updated_at": "2026-09-18T16:57:31+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. Local: accessibility.spec.mjs axe WCAG 2.1 A/AA clean on 13 routes at 1440/390; keyboard skip-link, focus and mobile Enter approval; no horizontal scroll at 1440/1024/390/320.",
+      "updated_at": "2026-09-18T17:00:57+00:00"
     },
     "P01-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:03+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. scripts/test-demo-workflows.mjs: 100 identical retries, conflicting retry 409, stale version 412, RLS same-user session and cross-tenant isolation, scoped reset. Local tests/browser/demo.spec.mjs 14/14 against Supabase 2026-09-19.",
+      "updated_at": "2026-09-18T17:00:57+00:00"
     },
     "P01-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. DEMO-01 and DEMO-03 browser scenarios pass (draft persists after reload, cross-role approval, posting, collection, dropped response replays one journal).",
+      "updated_at": "2026-09-18T17:00:57+00:00"
     },
     "P01-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. DEMO-02 browser scenario passes (low-confidence correction persisted, payment authority separate from bill, beneficiary change invalidates approval).",
+      "updated_at": "2026-09-18T17:00:57+00:00"
     },
     "P01-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. DEMO-05 browser scenario passes (partial then completing allocation, explicit fee adjustment, all lines Matched).",
+      "updated_at": "2026-09-18T17:00:57+00:00"
     },
     "P01-06": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. DEMO-04 and DEMO-06 browser scenarios pass (rejected/unknown acknowledgement repair leaves source unchanged; close blocked until owned evidence; report retained after lock).",
+      "updated_at": "2026-09-18T17:00:58+00:00"
     },
     "P01-07": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. DEMO-07 and DEMO-08 browser scenarios pass (TB to journal to evidence, 404 other tenant, 409 quarantine, 403 export for Clerk, watermarked export, offline draft retained, stale save requires explicit reload).",
+      "updated_at": "2026-09-18T17:00:58+00:00"
     },
     "P01-08": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains.",
-      "evidence": "Local 2026-09-19: tests/browser/demo.spec.mjs 14/14 passed against Supabase (scripts/test-demo-browser.mjs); scripts/test-demo-workflows.mjs PASS; 11 foundation tests; contracts:check and status:check PASS. CI gate evidence pending push.",
-      "updated_at": "2026-09-18T16:44:04+00:00"
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. scripts/test-api-readiness.mjs proves /demo/* absent outside demo mode; browser isolation test proves branch context scoping, per-session reset and simulation labels; legacy handlers removed.",
+      "updated_at": "2026-09-18T17:00:58+00:00"
     },
     "P01-09": {
       "status": "in_review",
       "owner": "Codex",
-      "note": "P01 implementation continued through local Supabase-backed prototype.",
-      "evidence": "Feedback screen and persisted feedback API added; feedback capture smoke-tested.",
-      "updated_at": "2026-09-18T09:35:32+00:00"
+      "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity.",
+      "evidence": "GitHub CI 35370240350 (54e71f1) and 35371504895 (31fa161) passed: verify job ran fresh+upgrade migrations through 0008, workflow suite, seeded Playwright suite and image scans. docs/development/P01-FACILITATOR.md; docs/development/p01-usability-template.json.",
+      "updated_at": "2026-09-18T17:00:58+00:00"
     },
     "P01-10": {
       "status": "blocked",
@@ -1656,7 +1656,61 @@
       "id": "P01-01",
       "action": "in_review",
       "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
+    },
+    {
+      "at": "2026-09-18T17:00:57+00:00",
+      "id": "P01-01",
+      "action": "done",
+      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
+    },
+    {
+      "at": "2026-09-18T17:00:57+00:00",
+      "id": "P01-02",
+      "action": "done",
+      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
+    },
+    {
+      "at": "2026-09-18T17:00:57+00:00",
+      "id": "P01-03",
+      "action": "done",
+      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
+    },
+    {
+      "at": "2026-09-18T17:00:57+00:00",
+      "id": "P01-04",
+      "action": "done",
+      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
+    },
+    {
+      "at": "2026-09-18T17:00:57+00:00",
+      "id": "P01-05",
+      "action": "done",
+      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
+    },
+    {
+      "at": "2026-09-18T17:00:58+00:00",
+      "id": "P01-06",
+      "action": "done",
+      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
+    },
+    {
+      "at": "2026-09-18T17:00:58+00:00",
+      "id": "P01-07",
+      "action": "done",
+      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
+    },
+    {
+      "at": "2026-09-18T17:00:58+00:00",
+      "id": "P01-08",
+      "action": "done",
+      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
+    },
+    {
+      "at": "2026-09-18T17:00:58+00:00",
+      "id": "P01-09",
+      "action": "in_review",
+      "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
     }
   ],
-  "updated_at": "2026-09-18T16:57:31+00:00"
+  "updated_at": "2026-09-18T17:00:58+00:00"
 }
