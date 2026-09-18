@@ -190,6 +190,8 @@ export async function activateCapability(tx,ctx,entityId,input){
  const updated=(await tx.query("update lara.capability_activations set status='active',approved_by=$2,activated_at=now(),profile_version=$3 where id=$1 returning *",[existing.id,ctx.principalId,input.profileVersion])).rows[0];
  await audit(tx,ctx,{entityId,action:'capability.activate',resourceType:'capability_activation',resourceId:existing.id,resourceVersion:Number(updated.version),reason:input.reason});
  await emit(tx,ctx,{entityId,aggregateType:'capability_activation',aggregateId:existing.id,aggregateVersion:Number(updated.version),eventType:'capability.activated.v1',payload:{entityId,capability:input.capability}});
+ // The ledger opens with one primary PHP book owned by LARA; separate books arrive with P09.
+ if(input.capability==='general_ledger')await tx.query("insert into lara.books(tenant_id,entity_id,code,kind,functional_currency,source_owner,status,created_by) select $1,$2,'MAIN','primary','PHP','lara','active',$3 where not exists (select 1 from lara.books b where b.tenant_id=$1 and b.entity_id=$2 and b.kind='primary' and b.status<>'archived')",[ctx.tenantId,entityId,ctx.principalId]);
  return {resourceType:'capability_activation',resourceId:existing.id,version:Number(updated.version),state:'active'};
 }
 export async function activeCapabilities(tx,ctx,entityId){

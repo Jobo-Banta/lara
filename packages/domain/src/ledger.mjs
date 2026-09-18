@@ -403,6 +403,17 @@ export async function commitImport(tx,ctx,entityId,id,input,expectedVersion,{com
  await emit(tx,ctx,{entityId,aggregateType:'import',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'document.posted.v1',payload:{importId:id,entryId,bookId:batch.book_id}});
  return {resourceType:'import',resourceId:id,version:Number(updated.version),state:'committed',journalEntryIds:[entryId]};
 }
+// Only staged imports change; validated ones return to staged so the rows are checked again.
+export async function updateImport(tx,ctx,entityId,id,expectedVersion,input){
+ requirePermission(ctx,'import.edit');requireEntity(ctx,entityId);assertInput('ImportCreate',input);
+ const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
+ if(!batch)fail('NOT_FOUND','Import not found.');expectVersion(batch,expectedVersion);
+ if(!['staged','validated'].includes(batch.state))fail('STATE_CONFLICT','Import is '+batch.state+'.');
+ if(input.kind!==batch.kind||input.evidenceId!==batch.evidence_id||input.sourceId.trim()!==batch.source_id)fail('VALIDATION_FAILED','Kind, evidence and source are fixed; create a new import for different content.',{fieldErrors:[{path:'evidenceId',message:'Immutable'}]});
+ const updated=(await tx.query("update lara.opening_batches set state='staged',mapping_version=$3,external_batch_id=$4,cutoff=$5,content_version=content_version+1 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,input.mappingVersion.trim(),input.externalBatchId.trim(),input.cutoffDate])).rows[0];
+ await audit(tx,ctx,{entityId,action:'import.edit',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version)});
+ return importResource(updated);
+}
 export async function getImport(tx,ctx,entityId,id){requirePermission(ctx,'import.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Import not found.');return importResource(row);}
 export async function listImports(tx,ctx,entityId,query){requirePermission(ctx,'import.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,importResource,scope);}
 export async function importRows(tx,ctx,entityId,id){requirePermission(ctx,'import.read');requireEntity(ctx,entityId);return (await tx.query('select row_no,source_key,account_code,branch_code,accounting_date,debit,credit,status,error from lara.opening_rows where tenant_id=$1 and entity_id=$2 and batch_id=$3 order by row_no',[ctx.tenantId,entityId,id])).rows.map(r=>({rowNo:r.row_no,sourceKey:r.source_key,accountCode:r.account_code,branchCode:r.branch_code,accountingDate:iso(r.accounting_date),debit:money(String(r.debit)),credit:money(String(r.credit)),status:r.status,error:r.error}));}

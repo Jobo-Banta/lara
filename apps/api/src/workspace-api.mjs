@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger} from '@lara/domain';
 
 const MAX_JSON=1048576,MAX_UPLOAD=20971520;
 const buckets=new Map();
@@ -124,6 +124,41 @@ const handlers={
   if(op&&!ctx.permissions.has(op.permission))fail('NOT_FOUND','Command not found.');
   return {status:200,body:{resourceType:r.resource_type||'command',resourceId:r.resource_id||r.id,version:1,state:r.status,journalEntryIds:[],taskIds:[],traceId:r.trace_id||ctx.traceId,simulation:false}};},
 };
+// P03 general ledger operations.
+Object.assign(handlers,{
+ post_accounts:async(tx,ctx,{entityId,body})=>created(await ledger.createAccount(tx,ctx,entityId,body)),
+ get_accounts:async(tx,ctx,{entityId,query})=>list(await ledger.listAccounts(tx,ctx,entityId,query)),
+ get_accounts_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getAccount(tx,ctx,entityId,params.id)),
+ patch_accounts_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateAccount(tx,ctx,entityId,params.id,version,body)),
+ post_journals:async(tx,ctx,{entityId,body})=>created(await ledger.createJournal(tx,ctx,entityId,body)),
+ get_journals:async(tx,ctx,{entityId,query})=>list(await ledger.listJournals(tx,ctx,entityId,query)),
+ get_journals_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getJournal(tx,ctx,entityId,params.id)),
+ patch_journals_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateJournal(tx,ctx,entityId,params.id,version,body)),
+ post_journals_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.submitJournal(tx,ctx,entityId,params.id,body,version)),
+ post_journals_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.approveJournal(tx,ctx,entityId,params.id,body,version)),
+ post_journals_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await ledger.postJournal(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ post_journals_id_reverse:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.reverseJournal(tx,ctx,entityId,params.id,body,version)),
+ post_periods:async(tx,ctx,{entityId,body})=>created(await ledger.createPeriod(tx,ctx,entityId,body)),
+ get_periods:async(tx,ctx,{entityId,query})=>list(await ledger.listPeriods(tx,ctx,entityId,query)),
+ get_periods_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getPeriod(tx,ctx,entityId,params.id)),
+ patch_periods_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updatePeriod(tx,ctx,entityId,params.id,version,body)),
+ post_periods_id_soft_close:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.softClosePeriod(tx,ctx,entityId,params.id,body,version)),
+ post_periods_id_lock:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.lockPeriod(tx,ctx,entityId,params.id,body,version)),
+ post_periods_id_reopen:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.reopenPeriod(tx,ctx,entityId,params.id,body,version)),
+ post_imports:async(tx,ctx,{entityId,body})=>created(await ledger.createImport(tx,ctx,entityId,body)),
+ get_imports:async(tx,ctx,{entityId,query})=>list(await ledger.listImports(tx,ctx,entityId,query)),
+ get_imports_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getImport(tx,ctx,entityId,params.id)),
+ patch_imports_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateImport(tx,ctx,entityId,params.id,version,body)),
+ post_imports_id_validate:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await ledger.validateImport(tx,ctx,entityId,params.id,body,version,{store})),
+ post_imports_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.approveImport(tx,ctx,entityId,params.id,body,version)),
+ post_imports_id_commit:async(tx,ctx,{entityId,params,body,version})=>{const r=await ledger.commitImport(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
+ post_reports:async(tx,ctx,{entityId,body})=>{
+  if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
+  if(!['trial_balance','statements'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
+  return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
+});
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 
 export function createWorkspaceApi({pool,issuer,store,mode}){
@@ -147,7 +182,7 @@ export function createWorkspaceApi({pool,issuer,store,mode}){
    const found=findOperation(method,path);
    if(!found)return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
    const {operation:op,params}=found;
-   if(op.phase!=='P02'||!handlers[op.operationId])return send(response,409,{code:'FEATURE_NOT_ENABLED',message:'This capability is not enabled in this release.',traceId,fieldErrors:[],retryable:false});
+   if(!handlers[op.operationId])return send(response,409,{code:'FEATURE_NOT_ENABLED',message:'This capability is not enabled in this release.',traceId,fieldErrors:[],retryable:false});
    if(op.path.startsWith('/demo/')&&mode!=='demo')return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
    const ctx=await resolveActor(db,identity_,{issuer,tenantHeader:request.headers['x-tenant-id'],traceId});
    const write=op.method!=='GET';

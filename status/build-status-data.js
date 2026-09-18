@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T20:56:03+00:00",
+  "updated_at": "2026-09-18T21:04:02+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1109,13 +1109,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
-      "evidence": "Local 2026-09-19: scripts/test-p03-domain.mjs 8 groups PASS (P03-T01..T05 at domain level) on Supabase; P03 schema 7, P02 schema 15, P02 domain 10, P02 API 7, foundation 24/24, restore PASS. CI pending push.",
-      "updated_at": "2026-09-18T20:56:03+00:00"
+      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:00:24+00:00"
     },
     {
       "id": "P03-03",
@@ -1153,13 +1153,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book.",
+      "evidence": "Local 2026-09-19: scripts/test-p03-api.mjs 6 groups PASS with API and worker processes against Supabase; P02 API 7 groups PASS; foundation 24/24. CI pending push.",
+      "updated_at": "2026-09-18T21:04:02+00:00"
     },
     {
       "id": "P03-04",
@@ -5522,18 +5522,6 @@ window.LARA_BUILD_STATUS = {
   "history": [
     {
       "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-01",
-      "action": "done",
-      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-02",
-      "action": "done",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
       "id": "P01-03",
       "action": "done",
       "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
@@ -5699,6 +5687,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P03-02",
       "action": "in_review",
       "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:00:24+00:00",
+      "id": "P03-02",
+      "action": "done",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:04:02+00:00",
+      "id": "P03-03",
+      "action": "in_review",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
     }
   ]
 };

@@ -1,6 +1,6 @@
 # P03 implementation review — 19 September 2026
 
-P03 is in progress, not released. Build-order steps 1 (contracts and migration) and 2 (domain rules) are implemented; no ledger controller or screen exists yet, and no book is activated.
+P03 is in progress, not released. Build-order steps 1 (contracts and migration), 2 (domain rules) and 3 (API and jobs) are implemented; no ledger screen exists yet, and no book is activated for a live tenant.
 
 ## P03-01 contracts and migration
 
@@ -24,8 +24,13 @@ Verification: `scripts/test-p03-schema.mjs` (also in `scripts/ci-database.mjs` f
 
 Verification: `scripts/test-p03-domain.mjs` (eight groups, also in CI for fresh and upgrade databases) covers the capability gate, chart, periods, the journal lifecycle with refusals (P03-T01, P03-T04), reports reconciling to lines across a reversal with the original snapshot checksum unchanged (P03-T03), opening imports with replay and changed-hash conflict (P03-T02) and the fiscal-year close once with a balanced new-year balance sheet (P03-T05).
 
+## P03-03 API and jobs
+
+The 27 P03 operations in the reviewed OpenAPI are served by `apps/api/src/workspace-api.mjs` through `@lara/contracts`: accounts (create/list/get/edit), journals (create/list/get/edit, submit, approve, post, reverse), periods (create/list/get/edit, soft-close, lock, reopen) and imports (create/list/get/edit, validate, approve, commit) run as idempotent commands with the `If-Match` version on every `{id}` action; `POST /reports` queues a `report.generate` job. The worker handler rechecks the requester's revocation version, snapshots the trial balance or statements with a checksum and stores the CSV or JSON rendering as restricted evidence, downloadable through the authenticated content endpoint. Activating the `general_ledger` capability opens the primary PHP book (`MAIN`) owned by LARA; separate books arrive with P09's `/books` operations. Operations of later phases still answer `FEATURE_NOT_ENABLED`.
+
+Verification: `scripts/test-p03-api.mjs` (in CI for fresh and upgrade databases) runs the API and worker as processes: chart with role checks and versioned edits, period overlap conflict, the journal lifecycle with unbalanced and self-approval refusals, single-effect posting, immutability, manual control-account refusal and reversal drafting, an opening import from scanned CSV evidence validated, independently approved and committed once (idempotent replay), a trial balance report job stored as evidence with `report.generate` enforced, and soft close/lock/late-posting refusal/reopen with permissions.
+
 ## Open for later P03 tickets
 
-- P03-03 API: the P03 operations already in the reviewed OpenAPI (`/accounts`, `/journals`, `/periods`, `/imports`, `/reports`) over `@lara/contracts`.
 - P03-04 screens: chart tree, journal editor with running difference, import staging, ledger drill-down, trial balance and statements, close checklist.
 - P03-05/06 acceptance, runbook and release; activation requires the controller's sign-off on mapping, openings, source ownership and a close rehearsal.

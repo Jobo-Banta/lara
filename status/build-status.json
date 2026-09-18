@@ -177,18 +177,18 @@
       "updated_at": "2026-09-18T20:31:20+00:00"
     },
     "P03-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
-      "evidence": "Local 2026-09-19: scripts/test-p03-domain.mjs 8 groups PASS (P03-T01..T05 at domain level) on Supabase; P03 schema 7, P02 schema 15, P02 domain 10, P02 API 7, foundation 24/24, restore PASS. CI pending push.",
-      "updated_at": "2026-09-18T20:56:03+00:00"
+      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:00:24+00:00"
     },
     "P03-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book.",
+      "evidence": "Local 2026-09-19: scripts/test-p03-api.mjs 6 groups PASS with API and worker processes against Supabase; P02 API 7 groups PASS; foundation 24/24. CI pending push.",
+      "updated_at": "2026-09-18T21:04:02+00:00"
     },
     "P03-04": {
       "status": "not_started",
@@ -1836,7 +1836,19 @@
       "id": "P03-02",
       "action": "in_review",
       "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:00:24+00:00",
+      "id": "P03-02",
+      "action": "done",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-18T21:04:02+00:00",
+      "id": "P03-03",
+      "action": "in_review",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
     }
   ],
-  "updated_at": "2026-09-18T20:56:03+00:00"
+  "updated_at": "2026-09-18T21:04:02+00:00"
 }

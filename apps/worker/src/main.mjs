@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -31,6 +31,24 @@ export const handlers={
  // recorded cutoff, write an immutable manifest with checksum as evidence.
  'export.tasks':(tx,ctx,job)=>exportRows(tx,ctx,job,'tasks','select id,kind,source_type,source_id,owner_id,due_at,status,severity,reason,created_at,updated_at,version from lara.tasks where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
  'export.masters':(tx,ctx,job)=>exportRows(tx,ctx,job,'masters','select p.id,p.legal_name,p.identity_status,p.status,p.created_at,p.version,(select string_agg(role,\';\' order by role) from lara.party_roles r where r.tenant_id=p.tenant_id and r.party_id=p.id) as roles from lara.party p where p.tenant_id=$1 and p.entity_id=$2 and p.created_at<=$3 order by p.created_at,p.id'),
+ // Ledger report: snapshot with checksum, rendered file stored as restricted evidence.
+ 'report.generate':async(tx,ctx,job)=>{
+  const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
+  const actor={...current,traceId:ctx.traceId};
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref);
+  const format=job.payload_ref.format||'json';
+  let content,mime;
+  if(format==='csv'){const cols=['code','name','category','debit','credit','balance'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...snap.payload.lines.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}
+  else if(format==='json'){content=Buffer.from(JSON.stringify(snap,null,1));mime='application/json';}
+  else throw new DomainError('FEATURE_NOT_ENABLED','PDF reports arrive with the reporting module.');
+  const sha256=createHash('sha256').update(content).digest('hex');
+  const key='tenants/'+job.tenant_id+'/entities/'+job.entity_id+'/reports/'+snap.id;
+  await store.put(key,content);
+  const row=(await tx.query("insert into lara.evidence(tenant_id,entity_id,object_key,filename,sha256,mime,byte_count,status,classification,created_by) values($1,$2,$3,$4,$5,$6,$7,'quarantined','restricted',$8) returning id",[job.tenant_id,job.entity_id,key,snap.reportType+'-'+snap.periodKey+'-v'+snap.versionNumber+'.'+format,sha256,mime,content.length,job.requested_by])).rows[0];
+  await tx.query("update lara.evidence set status='scanning' where id=$1",[row.id]);
+  await tx.query("update lara.evidence set status='available' where id=$1",[row.id]);
+  await audit(tx,{...ctx,principalId:job.requested_by},{entityId:job.entity_id,action:'report.generate',resourceType:'report_snapshot',resourceId:snap.id,resourceVersion:snap.versionNumber,afterRef:snap.checksum,reason:snap.reportType+' '+format});
+  return {resourceType:'evidence',resourceId:row.id,state:'available',snapshotId:snap.id,checksum:snap.checksum};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){
