@@ -263,6 +263,8 @@ async function seedSales(){
   await db.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,content_hash,created_by) values($1,$2,'VAT12',1,'vat','2026-01-01',0.12,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-01\"]',$4,$5)",[tenantId,entity,JSON.stringify([evidence]),hash,await principal('billing')]);
  }finally{await db.end();}
 }
+// The customer may have been renamed by the stale-version journey; pick it by prefix.
+const pickCustomer=async page=>{const box=page.getByRole('combobox',{name:'Customer'});await expect(box.locator('option',{hasText:'Northwind Services'})).toHaveCount(1);await box.selectOption(await box.locator('option',{hasText:'Northwind Services'}).getAttribute('value'));};
 test('sales: capability activation, control accounts, tax rule approval, invoice with server totals through review and issuance, delivery job, receipt with allocation, customer statement and aging',async({browser})=>{
  test.setTimeout(360000);
  const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),billing=await as(browser,'billing');
@@ -294,7 +296,7 @@ test('sales: capability activation, control accounts, tax rule approval, invoice
  // Invoice by billing: server totals, submit; preparer approves and issues.
  await billing.page.goto('/sales/invoices');await settled(billing.page);
  await expect(billing.page.getByText('No invoices yet.')).toBeVisible();
- await billing.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await pickCustomer(billing.page);
  await billing.page.getByLabel('Document date').fill('2026-10-05');await billing.page.getByLabel('Accounting date').fill('2026-10-05');
  await billing.page.getByRole('textbox',{name:'Line 1 description'}).fill('Consulting retainer');
  await billing.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('10000');
@@ -322,7 +324,7 @@ test('sales: capability activation, control accounts, tax rule approval, invoice
  await expect.poll(async()=>{await billing.page.reload();await settled(billing.page);return billing.page.locator('.status-grid dd').nth(1).textContent();},{timeout:60000}).toBe('sent');
  // Receipt with the allocation workbench; preparer approves and posts; the invoice is paid.
  await billing.page.goto('/sales/collections');await settled(billing.page);
- await billing.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await pickCustomer(billing.page);
  await billing.page.getByLabel('Value date',{exact:true}).fill('2026-10-06');
  await billing.page.getByLabel('Gross received').fill('11200');await billing.page.getByLabel('Cash amount').fill('11200');
  await billing.page.getByRole('button',{name:'Full'}).click();
