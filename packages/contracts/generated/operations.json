@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "18f75903c313c3f8ea64207f59ac595ac2a40f44abaf0d9b8df4109e8495f6a8",
+  "sha256": "4ea321765949f06c2cd78e52511964d38b7e310660e5e897038b17a431b8c1a3",
   "operations": [
     {
       "method": "POST",
@@ -356,6 +356,21 @@
       "method": "POST",
       "path": "/periods/{id}/reopen",
       "operationId": "post_periods_id_reopen"
+    },
+    {
+      "method": "GET",
+      "path": "/periods/{id}/close-tasks",
+      "operationId": "get_periods_id_close_tasks"
+    },
+    {
+      "method": "POST",
+      "path": "/periods/{id}/close-tasks",
+      "operationId": "post_periods_id_close_tasks"
+    },
+    {
+      "method": "POST",
+      "path": "/close-tasks/{id}/complete",
+      "operationId": "post_close_tasks_id_complete"
     },
     {
       "method": "POST",

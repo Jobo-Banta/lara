@@ -154,16 +154,22 @@ export async function reopenPeriod(tx,ctx,entityId,id,input,expectedVersion){
 }
 export async function getPeriod(tx,ctx,entityId,id){requirePermission(ctx,'period.read');requireEntity(ctx,entityId);const row=(await tx.query('select * from lara.periods where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Period not found.');return periodResource(row);}
 export async function listPeriods(tx,ctx,entityId,query){requirePermission(ctx,'period.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];let where='';if(query?.bookId){if(!isUuid(query.bookId))fail('VALIDATION_FAILED','bookId must be a UUID.');params.push(query.bookId);where=' and book_id=$'+params.length;}const rows=(await tx.query('select * from lara.periods where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,periodResource,scope);}
+export const closeTaskResource=t=>resource(t,{requirement:t.requirement,required:t.required,...(t.owner_id?{ownerId:t.owner_id}:{}),periodId:t.period_id,closeVersion:t.close_version,...(t.evidence_id?{evidenceId:t.evidence_id}:{})});
+export async function listCloseTasks(tx,ctx,entityId,periodId,query){requirePermission(ctx,'period.read');requireEntity(ctx,entityId);const period=(await tx.query('select close_version from lara.periods where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,periodId])).rows[0];if(!period)fail('NOT_FOUND','Period not found.');const scope=cursorScope(ctx,entityId,{...(query||{}),periodId});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,periodId,period.close_version,limit+1];const rows=(await tx.query('select * from lara.close_tasks where tenant_id=$1 and entity_id=$2 and period_id=$3 and close_version=$4'+cursorClause(after,params)+' order by created_at,id limit $5',params)).rows;return page(rows,limit,closeTaskResource,scope);}
 export async function addCloseTask(tx,ctx,entityId,periodId,{requirement,required=true,ownerId=null}){
  requirePermission(ctx,'period.edit');requireEntity(ctx,entityId);
  const period=await loadPeriod(tx,ctx,entityId,periodId);
+ if(!/^[a-z][a-z0-9_]{0,63}$/.test(requirement))fail('VALIDATION_FAILED','Requirement codes are lower-case identifiers.',{fieldErrors:[{path:'requirement',message:'Invalid code'}]});
  const row=(await tx.query('insert into lara.close_tasks(tenant_id,entity_id,period_id,close_version,requirement,required,owner_id,created_by) values($1,$2,$3,$4,$5,$6,$7,$8) on conflict (tenant_id,entity_id,period_id,close_version,requirement) do update set required=excluded.required returning *',[ctx.tenantId,entityId,periodId,period.close_version,requirement,required,ownerId,ctx.principalId])).rows[0];
- return {id:row.id,requirement:row.requirement,required:row.required,state:row.status};
+ await audit(tx,ctx,{entityId,action:'close_task.add',resourceType:'close_task',resourceId:row.id,resourceVersion:Number(row.version)});
+ return closeTaskResource(row);
 }
-export async function completeCloseTask(tx,ctx,entityId,taskId,{evidenceId,waiverReason}){
+export async function completeCloseTask(tx,ctx,entityId,taskId,{evidenceId,waiverReason},expectedVersion){
  requirePermission(ctx,'period.edit');requireEntity(ctx,entityId);
  const row=(await tx.query('select * from lara.close_tasks where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,taskId])).rows[0];
- if(!row)fail('NOT_FOUND','Close task not found.');
+ if(!row)fail('NOT_FOUND','Close task not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
+ if(row.status!=='open')return {resourceType:'close_task',resourceId:taskId,version:Number(row.version),state:row.status};
+ if(!evidenceId&&!waiverReason)fail('EVIDENCE_NOT_READY','Complete the task with available evidence, or waive a non-required task with a reason.');
  if(waiverReason){if(row.required)fail('STATE_CONFLICT','Required close tasks cannot be waived.');await tx.query("update lara.close_tasks set status='waived',waiver_reason=$3 where tenant_id=$1 and id=$2",[ctx.tenantId,taskId,waiverReason]);}
  else{await linkEvidence(tx,ctx,entityId,[evidenceId],'close_task',taskId,Number(row.version)+1);await tx.query("update lara.close_tasks set status='complete',evidence_id=$3,completed_by=$4,completed_at=now() where tenant_id=$1 and id=$2",[ctx.tenantId,taskId,evidenceId,ctx.principalId]);}
  await audit(tx,ctx,{entityId,action:waiverReason?'close_task.waive':'close_task.complete',resourceType:'close_task',resourceId:taskId,reason:waiverReason||null});

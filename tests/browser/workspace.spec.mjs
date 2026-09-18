@@ -161,6 +161,84 @@ test('obligations calendar completes with evidence and refuses without it',async
  await context.close();
 });
 
+test('ledger: two-principal capability activation, chart, period, journal review and posting, close checklist and a trial balance report',async({browser})=>{
+ test.setTimeout(300000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ // Capability: the controller requests, the preparer (holding the controller role since setup) approves.
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'General ledger and close'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Ledger go-live requested':'Reviewed activation evidence');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await preparer.page.goto('/settings/capabilities');await settled(preparer.page);
+ await expect(preparer.page.locator('section.demo-card').filter({hasText:'General ledger and close'})).toContainText('Active on this entity.');
+ // Period by the controller (book resolved through GET /books).
+ await controller.page.goto('/ledger/periods');await settled(controller.page);
+ await controller.page.getByLabel('Starts on').fill('2026-09-01');await controller.page.getByLabel('Ends on').fill('2026-09-30');
+ await controller.page.getByRole('button',{name:'Create period'}).click();
+ await expect(controller.page.getByRole('cell',{name:'2026-09-01 → 2026-09-30'})).toBeVisible();
+ // Chart by the preparer.
+ await preparer.page.goto('/ledger/accounts');await settled(preparer.page);
+ const acct=async(code,name,category,parent)=>{const form=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Create account'})});await form.getByLabel('Code',{exact:true}).fill(code);await form.getByLabel('Name',{exact:true}).fill(name);await form.getByRole('combobox',{name:'Category'}).selectOption(category);await form.getByRole('combobox',{name:'Parent'}).selectOption(parent?{label:parent}:{label:'None (top level)'});await form.getByRole('button',{name:'Create account'}).click();await expect(preparer.page.getByRole('cell',{name:code,exact:true})).toBeVisible();};
+ await acct('1000','Assets','asset');await acct('1010','Cash','asset','1000 Assets');await acct('4000','Service revenue','income');
+ await expect(preparer.page.getByRole('cell',{name:'1010',exact:true}).locator('span')).toHaveAttribute('style',/padding-left: 16px/);
+ // Journal: running difference, save, submit; controller approves; preparer posts.
+ await preparer.page.goto('/ledger/journals');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Description'}).fill('Cash service revenue');
+ await preparer.page.getByRole('combobox',{name:'Line 1 account'}).selectOption({label:'1010 Cash'});
+ await preparer.page.getByRole('textbox',{name:'Line 1 debit'}).fill('1000.00');
+ await expect(preparer.page.getByRole('status').filter({hasText:'Difference'})).toContainText('Balance the entry before saving');
+ await preparer.page.getByRole('combobox',{name:'Line 2 account'}).selectOption({label:'4000 Service revenue'});
+ await preparer.page.getByRole('textbox',{name:'Line 2 credit'}).fill('1000.00');
+ await expect(preparer.page.getByRole('status').filter({hasText:'Difference'})).toContainText('Balanced');
+ await preparer.page.getByRole('button',{name:'Save draft'}).click();
+ await expect(preparer.page).toHaveURL(/\/ledger\/journals\/[0-9a-f-]{36}$/);
+ const journalUrl=preparer.page.url();
+ await expect(preparer.page.getByText('State: draft',{exact:false})).toBeVisible();
+ await preparer.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(preparer.page.getByText('State: submitted',{exact:false})).toBeVisible();
+ // The preparer holds journal.approve but the API refuses self-approval explicitly.
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toContainText('cannot approve');
+ await controller.page.goto(new URL(journalUrl).pathname);await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(controller.page.getByText('State: approved',{exact:false})).toBeVisible();
+ await preparer.page.reload();await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Post to ledger'}).click();
+ await expect(preparer.page.getByText('State: posted',{exact:false})).toBeVisible();
+ await expect(preparer.page.getByText('Posted journals are immutable.')).toBeVisible();
+ // Close checklist: a required task blocks the lock until completed with evidence.
+ await controller.page.goto('/ledger/periods');await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Open checklist'}).first().click();
+ await controller.page.getByLabel('Requirement code').fill('bank_reconciliation');
+ await controller.page.getByRole('button',{name:'Add requirement'}).click();
+ await expect(controller.page.getByRole('cell',{name:'bank reconciliation'})).toBeVisible();
+ controller.page.once('dialog',d=>d.accept('Month end'));
+ await controller.page.getByRole('button',{name:'Soft close'}).click();
+ await expect(controller.page.getByRole('cell',{name:'soft closed'})).toBeVisible();
+ controller.page.once('dialog',d=>d.accept('Lock attempt'));
+ await controller.page.getByRole('button',{name:'Lock',exact:true}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toContainText('bank_reconciliation');
+ const row=controller.page.getByRole('row').filter({hasText:'bank reconciliation'});
+ await row.getByLabel('Note or waiver reason').fill('Reconciled to statement');
+ await row.getByRole('combobox',{name:'Evidence (required)'}).selectOption({label:'registration.pdf'});
+ await row.getByRole('button',{name:'Complete'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'bank reconciliation'}).getByRole('cell',{name:'complete'})).toBeVisible();
+ controller.page.once('dialog',d=>d.accept('Locked after reconciliation'));
+ await controller.page.getByRole('button',{name:'Lock',exact:true}).click();
+ await expect(controller.page.getByRole('cell',{name:'locked',exact:true})).toBeVisible();
+ // Trial balance report as a job rendered from the snapshot.
+ await controller.page.goto('/reports');await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Generate report'}).click();
+ await expect(controller.page.getByRole('status').filter({hasText:'Report job'})).toContainText('succeeded',{timeout:60000});
+ await expect(controller.page.getByRole('row').filter({hasText:'1010'})).toContainText('1,000.00');
+ for(const route of ['/ledger/journals','/ledger/accounts','/ledger/periods','/reports']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'ledger '+route);}
+ await controller.context.close();await preparer.context.close();
+});
+
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
@@ -168,7 +246,7 @@ test('forbidden, roadmap and unknown-account states are explicit; keyboard and m
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
  await clerk.page.goto('/sales/invoices');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('P03–P04',{exact:false})).toBeVisible();
+ await expect(clerk.page.getByText('(P04)',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

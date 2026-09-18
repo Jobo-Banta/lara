@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T21:04:02+00:00",
+  "updated_at": "2026-09-18T21:31:16+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1153,13 +1153,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book.",
-      "evidence": "Local 2026-09-19: scripts/test-p03-api.mjs 6 groups PASS with API and worker processes against Supabase; P02 API 7 groups PASS; foundation 24/24. CI pending push.",
-      "updated_at": "2026-09-18T21:04:02+00:00"
+      "evidence": "GitHub CI 35394822049 passed: scripts/test-p03-api.mjs 6 groups with API and worker processes (fresh and upgrade PostgreSQL 18), P03 schema and domain, P02 suites, restore, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:08:53+00:00"
     },
     {
       "id": "P03-04",
@@ -1197,13 +1197,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review.",
+      "evidence": "Local 2026-09-19: full browser suite 23/23 including the ledger journey on the LARA_MODE=local composition with axe scans; foundation 24/24; contracts and specification validation PASS (351 operations). CI pending push.",
+      "updated_at": "2026-09-18T21:31:16+00:00"
     },
     {
       "id": "P03-05",
@@ -5521,24 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-03",
-      "action": "done",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-04",
-      "action": "done",
-      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-05",
-      "action": "done",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
-    },
-    {
       "at": "2026-09-18T17:00:58+00:00",
       "id": "P01-06",
       "action": "done",
@@ -5699,6 +5681,24 @@
       "id": "P03-03",
       "action": "in_review",
       "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
+    },
+    {
+      "at": "2026-09-18T21:08:53+00:00",
+      "id": "P03-03",
+      "action": "done",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book."
+    },
+    {
+      "at": "2026-09-18T21:08:53+00:00",
+      "id": "P03-04",
+      "action": "in_progress",
+      "note": "Ledger screens: chart tree, journal editor with running difference and review actions, imports staging, periods with close checklist, reports from snapshots, capability activation; close-task operations added to the reviewed contract."
+    },
+    {
+      "at": "2026-09-18T21:31:16+00:00",
+      "id": "P03-04",
+      "action": "in_review",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review."
     }
   ]
 }

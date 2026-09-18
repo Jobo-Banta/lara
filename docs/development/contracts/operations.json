@@ -639,6 +639,33 @@
     "response": "CommandResult"
   },
   {
+    "operationId": "get_periods_id_close_tasks",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/periods/{id}/close-tasks",
+    "permission": "period.read",
+    "input": null,
+    "response": "CloseTaskResourceList"
+  },
+  {
+    "operationId": "post_periods_id_close_tasks",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods/{id}/close-tasks",
+    "permission": "period.edit",
+    "input": "CloseTaskCreate",
+    "response": "CloseTaskResource"
+  },
+  {
+    "operationId": "post_close_tasks_id_complete",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/close-tasks/{id}/complete",
+    "permission": "period.edit",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
     "operationId": "post_imports",
     "phase": "P03",
     "method": "POST",

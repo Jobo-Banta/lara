@@ -1,6 +1,6 @@
 # P03 implementation review — 19 September 2026
 
-P03 is in progress, not released. Build-order steps 1 (contracts and migration), 2 (domain rules) and 3 (API and jobs) are implemented; no ledger screen exists yet, and no book is activated for a live tenant.
+P03 is in progress, not released. Build-order steps 1 (contracts and migration), 2 (domain rules), 3 (API and jobs) and 4 (user journeys) are implemented; no book is activated for a live tenant.
 
 ## P03-01 contracts and migration
 
@@ -30,7 +30,16 @@ The 27 P03 operations in the reviewed OpenAPI are served by `apps/api/src/worksp
 
 Verification: `scripts/test-p03-api.mjs` (in CI for fresh and upgrade databases) runs the API and worker as processes: chart with role checks and versioned edits, period overlap conflict, the journal lifecycle with unbalanced and self-approval refusals, single-effect posting, immutability, manual control-account refusal and reversal drafting, an opening import from scanned CSV evidence validated, independently approved and committed once (idempotent replay), a trial balance report job stored as evidence with `report.generate` enforced, and soft close/lock/late-posting refusal/reopen with permissions.
 
+## P03-04 user journeys
+
+Screens in `apps/web/src/app/_components/workspace-ledger.tsx`, gated on the `general_ledger` capability with an explicit not-enabled panel: capabilities (request and independent approval with evidence), chart of accounts as an indented tree with create form (category, parent, control type, required dimensions), journal editor with dynamic lines, running debit/credit difference and a save button that stays disabled until balanced, journal detail with submit/approve/request-changes/post/reverse actions and an edit form for drafts, opening imports (stage from CSV evidence, validate, approve, commit), periods with soft close/lock/reopen and a close checklist (add requirements, complete with evidence or waive non-required), and reports generated as jobs and rendered from the stored snapshot with checksum. The primary book is resolved through `GET /books` (a reviewed P09 read operation served early; book creation stays disabled) or from the first visible account or period.
+
+Contract additions under the P03 rule (owner review requested): `GET /periods/{id}/close-tasks`, `POST /periods/{id}/close-tasks` (CloseTaskCreate) and `POST /close-tasks/{id}/complete` (ReasonAction) with `CloseTaskResource`/`CloseTaskResourceList`; catalog and generated contract regenerated (351 operations).
+
+Verification: the ledger journey in `tests/browser/workspace.spec.mjs` (production composition, CI and local): two-principal capability activation, period creation, chart with hierarchy, journal editor difference states, save, submit, self-approval refused, approval by the controller, posting, immutability notice, close checklist blocking the lock until the required task is completed with evidence, lock, trial balance report job rendered with the posted balance, and WCAG scans on the ledger routes. Full browser suite 23/23 locally.
+
+Known gaps for the owner: no reviewed operation lists posted journal lines by account (ledger drill-down shows posted journals instead), import row errors are not listed by a reviewed operation (the validate response carries counts; rows stay staged), and the fiscal-year close has no operation in the contract (domain command only).
+
 ## Open for later P03 tickets
 
-- P03-04 screens: chart tree, journal editor with running difference, import staging, ledger drill-down, trial balance and statements, close checklist.
 - P03-05/06 acceptance, runbook and release; activation requires the controller's sign-off on mapping, openings, source ownership and a close rehearsal.

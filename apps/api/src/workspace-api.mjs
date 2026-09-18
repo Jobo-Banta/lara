@@ -126,6 +126,8 @@ const handlers={
 };
 // P03 general ledger operations.
 Object.assign(handlers,{
+ // Reading books is served ahead of P09 so ledger screens can address the primary book; creating separate books stays disabled.
+ get_books:async(tx,ctx,{entityId,query})=>list(await ledger.listBooks(tx,ctx,entityId,query)),
  post_accounts:async(tx,ctx,{entityId,body})=>created(await ledger.createAccount(tx,ctx,entityId,body)),
  get_accounts:async(tx,ctx,{entityId,query})=>list(await ledger.listAccounts(tx,ctx,entityId,query)),
  get_accounts_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getAccount(tx,ctx,entityId,params.id)),
@@ -145,6 +147,9 @@ Object.assign(handlers,{
  post_periods_id_soft_close:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.softClosePeriod(tx,ctx,entityId,params.id,body,version)),
  post_periods_id_lock:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.lockPeriod(tx,ctx,entityId,params.id,body,version)),
  post_periods_id_reopen:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.reopenPeriod(tx,ctx,entityId,params.id,body,version)),
+ get_periods_id_close_tasks:async(tx,ctx,{entityId,params,query})=>list(await ledger.listCloseTasks(tx,ctx,entityId,params.id,query)),
+ post_periods_id_close_tasks:async(tx,ctx,{entityId,params,body})=>created(await ledger.addCloseTask(tx,ctx,entityId,params.id,body)),
+ post_close_tasks_id_complete:async(tx,ctx,{entityId,params,body,version})=>{const r=await ledger.completeCloseTask(tx,ctx,entityId,params.id,{evidenceId:(body.evidenceIds||[])[0],waiverReason:(body.evidenceIds||[]).length?undefined:body.reason},version);return result(ctx,r);},
  post_imports:async(tx,ctx,{entityId,body})=>created(await ledger.createImport(tx,ctx,entityId,body)),
  get_imports:async(tx,ctx,{entityId,query})=>list(await ledger.listImports(tx,ctx,entityId,query)),
  get_imports_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getImport(tx,ctx,entityId,params.id)),
