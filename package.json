@@ -21,7 +21,7 @@
     "db:restore:snapshot": "node scripts/restore-snapshot.mjs",
     "release:manifest": "node scripts/release-manifest.mjs",
     "setup": "node scripts/setup.mjs",
-    "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs tests/session-rotation.test.mjs tests/build-status-server.test.mjs tests/contracts.test.mjs",
+    "test:foundation": "node --test tests/foundation.test.mjs tests/identity.test.mjs tests/session-rotation.test.mjs tests/build-status-server.test.mjs tests/contracts.test.mjs tests/domain.test.mjs",
     "verify": "pnpm test:foundation && pnpm contracts:check && pnpm status:check && pnpm build",
     "test:isolation": "node scripts/test-subject-isolation.mjs",
     "dev:web": "pnpm --filter @lara/web dev",
@@ -32,7 +32,8 @@
     "contracts:check": "node scripts/generate-contracts.mjs --check",
     "status:serve": "node scripts/serve-build-status.mjs",
     "test:demo": "node scripts/test-demo-workflows.mjs",
-    "test:p02-schema": "node scripts/test-p02-schema.mjs"
+    "test:p02-schema": "node scripts/test-p02-schema.mjs",
+    "test:p02-domain": "node scripts/test-p02-domain.mjs"
   },
   "pnpm": {
     "overrides": {

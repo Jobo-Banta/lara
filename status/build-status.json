@@ -128,18 +128,18 @@
       "updated_at": "2026-09-18T16:44:04+00:00"
     },
     "P02-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata.",
-      "evidence": "Local 2026-09-19: scripts/test-p02-schema.mjs 15 groups PASS on Supabase PostgreSQL 17.6; tests/contracts.test.mjs 6/6; foundation 17/17; restore rehearsal includes new tables; migration applied to engineering database. CI pending push.",
-      "updated_at": "2026-09-18T17:21:53+00:00"
+      "evidence": "GitHub CI 35374766881 (0ba6b7a-range, branch feat/p02-contracts-migrations) passed: migration 0009 fresh and upgrade on PostgreSQL 18, scripts/test-p02-schema.mjs 15 groups in both databases, tests/contracts.test.mjs, restore rehearsal with new tables, image scans. Applied to engineering Supabase (PostgreSQL 17.6) 2026-09-19. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:34:29+00:00"
     },
     "P02-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer.",
+      "evidence": "Local 2026-09-19: scripts/test-p02-domain.mjs 10 groups PASS on Supabase; tests/domain.test.mjs and foundation 22/22; test tenants removed. CI pending push.",
+      "updated_at": "2026-09-18T17:44:47+00:00"
     },
     "P02-03": {
       "status": "not_started",
@@ -1722,7 +1722,25 @@
       "id": "P02-01",
       "action": "in_review",
       "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata."
+    },
+    {
+      "at": "2026-09-18T17:34:29+00:00",
+      "id": "P02-01",
+      "action": "done",
+      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata."
+    },
+    {
+      "at": "2026-09-18T17:34:29+00:00",
+      "id": "P02-02",
+      "action": "in_progress",
+      "note": "Implementing @lara/domain: identity (actor context, memberships, revocation), organization (entity activation maker-checker, settings versions, capabilities), parties (encrypted tax ids, merge), evidence (verify, scan) and workflow (tasks, obligations, approval engine) with a real-database test."
+    },
+    {
+      "at": "2026-09-18T17:44:47+00:00",
+      "id": "P02-02",
+      "action": "in_review",
+      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer."
     }
   ],
-  "updated_at": "2026-09-18T17:21:53+00:00"
+  "updated_at": "2026-09-18T17:44:47+00:00"
 }

@@ -1,6 +1,6 @@
 # P02 implementation review — 19 September 2026
 
-P02 is in progress, not released. Only the first build-order step (typed contracts, SQL migrations and permission/capability definitions) is implemented. No P02 screen, controller or job exists yet, and nothing in this phase is activated for any tenant.
+P02 is in progress, not released. Build-order steps 1 (contracts and migrations) and 2 (domain rules) are implemented. No P02 controller, job runner or screen exists yet, and nothing in this phase is activated for any tenant.
 
 ## P02-01 contracts and migrations
 
@@ -25,8 +25,22 @@ Row-level security is forced on every tenant table, including for the table owne
 - `scripts/test-foundation-db.mjs` fresh, upgrade, no-op and checksum paths; `scripts/test-restore.mjs` snapshot includes the new tables.
 - Applied to the engineering Supabase database on 19 September 2026 (PostgreSQL 17.6). CI runs the same migration on PostgreSQL 18.
 
+## P02-02 domain and rules
+
+`@lara/domain` implements the P02 state and calculation rules over the schema, in plain ESM modules the API and worker share:
+
+- `core`: typed `DomainError` with the contract status map, canonical content hashing, tenant-bound transactions with serialization retry, the idempotent command envelope (receipt reserved and finalized in the same transaction; replay returns the committed response; a different request on the same key is `IDEMPOTENCY_CONFLICT`), audit and outbox writers, cursor paging.
+- `identity`: principal resolution by OIDC issuer/subject, actor context (permissions from approved roles through active memberships and delegations; entity scope), roles with versioned re-approval, memberships and revocation, and `assertJobStillAuthorized` comparing a job's stored revocation version with the principal's current one (CORE-14).
+- `organization`: tenant provisioning, entities with material-change detection (content version and hash), activation blockers (legal name, PHP, fiscal year, time zone, one active branch, an independent controller, live-tenant profile and onboarding gates), request/approve activation as separate principals binding the content version, branches, settings versions approved by hash with supersession, capability activation with evidence and independent approval.
+- `parties`: AES-256-GCM field encryption for tax identifiers with masked display, identity-status rules without dummy identifiers, one identity task per party, additive roles, normalized search and reviewed merge as an archived alias link.
+- `evidence`: register (quarantine, tenant-private object key), complete (checksum, size and sniffed type must match; mismatches persist as `rejected` and store nothing), scan job and scan outcome through `Scanner`/`EvidenceStore` adapters, content streaming only for available evidence.
+- `workflow`: tasks deduplicated per source/kind/cause, assignment and waiting states, resolution that links evidence and passes the related onboarding check, comments, obligations instantiated once per kind/period/profile with retained completion, and the shared approval request/decision engine.
+
+Verification: `scripts/test-p02-domain.mjs` (10 groups against real PostgreSQL through the runtime role, also in CI for fresh and upgrade databases) covers P02-T01 isolation, P02-T02 revocation of a queued export, P02-T03 settings approval binding, P02-T04 single task per check resolved with evidence, P02-T05 checksum/executable/infected rejection, entity activation maker-checker, party rules and merge, obligations and command replay. `tests/domain.test.mjs` covers hashing, error translation, paging, type sniffing and field encryption.
+
+Architecture note: ADR 001 names NestJS and Vitest; P00 and P01 shipped a plain Node HTTP API with `node:test`, and P02 follows the shipped code. Adopting the framework is a separate decision for the owner, not something to change mid-phase.
+
 ## Open for later P02 tickets
 
-- P02-02: domain services for the state and calculation rules (content hash and content version management, approval routing, party merge, obligation instantiation from versioned templates), with real transaction tests.
 - P02-03: `/v1` controllers using `@lara/contracts`, idempotent command receipts, outbox publication, evidence upload/scan adapter and export jobs with revocation rechecks.
 - P02-04: the workspace UI journey; P02-05 acceptance, runbooks and load; P02-06 release. Registration profile and retention policy tables are referenced by id but defined in their owning phases.
