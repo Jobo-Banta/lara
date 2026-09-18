@@ -68,10 +68,10 @@ export async function updateRole(tx,ctx,id,expectedVersion,input){
  await audit(tx,ctx,{action:'role.edit',resourceType:'role',resourceId:id,resourceVersion:Number(updated.version)});
  return roleResource(updated);
 }
-export async function approveRole(tx,ctx,id,input){
+export async function approveRole(tx,ctx,id,input,expectedVersion){
  requirePermission(ctx,'role.approve');assertInput('ApprovalDecision',input);
  const row=(await tx.query('select * from lara.roles where tenant_id=$1 and id=$2 for update',[ctx.tenantId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Role not found.');
+ if(!row)fail('NOT_FOUND','Role not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.created_by===ctx.principalId)fail('SELF_APPROVAL','The role author cannot approve it.');
  if(Number(row.content_version)!==input.contentVersion)fail('VERSION_CONFLICT','The role content changed since review.',{resourceVersion:Number(row.version)});
  if(row.status==='approved')fail('STATE_CONFLICT','Role is already approved.');
@@ -101,10 +101,10 @@ export async function createMembership(tx,ctx,entityId,input){
  await emit(tx,ctx,{entityId,aggregateType:'membership',aggregateId:row.id,aggregateVersion:1,eventType:'membership.changed.v1',payload:{membershipId:row.id,principalId:input.principalId}});
  return membershipResource(row);
 }
-export async function revokeMembership(tx,ctx,entityId,id,input){
+export async function revokeMembership(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'membership.revoke');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const row=(await tx.query('select * from lara.memberships where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Membership not found.');
+ if(!row)fail('NOT_FOUND','Membership not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status==='revoked')return {resourceType:'membership',resourceId:id,version:Number(row.version),state:'revoked'};
  const updated=(await tx.query("update lara.memberships set status='revoked',revoked_reason=$3,valid_to=least(coalesce(valid_to,now()),now()) where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,input.reason])).rows[0];
  await audit(tx,ctx,{entityId,action:'membership.revoke',resourceType:'membership',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});

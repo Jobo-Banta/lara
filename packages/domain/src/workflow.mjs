@@ -25,9 +25,9 @@ async function loadTask(tx,ctx,entityId,id){
  const row=(await tx.query('select * from lara.tasks where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!row)fail('NOT_FOUND','Task not found.');return row;
 }
-export async function assignTask(tx,ctx,entityId,id,input){
+export async function assignTask(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'task.assign');requireEntity(ctx,entityId);assertInput('AssignTask',input);
- const row=await loadTask(tx,ctx,entityId,id);
+ const row=await loadTask(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(!activeStates.includes(row.status))fail('STATE_CONFLICT','Task is '+row.status+'.');
  if(!(await tx.query("select 1 from lara.principals where tenant_id=$1 and id=$2 and status='active'",[ctx.tenantId,input.ownerId])).rowCount)fail('NOT_FOUND','Owner principal not found.');
  const status=row.status==='open'?'assigned':row.status;
@@ -56,9 +56,9 @@ export async function updateTask(tx,ctx,entityId,id,expectedVersion,input,{state
 // Resolving links the supplied available evidence and, for missing-evidence
 // tasks raised by onboarding checks, marks the related check passed. Related
 // checks update in place; no second task is created.
-export async function resolveTask(tx,ctx,entityId,id,input){
+export async function resolveTask(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'task.resolve');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
- const row=await loadTask(tx,ctx,entityId,id);
+ const row=await loadTask(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status==='resolved')return {resourceType:'task',resourceId:id,version:Number(row.version),state:'resolved'};
  if(row.status==='cancelled')fail('STATE_CONFLICT','Cancelled tasks cannot be resolved.');
  if(row.kind==='missing_evidence'&&!(input.evidenceIds||[]).length)fail('EVIDENCE_NOT_READY','Attach the available evidence that resolves this task.');
@@ -71,9 +71,9 @@ export async function resolveTask(tx,ctx,entityId,id,input){
  await emit(tx,ctx,{entityId,aggregateType:'task',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'task.resolved.v1',payload:{taskId:id,sourceType:row.source_type,sourceId:row.source_id}});
  return {resourceType:'task',resourceId:id,version:Number(updated.version),state:'resolved'};
 }
-export async function commentTask(tx,ctx,entityId,id,input){
+export async function commentTask(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'task.comments');requireEntity(ctx,entityId);assertInput('CommentCreate',input);
- const row=await loadTask(tx,ctx,entityId,id);
+ const row=await loadTask(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  const evidenceId=(input.evidenceIds||[])[0]||null;
  if(evidenceId)await linkEvidence(tx,ctx,entityId,[evidenceId],'task',id,Number(row.version));
  const comment=(await tx.query('insert into lara.task_comments(tenant_id,entity_id,task_id,body,evidence_id,created_by) values($1,$2,$3,$4,$5,$6) returning id',[ctx.tenantId,entityId,id,input.body.trim(),evidenceId,ctx.principalId])).rows[0];
@@ -126,10 +126,10 @@ export async function updateObligation(tx,ctx,entityId,id,expectedVersion,input)
  await audit(tx,ctx,{entityId,action:'obligation.edit',resourceType:'obligation',resourceId:id,resourceVersion:Number(updated.version)});
  return obligationResource(updated);
 }
-export async function completeObligation(tx,ctx,entityId,id,input){
+export async function completeObligation(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'obligation.complete');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const row=(await tx.query('select * from lara.obligations where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Obligation not found.');
+ if(!row)fail('NOT_FOUND','Obligation not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status==='completed')return {resourceType:'obligation',resourceId:id,version:Number(row.version),state:'completed'};
  const evidenceId=(input.evidenceIds||[])[0];
  if(!evidenceId)fail('EVIDENCE_NOT_READY','Completion requires the configured evidence.');

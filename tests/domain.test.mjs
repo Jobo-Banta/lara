@@ -63,3 +63,16 @@ test('field encryption round-trips with a configured key and never leaks plainte
   assert.throws(()=>encryptField('x',{}),/not configured/);
   assert.equal(maskTaxId('123-456-789-000'),'•••••••••000');
 });
+
+test('rate limiter refills per minute and denies the burst above the limit', async () => {
+  process.env.RATE_LIMIT_WRITES_PER_MINUTE='4';
+  const {rateLimit}=await import('../apps/api/src/workspace-api.mjs');
+  let now=1_000_000;
+  for(let i=0;i<4;i++)rateLimit('p1',true,now);
+  assert.throws(()=>rateLimit('p1',true,now),/Too many requests/);
+  rateLimit('p2',true,now);
+  now+=15_000;rateLimit('p1',true,now);
+  assert.throws(()=>rateLimit('p1',true,now),/Too many requests/);
+  now+=60_000;for(let i=0;i<4;i++)rateLimit('p1',true,now);
+  assert.throws(()=>rateLimit('p1',true,now),/Too many requests/);
+});

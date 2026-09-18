@@ -3,7 +3,7 @@
 // state an approval may bind to. Storage and scanning are adapters owned by
 // LARA; the fixture scanner flags the EICAR test string.
 import {createHash,randomUUID} from 'node:crypto';
-import {assertInput,audit,cursorClause,emit,enqueueJob,fail,page,pageArgs,requireEntity,requirePermission} from './core.mjs';
+import {assertInput,audit,cursorClause,emit,enqueueJob,expectVersion,fail,page,pageArgs,requireEntity,requirePermission} from './core.mjs';
 
 export const allowedMime=new Set(['application/pdf','image/jpeg','image/png','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
 export const maxBytes=20971520;
@@ -62,10 +62,10 @@ export async function registerUpload(tx,ctx,entityId,input,{uploadBase='/v1/evid
 // 2. Complete: bytes are checked against the declared checksum, size and
 // type. Any mismatch rejects the record; nothing mismatched is ever stored.
 // Success stores the object and queues the scan job (state scanning).
-export async function completeUpload(tx,ctx,entityId,id,bytes,store){
+export async function completeUpload(tx,ctx,entityId,id,bytes,store,expectedVersion){
  requirePermission(ctx,'evidence.upload');requireEntity(ctx,entityId);
  const row=(await tx.query('select * from lara.evidence where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Evidence not found.');
+ if(!row)fail('NOT_FOUND','Evidence not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status!=='quarantined')fail('STATE_CONFLICT','Upload is already '+row.status+'.');
  const reasons=[];
  const actual=createHash('sha256').update(bytes).digest('hex');

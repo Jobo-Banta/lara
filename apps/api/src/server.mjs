@@ -1,4 +1,6 @@
 import {demoRequest} from './demo-service.mjs';
+import {createWorkspaceApi} from './workspace-api.mjs';
+import {evidenceStoreFromEnv} from '@lara/domain';
 import {DemoError} from './demo-domain.mjs';
 import {requestTrace,exportTrace} from '../../../packages/config/src/telemetry.mjs';
 import {sessionKeys} from '../../../packages/config/src/session-keys.mjs';
@@ -17,6 +19,9 @@ let config;
 try { config = loadConfig(); } catch (error) { console.error(safeConfigError(error)); process.exit(1); }
 const port = Number(process.env.API_PORT || 4000);
 function database() { return new pg.Client({...connectionOptions(process.env.DATABASE_URL),connectionTimeoutMillis:3000,query_timeout:5000}); }
+const pool=new pg.Pool({...connectionOptions(process.env.DATABASE_URL),max:Number(process.env.API_POOL_SIZE)||10,connectionTimeoutMillis:3000,query_timeout:10000,idleTimeoutMillis:30000});
+pool.on('error',error=>console.error(JSON.stringify({service:'api',event:'pool_error',message:safeConfigError(error)})));
+const workspace=createWorkspaceApi({pool,issuer:process.env.OIDC_ISSUER,store:evidenceStoreFromEnv(),mode:config.mode});
 async function query(sql, params = []) {
  const db=database();await db.connect();
  try {await db.query('begin');await db.query("select set_config('lara.subject',$1,true),set_config('lara.run_id',$2,true)",[scope.getStore()?.sub || '',scope.getStore()?.run || '']);const result=await db.query(sql,params);await db.query('commit');return result;}
@@ -24,7 +29,7 @@ async function query(sql, params = []) {
 }
 async function body(request) { let text = ""; for await (const chunk of request) {text += chunk;if(Buffer.byteLength(text)>65536)throw new DemoError(413,"Command is too large.");} try{return text ? JSON.parse(text) : {};}catch{throw new DemoError(400,"Invalid JSON.");} }
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
-async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0008_demo_workspaces")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
+async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0010_p02_principal_directory")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer((request, response) => scope.run({}, async () => {
   const started=performance.now();
   const trace=requestTrace();response.setHeader("x-trace-id",trace.traceId);
@@ -47,6 +52,7 @@ const server = http.createServer((request, response) => scope.run({}, async () =
       if(config.mode!=='demo')return send(response,404,{error:'NOT_FOUND'});
       return send(response,200,await demoRequest(database(),identity,method,path,method==='POST'?await body(request):{}));
     }
+    if(path==='/v1'||path.startsWith('/v1/'))return workspace(request,response,{identity,path:path.slice(3)||'/',method,traceId:trace.traceId,send:(res,status,value)=>{res.statusCode=status;res.end(typeof value==='string'?value:JSON.stringify(value));}});
     return send(response, 404, { error: "NOT_FOUND" });
   } catch (error) { return send(response, error instanceof DemoError?error.status:500, { error: error instanceof DemoError?error.message:safeConfigError(error) }); }
 }));

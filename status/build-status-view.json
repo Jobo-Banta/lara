@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T17:44:47+00:00",
+  "updated_at": "2026-09-18T18:45:25+00:00",
   "releases": [
     {
       "id": "P00",
@@ -793,13 +793,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer.",
-      "evidence": "Local 2026-09-19: scripts/test-p02-domain.mjs 10 groups PASS on Supabase; tests/domain.test.mjs and foundation 22/22; test tenants removed. CI pending push.",
-      "updated_at": "2026-09-18T17:44:47+00:00"
+      "evidence": "GitHub CI 35376135655 passed: scripts/test-p02-domain.mjs 10 groups in fresh and upgrade PostgreSQL 18 databases through the runtime role, tests/domain.test.mjs, foundation 22/22, image scans. Local Supabase run 2026-09-19 PASS with test tenants removed. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:48:26+00:00"
     },
     {
       "id": "P02-03",
@@ -850,13 +850,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck.",
+      "evidence": "Local 2026-09-19: scripts/test-p02-api.mjs 7 groups PASS with API and worker processes against Supabase; readiness, worker, restore, schema (15) and domain (10) tests PASS; foundation 23/23. CI pending push.",
+      "updated_at": "2026-09-18T18:45:25+00:00"
     },
     {
       "id": "P02-04",
@@ -5521,24 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-18T15:55:29+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-03",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-04",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
       "at": "2026-09-18T15:55:52+00:00",
       "id": "P01-05",
       "action": "in_progress",
@@ -5699,6 +5681,24 @@
       "id": "P02-02",
       "action": "in_review",
       "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer."
+    },
+    {
+      "at": "2026-09-18T17:48:26+00:00",
+      "id": "P02-02",
+      "action": "done",
+      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer."
+    },
+    {
+      "at": "2026-09-18T17:48:26+00:00",
+      "id": "P02-03",
+      "action": "in_progress",
+      "note": "Implementing /v1 controllers over @lara/contracts and @lara/domain: actor resolution from the principal directory, header conventions, idempotent commands, evidence upload/complete/content, exports and jobs; worker job loop with leases, retries, scan and export handlers."
+    },
+    {
+      "at": "2026-09-18T18:45:25+00:00",
+      "id": "P02-03",
+      "action": "in_review",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
     }
   ]
 }

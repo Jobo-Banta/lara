@@ -74,10 +74,10 @@ export async function activationBlockers(tx,ctx,entity,requesterId=ctx.principal
 // Step 1: the preparer requests activation, which opens an approval request
 // bound to the current content version and hash. Step 2: a different
 // principal with entity.activate approves; the database re-validates gates.
-export async function requestActivation(tx,ctx,id,input){
+export async function requestActivation(tx,ctx,id,input,expectedVersion){
  requirePermission(ctx,'entity.edit');requireEntity(ctx,id);assertInput('ReasonAction',input);
  const entity=(await tx.query('select * from lara.entities where tenant_id=$1 and id=$2 for update',[ctx.tenantId,id])).rows[0];
- if(!entity)fail('NOT_FOUND','Entity not found.');
+ if(!entity)fail('NOT_FOUND','Entity not found.');if(expectedVersion!==undefined)expectVersion(entity,expectedVersion);
  if(entity.status==='active')fail('STATE_CONFLICT','Entity is already active.');
  if(entity.status==='archived')fail('STATE_CONFLICT','Archived entities cannot activate.');
  const blockers=await activationBlockers(tx,ctx,entity);
@@ -88,10 +88,10 @@ export async function requestActivation(tx,ctx,id,input){
  await audit(tx,ctx,{entityId:id,action:'entity.request_activation',resourceType:'entity',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});
  return {resourceType:'entity',resourceId:id,version:Number(updated.version),state:'pending_activation',approvalRequestId:request.id};
 }
-export async function activateEntity(tx,ctx,id,input){
+export async function activateEntity(tx,ctx,id,input,expectedVersion){
  requirePermission(ctx,'entity.activate');requireEntity(ctx,id);assertInput('ReasonAction',input);
  const entity=(await tx.query('select * from lara.entities where tenant_id=$1 and id=$2 for update',[ctx.tenantId,id])).rows[0];
- if(!entity)fail('NOT_FOUND','Entity not found.');
+ if(!entity)fail('NOT_FOUND','Entity not found.');if(expectedVersion!==undefined)expectVersion(entity,expectedVersion);
  if(entity.status!=='pending_activation')fail('STATE_CONFLICT','Request activation before approving it.');
  const request=(await tx.query("select * from lara.approval_requests where tenant_id=$1 and entity_id=$2 and resource_type='entity' and resource_id=$2 and status='pending' order by created_at desc limit 1 for update",[ctx.tenantId,id])).rows[0];
  if(!request)fail('STATE_CONFLICT','No pending activation request.');

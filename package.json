@@ -33,7 +33,8 @@
     "status:serve": "node scripts/serve-build-status.mjs",
     "test:demo": "node scripts/test-demo-workflows.mjs",
     "test:p02-schema": "node scripts/test-p02-schema.mjs",
-    "test:p02-domain": "node scripts/test-p02-domain.mjs"
+    "test:p02-domain": "node scripts/test-p02-domain.mjs",
+    "test:p02-api": "node scripts/test-p02-api.mjs"
   },
   "pnpm": {
     "overrides": {

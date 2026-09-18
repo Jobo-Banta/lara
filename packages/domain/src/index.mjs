@@ -4,3 +4,4 @@ export * as organization from './organization.mjs';
 export * as parties from './parties.mjs';
 export * as evidence from './evidence.mjs';
 export * as workflow from './workflow.mjs';
+export * from './adapters.mjs';

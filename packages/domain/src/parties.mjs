@@ -73,10 +73,10 @@ export async function updateParty(tx,ctx,entityId,id,expectedVersion,input,env){
  await audit(tx,ctx,{entityId,action:'party.edit',resourceType:'party',resourceId:id,resourceVersion:Number(updated.version),afterRef:hash});
  return partyResource(updated,await rolesOf(tx,ctx,id),env);
 }
-export async function archiveParty(tx,ctx,entityId,id,input){
+export async function archiveParty(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'party.archive');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const row=(await tx.query('select * from lara.party where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Party not found.');
+ if(!row)fail('NOT_FOUND','Party not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status==='archived')return {resourceType:'party',resourceId:id,version:Number(row.version),state:'archived'};
  const updated=(await tx.query("update lara.party set status='archived' where tenant_id=$1 and entity_id=$2 and id=$3 returning version",[ctx.tenantId,entityId,id])).rows[0];
  await tx.query("update lara.tasks set status='cancelled' where tenant_id=$1 and entity_id=$2 and source_type='party' and source_id=$3 and status not in ('resolved','cancelled')",[ctx.tenantId,entityId,id]);

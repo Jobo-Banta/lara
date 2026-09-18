@@ -1,6 +1,6 @@
 # P02 implementation review — 19 September 2026
 
-P02 is in progress, not released. Build-order steps 1 (contracts and migrations) and 2 (domain rules) are implemented. No P02 controller, job runner or screen exists yet, and nothing in this phase is activated for any tenant.
+P02 is in progress, not released. Build-order steps 1 (contracts and migrations), 2 (domain rules) and 3 (API, jobs and adapters) are implemented. No P02 screen exists yet, and nothing in this phase is activated for any tenant.
 
 ## P02-01 contracts and migrations
 
@@ -40,7 +40,19 @@ Verification: `scripts/test-p02-domain.mjs` (10 groups against real PostgreSQL t
 
 Architecture note: ADR 001 names NestJS and Vitest; P00 and P01 shipped a plain Node HTTP API with `node:test`, and P02 follows the shipped code. Adopting the framework is a separate decision for the owner, not something to change mid-phase.
 
+## P02-03 API, jobs and adapters
+
+The `/v1` surface in `apps/api/src/workspace-api.mjs` routes every request through the reviewed contract (`findOperation`), so unknown paths are 404 and operations of later phases answer `FEATURE_NOT_ENABLED`. The tenant comes from `lara.principal_directory` (migration 0010: an issuer/subject → tenant map maintained by trigger), never from the body; accounts in several tenants name one with `X-Tenant-Id`. Header conventions are enforced from the contract: `X-Entity-Id` for entity scope (out-of-scope entities read as not found), `Idempotency-Key` for POST (428 when missing), `If-Match` for PATCH and `{id}` actions (428/412 with `resourceVersion`), ETag on resources. Bodies are validated with `@lara/contracts` into typed field errors. Commands run through the domain envelope so replay is exact and a different request on the same key is 409. Per-principal token buckets return 429 with `Retry-After`; the limits are configuration (`RATE_LIMIT_*`). A connection pool serves `/v1`.
+
+Evidence: `POST /evidence/uploads` registers the quarantined record and returns the local-stream upload URL; `PUT /v1/evidence/{id}/content` stages bytes; `POST /evidence/{id}/complete` verifies checksum, size and sniffed type (a mismatch commits the `rejected` state and returns 422) and queues the scan job; `GET /evidence/{id}/content` streams only available content to a current member. `POST /exports` queues a scoped job; `GET /jobs/{id}` and `GET /commands/{key}` answer within scope.
+
+Worker (`apps/worker/src/main.mjs`): claims jobs with `SKIP LOCKED` under a 60 s lease renewed every 20 s, retries infrastructure failures at 1 s/5 s/30 s/2 m/10 m, dead-letters with an owned high-severity task, and treats authorization and rule failures as final. Handlers: `evidence.scan` (fixture scanner, disposal of infected content) and `export.tasks|masters|evidence_manifest` (revocation recheck through `assertJobStillAuthorized`, snapshot at the recorded cutoff, CSV or JSON, checksummed and stored as restricted evidence so downloads keep rechecking membership). Adapters: filesystem evidence store and fixture scanner for local/demo; production composition fails closed until the S3-compatible store and a real scanner are configured.
+
+Verification: `scripts/test-p02-api.mjs` (in CI for fresh and upgrade databases) runs the API and worker as processes and covers session context, routing and gating, header conventions, idempotent replay and conflict, validation errors, cross-tenant isolation, two-principal activation, the full evidence path including a rejected checksum, tasks, exports with the revocation denial (CORE-14), command lookup and the 429 path on a low-limit instance. Unit tests cover the token bucket. `scripts/test-api-readiness.mjs` now derives the expected schema version from the migrations directory.
+
+Not yet: approval-policy endpoints return `FEATURE_NOT_ENABLED` until the ledger approval routing (P03) consumes them; delegation has no endpoint in the reviewed contract; the S3 evidence store and a production scanner adapter are qualification items for release.
+
 ## Open for later P02 tickets
 
-- P02-03: `/v1` controllers using `@lara/contracts`, idempotent command receipts, outbox publication, evidence upload/scan adapter and export jobs with revocation rechecks.
+- Outbox publication to consumers (notifications) is pending a consumer; events are written and published_at stays null until one exists.
 - P02-04: the workspace UI journey; P02-05 acceptance, runbooks and load; P02-06 release. Registration profile and retention policy tables are referenced by id but defined in their owning phases.
