@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-18T14:42:39+00:00",
+  "updated_at": "2026-09-18T14:51:41+00:00",
   "releases": [
     {
       "id": "P00",
@@ -10,8 +10,8 @@ window.LARA_BUILD_STATUS = {
       "spec": "03-phase-00-setup.md",
       "release_gate": "RG-01..08",
       "purpose": "engineering",
-      "released_at": null,
-      "evidence": ""
+      "released_at": "2026-09-18T14:51:41+00:00",
+      "evidence": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
     },
     {
       "id": "P01",
@@ -499,13 +499,13 @@ window.LARA_BUILD_STATUS = {
       ],
       "spec": "03-phase-00-setup.md",
       "acceptance": "P00-T08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "ready_for_implementation",
       "owner": "Codex",
-      "note": "Signed-tag workflow, verification key, tested-image archives/SBOMs and deployment runbook implemented. CI and actual signed artifact delivery still required.",
-      "evidence": "Nonempty restore passed; release source gate rejects mismatched CI; release workflow and signing trust source awaiting CI.",
-      "updated_at": "2026-09-18T14:36:46+00:00"
+      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance.",
+      "evidence": "docs/development/releases/0.0.1.md; CI 35358280423 and release 35358571786 passed; all ten assets uploaded.",
+      "updated_at": "2026-09-18T14:51:41+00:00"
     },
     {
       "id": "P01-01",
@@ -5521,18 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T09:35:32+00:00",
-      "id": "P01-08",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:32+00:00",
-      "id": "P01-09",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
       "at": "2026-09-18T09:35:33+00:00",
       "id": "P01-10",
       "action": "in_review",
@@ -5699,6 +5687,18 @@ window.LARA_BUILD_STATUS = {
       "id": "P00-05",
       "action": "done",
       "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
+    },
+    {
+      "at": "2026-09-18T14:51:41+00:00",
+      "id": "P00-08",
+      "action": "done",
+      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance."
+    },
+    {
+      "at": "2026-09-18T14:51:41+00:00",
+      "id": "P00",
+      "action": "release",
+      "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
     }
   ]
 };

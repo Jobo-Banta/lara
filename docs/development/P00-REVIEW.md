@@ -15,7 +15,7 @@ CI https://github.com/Jobo-Banta/lara/actions/runs/35357486680 passed all four j
 | P00-T05 | PostgreSQL 18 clean and previous-version databases migrate in CI; Supabase PostgreSQL 17.6 separately passes live rehearsals. Dedicated migrator owns LARA objects; runtime cannot alter schemas. |
 | P00-T06 | Seeding requires explicit demo mode, confirmation and the dedicated demo marker. Two runs preserve fixture counts; production mode is rejected before connection. Unassigned subjects cannot access shared fixtures. |
 | P00-T07 | GitHub main protection requires verify plus all three image jobs, strict up-to-date checks and pull requests, including admins. Force-push/deletion are disabled. Release-source verification rejects failed/mismatched CI. Contract/schema, deterministic assets, tracker, dependency/secret/image scans pass. |
-| P00-T08 | Rollback-only snapshot restoration verifies hashes for 12 tables with nonempty tasks, invoices and other fixtures; corruption is rejected. Engineering artifact delivery is staged in CI; signed release publication remains the final gate. |
+| P00-T08 | Rollback-only snapshot restoration verifies hashes for 12 tables with nonempty tasks, invoices and other fixtures; corruption is rejected. Signed v0.0.1 and all ten engineering assets were delivered by workflow 35358571786. |
 
 ## Operational evidence
 
@@ -27,6 +27,6 @@ README.md and infra/deployment/README.md document setup, release-image loading, 
 
 ## Release boundary
 
-P00 is an engineering baseline, not production finance. The signed-tag workflow verifies tag signature and exact successful CI source, retrieves already-built/scanned images and publishes their archives/SBOMs/provenance. P00 remains unshipped until that workflow delivers the release and the tracker records its evidence.
+P00 is an engineering baseline, not production finance. The signed-tag workflow verifies tag signature and exact successful CI source, retrieves already-built/scanned images and publishes their archives/SBOMs/provenance. P00 is shipped as v0.0.1. Delivery, signed source and gate evidence are recorded in releases/0.0.1.md.
 
 Full session scenario seeding/reset remains P01 work; reset is disabled. No production accounting, tax compliance activation or cloud deployment is attested.
