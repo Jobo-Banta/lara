@@ -1,0 +1,1 @@
+import{access}from "node:fs/promises";import{loadConfig}from "../packages/config/src/env.mjs";await access("pnpm-lock.yaml");await access("apps/web/public/assets/lara/asset-manifest.json");loadConfig();console.log("Phase 0 release prerequisites are present.");

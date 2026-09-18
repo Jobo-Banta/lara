@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "rules": "Transitions require role/version/policy/evidence guards in shared and phase specs. Posted financial corrections create linked documents. Reopening requires a new close version. Terminal provider rejection may create a new repaired payload job, never mutate accepted financial facts.",
+  "machines": {
+    "document": {
+      "draft": [
+        "submitted",
+        "cancelled"
+      ],
+      "submitted": [
+        "approved",
+        "changes_requested",
+        "cancelled"
+      ],
+      "changes_requested": [
+        "draft"
+      ],
+      "approved": [
+        "posted",
+        "draft"
+      ],
+      "posted": [],
+      "cancelled": []
+    },
+    "payment": {
+      "draft": [
+        "submitted",
+        "cancelled"
+      ],
+      "submitted": [
+        "authorized",
+        "draft",
+        "cancelled"
+      ],
+      "authorized": [
+        "released",
+        "release_unknown",
+        "draft",
+        "cancelled"
+      ],
+      "release_unknown": [
+        "released",
+        "failed"
+      ],
+      "released": [
+        "settled",
+        "failed",
+        "returned"
+      ],
+      "settled": [
+        "returned"
+      ],
+      "failed": [],
+      "returned": [],
+      "cancelled": []
+    },
+    "transmission": {
+      "not_applicable": [],
+      "queued": [
+        "sending"
+      ],
+      "sending": [
+        "accepted",
+        "rejected",
+        "unknown",
+        "retry_wait"
+      ],
+      "unknown": [
+        "accepted",
+        "rejected",
+        "retry_wait"
+      ],
+      "retry_wait": [
+        "sending"
+      ],
+      "accepted": [],
+      "rejected": []
+    },
+    "period": {
+      "open": [
+        "soft_closed"
+      ],
+      "soft_closed": [
+        "open",
+        "locked"
+      ],
+      "locked": [
+        "open"
+      ]
+    },
+    "evidence": {
+      "quarantined": [
+        "scanning",
+        "rejected"
+      ],
+      "scanning": [
+        "available",
+        "rejected"
+      ],
+      "available": [],
+      "rejected": []
+    },
+    "job": {
+      "queued": [
+        "running",
+        "cancelled"
+      ],
+      "running": [
+        "succeeded",
+        "retry_wait",
+        "failed",
+        "dead_letter"
+      ],
+      "retry_wait": [
+        "running",
+        "cancelled"
+      ],
+      "succeeded": [],
+      "failed": [],
+      "dead_letter": [],
+      "cancelled": []
+    }
+  }
+}

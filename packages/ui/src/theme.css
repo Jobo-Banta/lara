@@ -1,0 +1,40 @@
+:root {
+  --color-accent: #125d66;
+  --color-accent-hover: #0d4850;
+  --color-page: #f6f8f5;
+  --color-surface: #ffffff;
+  --color-text: #202e3a;
+  --color-text-muted: #52636e;
+  --color-border: #c7deda;
+  --color-navigation: #202e3a;
+  --color-success: #24734d;
+  --color-warning: #9b6700;
+  --color-danger: #a43d3d;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font-family: Manrope, system-ui, sans-serif;
+}
+.lara-shell { min-height: 100vh; }
+.lara-header {
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 16px 24px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.lara-panel {
+  max-width: 720px;
+  margin: 10vh auto;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+.eyebrow { color: var(--color-accent); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }

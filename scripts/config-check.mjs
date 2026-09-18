@@ -1,0 +1,1 @@
+import{loadConfig,safeConfigError}from "../packages/config/src/env.mjs";try{console.log("Configuration valid for "+loadConfig().mode+" mode.");}catch(e){console.error("Configuration invalid: "+safeConfigError(e));process.exitCode=1;}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LARA · Build status</title>
+  <link rel="icon" href="images/branding/ledger-l/web/logos/favicon.svg">
+  <link rel="stylesheet" href="images/branding/ledger-l/web/lara-theme.css">
+  <link rel="stylesheet" href="status/build-status.css">
+  <script src="status/build-status-data.js" defer></script>
+  <script src="status/build-status.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to build status</a>
+<aside class="rail">
+  <a href="build-status.html" aria-label="LARA build status"><img class="logo" src="images/branding/ledger-l/web/logos/lara-logo-primary.svg" alt="LARA" width="166" height="40"></a>
+  <p class="tagline">Clear books. Clear next steps.</p>
+  <p class="eyebrow">Delivery workspace</p>
+  <nav aria-label="Build navigation">
+    <a href="#main" aria-current="page">Build overview <span>↗</span></a>
+    <a href="#roadmap">Phases & modules</a>
+    <a href="#activity">Recent updates</a>
+    <a href="docs/development/README.md">Implementation specs</a>
+    <a href="docs/development/13-build-tracking.md">How to update progress</a>
+  </nav>
+  <div class="rail-note"><img src="images/branding/ledger-l/web/icons/evidence.svg" alt="" width="24" height="24"><strong>Evidence before completion</strong><p>Done means verified. Shipped means the release gate is recorded.</p></div>
+  <footer>Internal build tracker<br>Ledger-L · DCP</footer>
+</aside>
+<main id="main" tabindex="-1">
+  <header class="topbar"><span>LARA <span class="slash">/</span> Product delivery</span><div class="connection"><span id="connection" role="status">Loading status…</span><button id="refresh" type="button">Refresh</button></div></header>
+  <section class="intro"><div><p class="eyebrow">From foundation to full platform</p><h1>One build. Clear progress.</h1><p>Every phase has a usable outcome. Follow the prototype, production modules and the work that makes them ready to ship.</p></div><a class="primary" href="docs/development/01-delivery-plan.md">View delivery plan ↗</a></section>
+  <div class="notice"><strong>Specifications ready</strong><span>Build progress is tracked separately. Phase 1 is a synthetic-data prototype; later modules require their own production release gates.</span></div>
+  <section class="metrics" aria-label="Build summary">
+    <article><p>Release increments shipped</p><strong id="shipped">0 / 26</strong><small>Across 19 planned phases</small></article>
+    <article><p>Implementation tickets done</p><strong id="completed">0 / 162</strong><small id="percentage">0% · unweighted ticket count</small></article>
+    <article><p>Work in motion</p><strong id="active">0</strong><small>In progress or in review</small></article>
+    <article><p>Reported blockers</p><strong id="blocked">0</strong><small>Explicit blockers, excluding future dependencies</small></article>
+  </section>
+  <section class="next-panel" aria-label="Next milestone"><div><p class="eyebrow">Next release in sequence</p><h2 id="next-title">Phase 0 · Engineering baseline</h2><p id="next-description">Repository, configuration and a repeatable development environment.</p></div><div class="next-progress"><span id="next-count">0 of 8 tickets complete</span><progress id="next-progress" max="100" value="0" aria-label="Next release completion"></progress><small id="updated">No build updates yet</small></div></section>
+  <section id="roadmap" aria-labelledby="roadmap-title"><div class="section-heading"><div><p class="eyebrow">The delivery roadmap</p><h2 id="roadmap-title">Phases & modules</h2></div><span id="results"></span></div>
+    <div class="filters"><div class="search"><label for="search">Find a phase, module or ticket</label><input id="search" type="search" placeholder="Search ledger, AI, P01…"></div><div><label for="status-filter">Build status</label><select id="status-filter"><option value="all">All statuses</option><option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="blocked">Blocked</option><option value="in_review">In review</option><option value="ready">Ready for release</option><option value="shipped">Shipped</option></select></div><button id="clear" type="button">Clear filters</button></div>
+    <p class="muted legend">Expand a module for tickets, acceptance criteria, dependencies and release evidence. Percentages count completed tickets, not elapsed time or estimated effort.</p>
+    <div id="releases"></div><p id="empty" class="empty" hidden>No matching modules. Try another search or clear the filters.</p>
+  </section>
+  <section id="activity" class="activity"><div class="section-heading"><h2>Recent updates</h2><span>Latest 30 changes</span></div><ul id="history"></ul></section>
+  <footer class="page-footer"><span>Source: approved release plan + tracked build evidence</span><a href="docs/development/13-build-tracking.md">Update instructions ↗</a></footer>
+</main>
+<noscript>This tracker needs JavaScript to display the release plan. Read docs/development/01-delivery-plan.md for the static plan.</noscript>
+</body>
+</html>

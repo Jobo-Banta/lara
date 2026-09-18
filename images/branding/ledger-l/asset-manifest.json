@@ -1,0 +1,417 @@
+[
+  {
+    "path": "web/lara-theme.css",
+    "bytes": 697,
+    "sha256": "5d86b1f0d455f6bd5fbccc1e7f1604764c6ef44d5aaf475123e73028647d2508"
+  },
+  {
+    "path": "web/manifest.webmanifest",
+    "bytes": 421,
+    "sha256": "e9e5d27ba5fed0a2cc8dbd4aa2f4f0b245a52ccd7085e2c3a87b3ea719a661d5"
+  },
+  {
+    "path": "web/backgrounds/banner-dark.png",
+    "bytes": 7079,
+    "sha256": "a6472e650cdd40d541dcf14bae75fa6e30a875199983d30aed85e6fcb0d89c63"
+  },
+  {
+    "path": "web/backgrounds/banner-dark.svg",
+    "bytes": 561,
+    "sha256": "987bb0cf283cfb24de69c20eded5f3200c7c1a54c862038e90718e4c9e5608d8"
+  },
+  {
+    "path": "web/backgrounds/banner-light.png",
+    "bytes": 6999,
+    "sha256": "47a10a3b3364c015cb1a22d8bdbc3a3e37f27d999a1dd7b31dc9b428d22e698c"
+  },
+  {
+    "path": "web/backgrounds/banner-light.svg",
+    "bytes": 563,
+    "sha256": "ab39f056ee2fbec96540ac89cc615705f3dc53194a7934c851c1cd1d88e0ebee"
+  },
+  {
+    "path": "web/backgrounds/banner-mobile.png",
+    "bytes": 5276,
+    "sha256": "a269592fb43d4b274e431bb889bb5224be9beb139d77964203379e4073da995a"
+  },
+  {
+    "path": "web/backgrounds/banner-mobile.svg",
+    "bytes": 558,
+    "sha256": "1bb337afa136e66f39b0b9fc6712290a8e4bc97daf4e3e39dde9a57dad87c81c"
+  },
+  {
+    "path": "web/backgrounds/banner-teal.png",
+    "bytes": 7162,
+    "sha256": "2043a9c66fee65d4bec94d4220234e0197463a18beecb8b7fa9c01b8d16528d5"
+  },
+  {
+    "path": "web/backgrounds/banner-teal.svg",
+    "bytes": 586,
+    "sha256": "76d8ea7f9680d13fa03f6a9fe90af2276aae611013b7323ab77c234c27d5c431"
+  },
+  {
+    "path": "web/backgrounds/ledger-tile.png",
+    "bytes": 557,
+    "sha256": "c2ea3f222942bcd3f51154a353680a4ef79183337168ba89e4421197092c3b3d"
+  },
+  {
+    "path": "web/backgrounds/ledger-tile.svg",
+    "bytes": 213,
+    "sha256": "590863fa162712e91b62efbc7164361b90e80dd3ce81305bc7e413231a8806a4"
+  },
+  {
+    "path": "web/backgrounds/page-dark.png",
+    "bytes": 10429,
+    "sha256": "12ab239413cf1756353b4038b8d3c4f26116827142c2453063d4a9a160e4fb2f"
+  },
+  {
+    "path": "web/backgrounds/page-dark.svg",
+    "bytes": 494,
+    "sha256": "c429d9a2235684168f9daebc0ea7da4b9a1adaa630bc3ae204d190553481da85"
+  },
+  {
+    "path": "web/backgrounds/page-light.png",
+    "bytes": 8964,
+    "sha256": "f0a6c9f1044ae7646ba0e1c8abf8fd8459f2392c8a10e6e4cb9a7e656bb9bb13"
+  },
+  {
+    "path": "web/backgrounds/page-light.svg",
+    "bytes": 403,
+    "sha256": "bd36ec642f36578ed7dfd19639d771faa0966e763a594e33bcbeddb86cf62c69"
+  },
+  {
+    "path": "web/backgrounds/social-square.png",
+    "bytes": 8070,
+    "sha256": "83dab4a8a066e94ae8fee198dfffa490274024ca1548fa23e027d1c90310b04d"
+  },
+  {
+    "path": "web/backgrounds/social-square.svg",
+    "bytes": 563,
+    "sha256": "071695973f8398fd0c045ecb2cf22f7f7cf357e45b1fd38a900b64847b65f982"
+  },
+  {
+    "path": "web/icons/approval.svg",
+    "bytes": 253,
+    "sha256": "edc6fc2d149e92ca1a77f1a7629893ef2f94627b2065282ddee8d313b307612d"
+  },
+  {
+    "path": "web/icons/assets.svg",
+    "bytes": 290,
+    "sha256": "0bd736fb63d13700081f6a7f83f32244ae083a67329aaab1e3d65cc1575a2a35"
+  },
+  {
+    "path": "web/icons/audit-trail.svg",
+    "bytes": 332,
+    "sha256": "02eb0f220f874ff9a9d09db9212ac02d284f4141cc091e78b2bc7be1d69706f2"
+  },
+  {
+    "path": "web/icons/bank.svg",
+    "bytes": 266,
+    "sha256": "dbd28a0ef748de42aec034c0e3836caf9ec3983f8dc3ab836e8c649957bec9da"
+  },
+  {
+    "path": "web/icons/branch.svg",
+    "bytes": 376,
+    "sha256": "e4a768b66b140e814b215c35d9f8ad1217f1c0cf4da06d82c26ae93ebdc8ee3a"
+  },
+  {
+    "path": "web/icons/budget.svg",
+    "bytes": 265,
+    "sha256": "13aa34de29b1b3aa9336d42264b7ddc208d6c8ec3a232944715acaee035077ac"
+  },
+  {
+    "path": "web/icons/calendar.svg",
+    "bytes": 306,
+    "sha256": "704342f15512b27fe8dcaa6a56833670f0302e1c80f2fe776e9fb5a038983a64"
+  },
+  {
+    "path": "web/icons/dashboard.svg",
+    "bytes": 389,
+    "sha256": "5e219d54dcc3169fe8f389a66e6bbe85018613356961a818c4ed3438df772a98"
+  },
+  {
+    "path": "web/icons/download.svg",
+    "bytes": 245,
+    "sha256": "91d623e4ffa8d4ee7ebc3b90cef3da665c1653b3ccac2efea5d77051e7dfdf1f"
+  },
+  {
+    "path": "web/icons/evidence.svg",
+    "bytes": 262,
+    "sha256": "cb5ecdfe5f4c90e23ffc2786d87e174f848b7d286c157ed75b416f6bfd722565"
+  },
+  {
+    "path": "web/icons/exception.svg",
+    "bytes": 240,
+    "sha256": "499098d1fcf545f7866594310d54d6aaa9421c89a4e31d3d481eb470d5d5515e"
+  },
+  {
+    "path": "web/icons/help.svg",
+    "bytes": 279,
+    "sha256": "03704ccefc2f657713de86d87700114b3e46431d85c7e427ac09c7876791cb16"
+  },
+  {
+    "path": "web/icons/inventory.svg",
+    "bytes": 266,
+    "sha256": "cdfe3b2f7eef083c3cb4f708dc7c18b7467dda7559a9f3cf6c06df5fc89be887"
+  },
+  {
+    "path": "web/icons/invoice.svg",
+    "bytes": 262,
+    "sha256": "83c90cf974faeecfca18b5008a7b71facf58884628dc6caa71fb85d0520627fa"
+  },
+  {
+    "path": "web/icons/journal.svg",
+    "bytes": 266,
+    "sha256": "a0ed58fdb2549e7159680e1a46606efc88de8b7fc04aabe444d5a2148b58d771"
+  },
+  {
+    "path": "web/icons/ledger.svg",
+    "bytes": 291,
+    "sha256": "dab66a1c41cdc36a9e6804664ad18c6e557e9427337f6e46b6751a8685b5b8ea"
+  },
+  {
+    "path": "web/icons/lock.svg",
+    "bytes": 289,
+    "sha256": "7efffd3ce6236aab41750b0211fb0e9bf9f661cc46cb4144ae7621f90f863ff7"
+  },
+  {
+    "path": "web/icons/menu.svg",
+    "bytes": 234,
+    "sha256": "dbddd3f7d61d89a34abe6e8dd14853d103565f1126cb83f623f3555c57b67aa7"
+  },
+  {
+    "path": "web/icons/next.svg",
+    "bytes": 231,
+    "sha256": "2ae69d2bc9f6d5471f33f3d86f675c81344ed5998de55a098fccb59fe1724a59"
+  },
+  {
+    "path": "web/icons/notification.svg",
+    "bytes": 250,
+    "sha256": "cc7714e40aa9b95335aba3b2cd55a48ab3eaa085eba4453f0040adb1dde7f9a6"
+  },
+  {
+    "path": "web/icons/payables.svg",
+    "bytes": 290,
+    "sha256": "56cedbd0aad571783e00f269306f8f31244da4c376244403b8ceb2531e8b22cf"
+  },
+  {
+    "path": "web/icons/period-close.svg",
+    "bytes": 295,
+    "sha256": "3ebaa9efeb021097243ee9ff7f5134de5806d0b6236a5afee6f1151231e5442b"
+  },
+  {
+    "path": "web/icons/receipt.svg",
+    "bytes": 260,
+    "sha256": "6c80fba29374043654bacc9503bbe8488dd89fb895803bbd95dfb41c69a37253"
+  },
+  {
+    "path": "web/icons/receivables.svg",
+    "bytes": 289,
+    "sha256": "115fc69beeb589dda292cfc01908be3cc4c4b5d64ebcb4a346e203d9a4f3951a"
+  },
+  {
+    "path": "web/icons/reconcile.svg",
+    "bytes": 265,
+    "sha256": "e25679eb3f653d47657a15e47b5b366db3670dd3c1e4a4def8daa973f6b867a0"
+  },
+  {
+    "path": "web/icons/reports.svg",
+    "bytes": 246,
+    "sha256": "588fb1d9c4d112c9711816c694e5534479ad6da620c2bb8fe697491344e20370"
+  },
+  {
+    "path": "web/icons/review.svg",
+    "bytes": 264,
+    "sha256": "3c8139d532a242c92bf697b0e496b3b1dc3c362dde19c63f0be2bfa7049be87e"
+  },
+  {
+    "path": "web/icons/search.svg",
+    "bytes": 250,
+    "sha256": "90aab4494f946436d83aac446fd2509ee7aa2a2577c75e035aebb2a388c91016"
+  },
+  {
+    "path": "web/icons/settings.svg",
+    "bytes": 321,
+    "sha256": "edc3b7fd8e14216fe7674f1aeba633babe3906a8c4908ec7871ebcf7ef865ae5"
+  },
+  {
+    "path": "web/icons/sprite.svg",
+    "bytes": 7903,
+    "sha256": "5ee6e3dcccef3e0f46f67bf00040e9e8e02e15df2a9e0cbc6aa2c0a4ee7360a2"
+  },
+  {
+    "path": "web/icons/tax.svg",
+    "bytes": 325,
+    "sha256": "2889333ff8a66641cae9ce128c0e51b1826e75be875f58e5acab4f7c25aba3de"
+  },
+  {
+    "path": "web/icons/upload.svg",
+    "bytes": 244,
+    "sha256": "89ceec7797a1bc8c482bbc578b400a1e7a3d4fa7bec760d39a2771f9b1b645a4"
+  },
+  {
+    "path": "web/icons/users.svg",
+    "bytes": 300,
+    "sha256": "77409961f19a5682082496332d366cc06e9941941f212796d4b0acb1a356c110"
+  },
+  {
+    "path": "web/illustrations/empty-records.svg",
+    "bytes": 534,
+    "sha256": "becdcd26349ce3d7d44ccac2671f7cee30dfcd8018c64df66623e77fdd5e4cf9"
+  },
+  {
+    "path": "web/illustrations/empty-search.svg",
+    "bytes": 493,
+    "sha256": "322b87aacebafab6c423a3d0af3c8312cf90e638d36c911d6961cdf00e7f2202"
+  },
+  {
+    "path": "web/illustrations/lara-mascot-transparent.png",
+    "bytes": 1860825,
+    "sha256": "92443542f7b3fd44294791479d50bc69adfc07bcd138a2b2cc62d1dbbb5f72b1"
+  },
+  {
+    "path": "web/illustrations/review-complete.svg",
+    "bytes": 501,
+    "sha256": "55d0cf424f937fad4195788ea158c1d66329152a7addfdd5d006711700c291b1"
+  },
+  {
+    "path": "web/logos/favicon.ico",
+    "bytes": 2220,
+    "sha256": "4371e171b454c759394f027bbfc10f6ac1b52625af143c875f33896fb900050b"
+  },
+  {
+    "path": "web/logos/favicon.svg",
+    "bytes": 500,
+    "sha256": "e649e15815d50b9c317b29747c0d59b2a95044f370e60c5c69b1dd164bc758d9"
+  },
+  {
+    "path": "web/logos/lara-app-icon-maskable.svg",
+    "bytes": 503,
+    "sha256": "063810a8464995f8da95cdc27512e0c242ad1dbcfe49eca0dce6c9ca9d46a305"
+  },
+  {
+    "path": "web/logos/lara-app-icon.svg",
+    "bytes": 512,
+    "sha256": "cd91313b1f0242c4307e0a471841c8e50e578dc3d3924f607858e931f72c4443"
+  },
+  {
+    "path": "web/logos/lara-icon-16.png",
+    "bytes": 442,
+    "sha256": "2fe2d0fb4684e97f046f2272693ab0cc1103abc1fc8f7c8cfde0d33249f0dabf"
+  },
+  {
+    "path": "web/logos/lara-icon-180.png",
+    "bytes": 3050,
+    "sha256": "b539002b3d69e4f2fed0514f988823735c9cf7a2afcd5e6a977d3d5dbb18858f"
+  },
+  {
+    "path": "web/logos/lara-icon-192.png",
+    "bytes": 3299,
+    "sha256": "2598da00b3a42272d22f654c4a7c1e74a909825ec4bad071a21dc1ed4694a1b0"
+  },
+  {
+    "path": "web/logos/lara-icon-32.png",
+    "bytes": 745,
+    "sha256": "09a4985010a46193b423c33afbe8d0e9b4aab8b2afd03d93f231416d98e7dfd3"
+  },
+  {
+    "path": "web/logos/lara-icon-48.png",
+    "bytes": 979,
+    "sha256": "c8ca9520c3e40dcb2d80f6e8aea2f76107db5cc2c8b22edea80e20072bed1c94"
+  },
+  {
+    "path": "web/logos/lara-icon-512.png",
+    "bytes": 8780,
+    "sha256": "f3ecf8fc1a6b60c3220b2903d0bda7dc256e10753ceb0f43377dd6fd5bbc4149"
+  },
+  {
+    "path": "web/logos/lara-icon-maskable-512.png",
+    "bytes": 3689,
+    "sha256": "00ec0601e51bf47665dc3cd7d1b8c67816c8d814d777b3842dc105d0d645240b"
+  },
+  {
+    "path": "web/logos/lara-logo-mono.svg",
+    "bytes": 809,
+    "sha256": "65099d8e410ca8e973526c65dfd3fd19606552df1bd1f9a76b55b2f73e34457c"
+  },
+  {
+    "path": "web/logos/lara-logo-primary.png",
+    "bytes": 16544,
+    "sha256": "f1c29e01b7b6cbc90a0aec5ffdb64a36af2004e53fe629a8ddad0a15c29e8548"
+  },
+  {
+    "path": "web/logos/lara-logo-primary.svg",
+    "bytes": 809,
+    "sha256": "06ec642d1bd0992827e90d328607fd041e2dc220f3648ff8ef65a9a2d94a3b5a"
+  },
+  {
+    "path": "web/logos/lara-logo-reverse.png",
+    "bytes": 14121,
+    "sha256": "0dbafccbbfaffaee8a6a09065ca39302b264f3bfba221d0b8263da2103e74660"
+  },
+  {
+    "path": "web/logos/lara-logo-reverse.svg",
+    "bytes": 809,
+    "sha256": "f63a6e29f0a62f924dbf307318b9d1f717293726e815ce0e56489f644835d2ad"
+  },
+  {
+    "path": "web/logos/lara-logo-white.svg",
+    "bytes": 809,
+    "sha256": "55cccd76d86a6b20765bc86f7be6687022a266dfd069498841bea6b3859ae1a4"
+  },
+  {
+    "path": "web/logos/lara-symbol-mono.svg",
+    "bytes": 441,
+    "sha256": "52a1bdf7cbc377cdbec3e3fc4131878a1aa63f1cc95aad2a020bcb90d1ad425a"
+  },
+  {
+    "path": "web/logos/lara-symbol-primary.png",
+    "bytes": 3053,
+    "sha256": "033bd7da726c6a19a3d52b0215b5829f29a2b2c645a3b0f01852e551380a2d44"
+  },
+  {
+    "path": "web/logos/lara-symbol-primary.svg",
+    "bytes": 441,
+    "sha256": "4fba7af39839252bab2c8aa62cc0c5b0e2971991170d9e9145216235f2943371"
+  },
+  {
+    "path": "web/logos/lara-symbol-reverse.png",
+    "bytes": 2782,
+    "sha256": "ea36e20894839af11e0882b5250c5b61ba95a555b9b8cb337b5740db62a88e90"
+  },
+  {
+    "path": "web/logos/lara-symbol-reverse.svg",
+    "bytes": 441,
+    "sha256": "643dcc5cf37ef38470e1969b9c547104376ccd7e92cc60ea0582d778deb338ee"
+  },
+  {
+    "path": "web/logos/lara-symbol-white.svg",
+    "bytes": 441,
+    "sha256": "00bbeaf84abf596832bc0db0313416efb86a5044358694d1273d9a537b374b7c"
+  },
+  {
+    "path": "brand/LARA-avatar-accounting-expert.png",
+    "bytes": 1761769,
+    "sha256": "94ce37a8dd5bb7148cfea639fe354537be197194f86f8e0109403721e17215de"
+  },
+  {
+    "path": "brand/LARA-brand-overview.png",
+    "bytes": 1688434,
+    "sha256": "3b2063497002f88e4f307babac97bd4dc4f45a24a5ff08231a9cd5e5b1a93590"
+  },
+  {
+    "path": "brand/LARA-launch-campaign.png",
+    "bytes": 1514858,
+    "sha256": "8623d8917f5eca753fe046028f6c512b46fe55d25d4bce34957c063e0e29e558"
+  },
+  {
+    "path": "brand/LARA-product-infographic.png",
+    "bytes": 1707006,
+    "sha256": "c3d319dbf355e55788673734f52f8d6fde2b0f91a1573ec3c31ed36f2c49fa00"
+  },
+  {
+    "path": "brand/LARA-website-hero.png",
+    "bytes": 1562761,
+    "sha256": "18317fdb1fb2b1b105d2ffeddcc93de26760be07435c7f382af614200a8bb839"
+  }
+]

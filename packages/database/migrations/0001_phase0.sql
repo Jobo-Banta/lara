@@ -1,0 +1,1 @@
+create schema if not exists lara;create table if not exists lara.demo_seed_runs(id bigserial primary key,fixture_version text not null,created_at timestamptz not null default now(),row_count integer not null);

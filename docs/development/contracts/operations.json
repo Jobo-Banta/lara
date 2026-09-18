@@ -1,0 +1,3125 @@
+[
+  {
+    "operationId": "post_entities",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/entities",
+    "permission": "entity.create",
+    "input": "EntityCreate",
+    "response": "EntityResource"
+  },
+  {
+    "operationId": "get_entities",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/entities",
+    "permission": "entity.read",
+    "input": null,
+    "response": "EntityResourceList"
+  },
+  {
+    "operationId": "get_entities_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/entities/{id}",
+    "permission": "entity.read",
+    "input": null,
+    "response": "EntityResource"
+  },
+  {
+    "operationId": "patch_entities_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/entities/{id}",
+    "permission": "entity.edit",
+    "input": "EntityCreate",
+    "response": "EntityResource"
+  },
+  {
+    "operationId": "post_entities_id_activate",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/entities/{id}/activate",
+    "permission": "entity.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_branches",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/branches",
+    "permission": "branch.create",
+    "input": "BranchCreate",
+    "response": "BranchResource"
+  },
+  {
+    "operationId": "get_branches",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/branches",
+    "permission": "branch.read",
+    "input": null,
+    "response": "BranchResourceList"
+  },
+  {
+    "operationId": "get_branches_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/branches/{id}",
+    "permission": "branch.read",
+    "input": null,
+    "response": "BranchResource"
+  },
+  {
+    "operationId": "patch_branches_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/branches/{id}",
+    "permission": "branch.edit",
+    "input": "BranchCreate",
+    "response": "BranchResource"
+  },
+  {
+    "operationId": "post_parties",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/parties",
+    "permission": "party.create",
+    "input": "PartyCreate",
+    "response": "PartyResource"
+  },
+  {
+    "operationId": "get_parties",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/parties",
+    "permission": "party.read",
+    "input": null,
+    "response": "PartyResourceList"
+  },
+  {
+    "operationId": "get_parties_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/parties/{id}",
+    "permission": "party.read",
+    "input": null,
+    "response": "PartyResource"
+  },
+  {
+    "operationId": "patch_parties_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/parties/{id}",
+    "permission": "party.edit",
+    "input": "PartyEdit",
+    "response": "PartyResource"
+  },
+  {
+    "operationId": "post_parties_id_archive",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/parties/{id}/archive",
+    "permission": "party.archive",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_memberships",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/memberships",
+    "permission": "membership.create",
+    "input": "MembershipCreate",
+    "response": "MembershipResource"
+  },
+  {
+    "operationId": "get_memberships",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/memberships",
+    "permission": "membership.read",
+    "input": null,
+    "response": "MembershipResourceList"
+  },
+  {
+    "operationId": "get_memberships_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/memberships/{id}",
+    "permission": "membership.read",
+    "input": null,
+    "response": "MembershipResource"
+  },
+  {
+    "operationId": "patch_memberships_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/memberships/{id}",
+    "permission": "membership.edit",
+    "input": "MembershipCreate",
+    "response": "MembershipResource"
+  },
+  {
+    "operationId": "post_memberships_id_revoke",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/memberships/{id}/revoke",
+    "permission": "membership.revoke",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_roles",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/roles",
+    "permission": "role.create",
+    "input": "RoleCreate",
+    "response": "RoleResource"
+  },
+  {
+    "operationId": "get_roles",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/roles",
+    "permission": "role.read",
+    "input": null,
+    "response": "RoleResourceList"
+  },
+  {
+    "operationId": "get_roles_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/roles/{id}",
+    "permission": "role.read",
+    "input": null,
+    "response": "RoleResource"
+  },
+  {
+    "operationId": "patch_roles_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/roles/{id}",
+    "permission": "role.edit",
+    "input": "RoleCreate",
+    "response": "RoleResource"
+  },
+  {
+    "operationId": "post_roles_id_approve",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/roles/{id}/approve",
+    "permission": "role.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_approval_policies",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/approval-policies",
+    "permission": "approval_policy.create",
+    "input": "ApprovalPolicyCreate",
+    "response": "ApprovalPolicyResource"
+  },
+  {
+    "operationId": "get_approval_policies",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/approval-policies",
+    "permission": "approval_policy.read",
+    "input": null,
+    "response": "ApprovalPolicyResourceList"
+  },
+  {
+    "operationId": "get_approval_policies_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/approval-policies/{id}",
+    "permission": "approval_policy.read",
+    "input": null,
+    "response": "ApprovalPolicyResource"
+  },
+  {
+    "operationId": "patch_approval_policies_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/approval-policies/{id}",
+    "permission": "approval_policy.edit",
+    "input": "ApprovalPolicyCreate",
+    "response": "ApprovalPolicyResource"
+  },
+  {
+    "operationId": "post_approval_policies_id_approve",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/approval-policies/{id}/approve",
+    "permission": "approval_policy.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_approval_policies_id_activate",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/approval-policies/{id}/activate",
+    "permission": "approval_policy.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_me",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/me",
+    "permission": "session.read",
+    "input": null,
+    "response": "SessionContext"
+  },
+  {
+    "operationId": "post_capabilities_activate",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/capabilities/activate",
+    "permission": "capability.activate",
+    "input": "CapabilityActivation",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tasks",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/tasks",
+    "permission": "task.create",
+    "input": "TaskCreate",
+    "response": "TaskResource"
+  },
+  {
+    "operationId": "get_tasks",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/tasks",
+    "permission": "task.read",
+    "input": null,
+    "response": "TaskResourceList"
+  },
+  {
+    "operationId": "get_tasks_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/tasks/{id}",
+    "permission": "task.read",
+    "input": null,
+    "response": "TaskResource"
+  },
+  {
+    "operationId": "patch_tasks_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/tasks/{id}",
+    "permission": "task.edit",
+    "input": "TaskCreate",
+    "response": "TaskResource"
+  },
+  {
+    "operationId": "post_tasks_id_assign",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/tasks/{id}/assign",
+    "permission": "task.assign",
+    "input": "AssignTask",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tasks_id_resolve",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/tasks/{id}/resolve",
+    "permission": "task.resolve",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tasks_id_comments",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/tasks/{id}/comments",
+    "permission": "task.comments",
+    "input": "CommentCreate",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_obligations",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/obligations",
+    "permission": "obligation.create",
+    "input": "ObligationCreate",
+    "response": "ObligationResource"
+  },
+  {
+    "operationId": "get_obligations",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/obligations",
+    "permission": "obligation.read",
+    "input": null,
+    "response": "ObligationResourceList"
+  },
+  {
+    "operationId": "get_obligations_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/obligations/{id}",
+    "permission": "obligation.read",
+    "input": null,
+    "response": "ObligationResource"
+  },
+  {
+    "operationId": "patch_obligations_id",
+    "phase": "P02",
+    "method": "PATCH",
+    "path": "/obligations/{id}",
+    "permission": "obligation.edit",
+    "input": "ObligationCreate",
+    "response": "ObligationResource"
+  },
+  {
+    "operationId": "post_obligations_id_complete",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/obligations/{id}/complete",
+    "permission": "obligation.complete",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_evidence_uploads",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/evidence/uploads",
+    "permission": "evidence.upload",
+    "input": "EvidenceUpload",
+    "response": "UploadResult"
+  },
+  {
+    "operationId": "post_evidence_id_complete",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/evidence/{id}/complete",
+    "permission": "evidence.upload",
+    "input": "Action",
+    "response": "Job"
+  },
+  {
+    "operationId": "get_evidence_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/evidence/{id}",
+    "permission": "evidence.read",
+    "input": null,
+    "response": "EvidenceResource"
+  },
+  {
+    "operationId": "get_evidence_id_content",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/evidence/{id}/content",
+    "permission": "evidence.read",
+    "input": null,
+    "response": "EvidenceResource"
+  },
+  {
+    "operationId": "post_exports",
+    "phase": "P02",
+    "method": "POST",
+    "path": "/exports",
+    "permission": "evidence.export",
+    "input": "ExportRequest",
+    "response": "Job"
+  },
+  {
+    "operationId": "get_commands_key",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/commands/{key}",
+    "permission": "command.read",
+    "input": null,
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_jobs_id",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/jobs/{id}",
+    "permission": "job.read",
+    "input": null,
+    "response": "Job"
+  },
+  {
+    "operationId": "post_accounts",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/accounts",
+    "permission": "account.create",
+    "input": "AccountCreate",
+    "response": "AccountResource"
+  },
+  {
+    "operationId": "get_accounts",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/accounts",
+    "permission": "account.read",
+    "input": null,
+    "response": "AccountResourceList"
+  },
+  {
+    "operationId": "get_accounts_id",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/accounts/{id}",
+    "permission": "account.read",
+    "input": null,
+    "response": "AccountResource"
+  },
+  {
+    "operationId": "patch_accounts_id",
+    "phase": "P03",
+    "method": "PATCH",
+    "path": "/accounts/{id}",
+    "permission": "account.edit",
+    "input": "AccountCreate",
+    "response": "AccountResource"
+  },
+  {
+    "operationId": "post_journals",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/journals",
+    "permission": "journal.prepare",
+    "input": "JournalCreate",
+    "response": "JournalResource"
+  },
+  {
+    "operationId": "get_journals",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/journals",
+    "permission": "journal.read",
+    "input": null,
+    "response": "JournalResourceList"
+  },
+  {
+    "operationId": "get_journals_id",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/journals/{id}",
+    "permission": "journal.read",
+    "input": null,
+    "response": "JournalResource"
+  },
+  {
+    "operationId": "patch_journals_id",
+    "phase": "P03",
+    "method": "PATCH",
+    "path": "/journals/{id}",
+    "permission": "journal.edit",
+    "input": "JournalCreate",
+    "response": "JournalResource"
+  },
+  {
+    "operationId": "post_journals_id_submit",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/journals/{id}/submit",
+    "permission": "journal.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_journals_id_approve",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/journals/{id}/approve",
+    "permission": "journal.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_journals_id_post",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/journals/{id}/post",
+    "permission": "journal.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_journals_id_reverse",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/journals/{id}/reverse",
+    "permission": "journal.reverse",
+    "input": "Reversal",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_periods",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods",
+    "permission": "period.create",
+    "input": "PeriodCreate",
+    "response": "PeriodResource"
+  },
+  {
+    "operationId": "get_periods",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/periods",
+    "permission": "period.read",
+    "input": null,
+    "response": "PeriodResourceList"
+  },
+  {
+    "operationId": "get_periods_id",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/periods/{id}",
+    "permission": "period.read",
+    "input": null,
+    "response": "PeriodResource"
+  },
+  {
+    "operationId": "patch_periods_id",
+    "phase": "P03",
+    "method": "PATCH",
+    "path": "/periods/{id}",
+    "permission": "period.edit",
+    "input": "PeriodCreate",
+    "response": "PeriodResource"
+  },
+  {
+    "operationId": "post_periods_id_soft_close",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods/{id}/soft-close",
+    "permission": "period.soft_close",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_periods_id_lock",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods/{id}/lock",
+    "permission": "period.lock",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_periods_id_reopen",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods/{id}/reopen",
+    "permission": "period.reopen",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_imports",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/imports",
+    "permission": "import.create",
+    "input": "ImportCreate",
+    "response": "ImportResource"
+  },
+  {
+    "operationId": "get_imports",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/imports",
+    "permission": "import.read",
+    "input": null,
+    "response": "ImportResourceList"
+  },
+  {
+    "operationId": "get_imports_id",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/imports/{id}",
+    "permission": "import.read",
+    "input": null,
+    "response": "ImportResource"
+  },
+  {
+    "operationId": "patch_imports_id",
+    "phase": "P03",
+    "method": "PATCH",
+    "path": "/imports/{id}",
+    "permission": "import.edit",
+    "input": "ImportCreate",
+    "response": "ImportResource"
+  },
+  {
+    "operationId": "post_imports_id_validate",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/imports/{id}/validate",
+    "permission": "import.validate",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_imports_id_approve",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/imports/{id}/approve",
+    "permission": "import.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_imports_id_commit",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/imports/{id}/commit",
+    "permission": "import.commit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_reports",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/reports",
+    "permission": "report.generate",
+    "input": "ReportRequest",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_tax_rules",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/tax-rules",
+    "permission": "tax_rule.create",
+    "input": "TaxRuleCreate",
+    "response": "TaxRuleResource"
+  },
+  {
+    "operationId": "get_tax_rules",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/tax-rules",
+    "permission": "tax_rule.read",
+    "input": null,
+    "response": "TaxRuleResourceList"
+  },
+  {
+    "operationId": "get_tax_rules_id",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/tax-rules/{id}",
+    "permission": "tax_rule.read",
+    "input": null,
+    "response": "TaxRuleResource"
+  },
+  {
+    "operationId": "patch_tax_rules_id",
+    "phase": "P04",
+    "method": "PATCH",
+    "path": "/tax-rules/{id}",
+    "permission": "tax_rule.edit",
+    "input": "TaxRuleCreate",
+    "response": "TaxRuleResource"
+  },
+  {
+    "operationId": "post_tax_rules_id_approve",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/tax-rules/{id}/approve",
+    "permission": "tax_rule.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tax_rules_id_activate",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/tax-rules/{id}/activate",
+    "permission": "tax_rule.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices",
+    "permission": "invoice.prepare",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "get_invoices",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/invoices",
+    "permission": "invoice.read",
+    "input": null,
+    "response": "DocumentResourceList"
+  },
+  {
+    "operationId": "get_invoices_id",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/invoices/{id}",
+    "permission": "invoice.read",
+    "input": null,
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "patch_invoices_id",
+    "phase": "P04",
+    "method": "PATCH",
+    "path": "/invoices/{id}",
+    "permission": "invoice.edit",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "post_invoices_id_submit",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices/{id}/submit",
+    "permission": "invoice.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_approve",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices/{id}/approve",
+    "permission": "invoice.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_post",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices/{id}/post",
+    "permission": "invoice.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_correct",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices/{id}/correct",
+    "permission": "invoice.correct",
+    "input": "DocumentCorrection",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_deliver",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/invoices/{id}/deliver",
+    "permission": "invoice.deliver",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_sales_orders",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/sales-orders",
+    "permission": "sales_order.create",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "get_sales_orders",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/sales-orders",
+    "permission": "sales_order.read",
+    "input": null,
+    "response": "DocumentResourceList"
+  },
+  {
+    "operationId": "get_sales_orders_id",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/sales-orders/{id}",
+    "permission": "sales_order.read",
+    "input": null,
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "patch_sales_orders_id",
+    "phase": "P04",
+    "method": "PATCH",
+    "path": "/sales-orders/{id}",
+    "permission": "sales_order.edit",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "post_sales_orders_id_submit",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/sales-orders/{id}/submit",
+    "permission": "sales_order.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_sales_orders_id_approve",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/sales-orders/{id}/approve",
+    "permission": "sales_order.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_sales_orders_id_convert",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/sales-orders/{id}/convert",
+    "permission": "sales_order.convert",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_collections",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections",
+    "permission": "collection.create",
+    "input": "SettlementCreate",
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "get_collections",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/collections",
+    "permission": "collection.read",
+    "input": null,
+    "response": "SettlementResourceList"
+  },
+  {
+    "operationId": "get_collections_id",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/collections/{id}",
+    "permission": "collection.read",
+    "input": null,
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "patch_collections_id",
+    "phase": "P04",
+    "method": "PATCH",
+    "path": "/collections/{id}",
+    "permission": "collection.edit",
+    "input": "SettlementCreate",
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "post_collections_id_submit",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections/{id}/submit",
+    "permission": "collection.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_collections_id_approve",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections/{id}/approve",
+    "permission": "collection.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_collections_id_post",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections/{id}/post",
+    "permission": "collection.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_collections_id_reverse",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections/{id}/reverse",
+    "permission": "collection.reverse",
+    "input": "Reversal",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_open_items",
+    "phase": "P04",
+    "method": "GET",
+    "path": "/open-items",
+    "permission": "open_item.read",
+    "input": null,
+    "response": "OpenItemList"
+  },
+  {
+    "operationId": "post_collections_id_allocations",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/collections/{id}/allocations",
+    "permission": "collection.allocate",
+    "input": "ApplyAllocations",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_allocations_id_reverse",
+    "phase": "P04",
+    "method": "POST",
+    "path": "/allocations/{id}/reverse",
+    "permission": "allocation.reverse",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bills",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/bills",
+    "permission": "bill.prepare",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "get_bills",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/bills",
+    "permission": "bill.read",
+    "input": null,
+    "response": "DocumentResourceList"
+  },
+  {
+    "operationId": "get_bills_id",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/bills/{id}",
+    "permission": "bill.read",
+    "input": null,
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "patch_bills_id",
+    "phase": "P05",
+    "method": "PATCH",
+    "path": "/bills/{id}",
+    "permission": "bill.edit",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "post_bills_id_submit",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/bills/{id}/submit",
+    "permission": "bill.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bills_id_approve",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/bills/{id}/approve",
+    "permission": "bill.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bills_id_post",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/bills/{id}/post",
+    "permission": "bill.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bills_id_correct",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/bills/{id}/correct",
+    "permission": "bill.correct",
+    "input": "DocumentCorrection",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_purchase_orders",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/purchase-orders",
+    "permission": "purchase_order.create",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "get_purchase_orders",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/purchase-orders",
+    "permission": "purchase_order.read",
+    "input": null,
+    "response": "DocumentResourceList"
+  },
+  {
+    "operationId": "get_purchase_orders_id",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/purchase-orders/{id}",
+    "permission": "purchase_order.read",
+    "input": null,
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "patch_purchase_orders_id",
+    "phase": "P05",
+    "method": "PATCH",
+    "path": "/purchase-orders/{id}",
+    "permission": "purchase_order.edit",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "post_purchase_orders_id_submit",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/purchase-orders/{id}/submit",
+    "permission": "purchase_order.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_purchase_orders_id_approve",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/purchase-orders/{id}/approve",
+    "permission": "purchase_order.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_purchase_orders_id_cancel",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/purchase-orders/{id}/cancel",
+    "permission": "purchase_order.cancel",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_expense_claims",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/expense-claims",
+    "permission": "expense_claim.prepare",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "get_expense_claims",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/expense-claims",
+    "permission": "expense_claim.read",
+    "input": null,
+    "response": "DocumentResourceList"
+  },
+  {
+    "operationId": "get_expense_claims_id",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/expense-claims/{id}",
+    "permission": "expense_claim.read",
+    "input": null,
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "patch_expense_claims_id",
+    "phase": "P05",
+    "method": "PATCH",
+    "path": "/expense-claims/{id}",
+    "permission": "expense_claim.edit",
+    "input": "DocumentCreate",
+    "response": "DocumentResource"
+  },
+  {
+    "operationId": "post_expense_claims_id_submit",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/expense-claims/{id}/submit",
+    "permission": "expense_claim.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_expense_claims_id_approve",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/expense-claims/{id}/approve",
+    "permission": "expense_claim.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_expense_claims_id_post",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/expense-claims/{id}/post",
+    "permission": "expense_claim.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_settlements",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/settlements",
+    "permission": "settlements.create",
+    "input": "SettlementCreate",
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "get_settlements",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/settlements",
+    "permission": "settlements.read",
+    "input": null,
+    "response": "SettlementResourceList"
+  },
+  {
+    "operationId": "get_settlements_id",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/settlements/{id}",
+    "permission": "settlements.read",
+    "input": null,
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "patch_settlements_id",
+    "phase": "P05",
+    "method": "PATCH",
+    "path": "/settlements/{id}",
+    "permission": "settlements.edit",
+    "input": "SettlementCreate",
+    "response": "SettlementResource"
+  },
+  {
+    "operationId": "post_settlements_id_submit",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/settlements/{id}/submit",
+    "permission": "settlements.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payments",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments",
+    "permission": "payment.create",
+    "input": "PaymentCreate",
+    "response": "PaymentResource"
+  },
+  {
+    "operationId": "get_payments",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/payments",
+    "permission": "payment.read",
+    "input": null,
+    "response": "PaymentResourceList"
+  },
+  {
+    "operationId": "get_payments_id",
+    "phase": "P05",
+    "method": "GET",
+    "path": "/payments/{id}",
+    "permission": "payment.read",
+    "input": null,
+    "response": "PaymentResource"
+  },
+  {
+    "operationId": "patch_payments_id",
+    "phase": "P05",
+    "method": "PATCH",
+    "path": "/payments/{id}",
+    "permission": "payment.edit",
+    "input": "PaymentCreate",
+    "response": "PaymentResource"
+  },
+  {
+    "operationId": "post_payments_id_submit",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments/{id}/submit",
+    "permission": "payment.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payments_id_authorize",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments/{id}/authorize",
+    "permission": "payment.authorize",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payments_id_release",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments/{id}/release",
+    "permission": "payment.release",
+    "input": "PaymentRelease",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payments_id_settle",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments/{id}/settle",
+    "permission": "payment.settle",
+    "input": "SettlementEvidence",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payments_id_return",
+    "phase": "P05",
+    "method": "POST",
+    "path": "/payments/{id}/return",
+    "permission": "payment.return",
+    "input": "Reversal",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bank_accounts",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/bank-accounts",
+    "permission": "bank_account.create",
+    "input": "BankAccountCreate",
+    "response": "BankAccountResource"
+  },
+  {
+    "operationId": "get_bank_accounts",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-accounts",
+    "permission": "bank_account.read",
+    "input": null,
+    "response": "BankAccountResourceList"
+  },
+  {
+    "operationId": "get_bank_accounts_id",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-accounts/{id}",
+    "permission": "bank_account.read",
+    "input": null,
+    "response": "BankAccountResource"
+  },
+  {
+    "operationId": "patch_bank_accounts_id",
+    "phase": "P06",
+    "method": "PATCH",
+    "path": "/bank-accounts/{id}",
+    "permission": "bank_account.edit",
+    "input": "BankAccountEdit",
+    "response": "BankAccountResource"
+  },
+  {
+    "operationId": "post_bank_accounts_id_approve",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/bank-accounts/{id}/approve",
+    "permission": "bank_account.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bank_matches",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/bank-matches",
+    "permission": "bank_match.create",
+    "input": "BankMatch",
+    "response": "BankMatchResource"
+  },
+  {
+    "operationId": "get_bank_matches",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-matches",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankMatchResourceList"
+  },
+  {
+    "operationId": "get_bank_matches_id",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-matches/{id}",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankMatchResource"
+  },
+  {
+    "operationId": "patch_bank_matches_id",
+    "phase": "P06",
+    "method": "PATCH",
+    "path": "/bank-matches/{id}",
+    "permission": "bank_match.edit",
+    "input": "BankMatch",
+    "response": "BankMatchResource"
+  },
+  {
+    "operationId": "post_bank_matches_id_confirm",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/bank-matches/{id}/confirm",
+    "permission": "bank_match.confirm",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_bank_matches_id_reverse",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/bank-matches/{id}/reverse",
+    "permission": "bank_match.reverse",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_transfers",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/transfers",
+    "permission": "transfer.create",
+    "input": "TransferCreate",
+    "response": "TransferResource"
+  },
+  {
+    "operationId": "get_transfers",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/transfers",
+    "permission": "transfer.read",
+    "input": null,
+    "response": "TransferResourceList"
+  },
+  {
+    "operationId": "get_transfers_id",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/transfers/{id}",
+    "permission": "transfer.read",
+    "input": null,
+    "response": "TransferResource"
+  },
+  {
+    "operationId": "patch_transfers_id",
+    "phase": "P06",
+    "method": "PATCH",
+    "path": "/transfers/{id}",
+    "permission": "transfer.edit",
+    "input": "TransferCreate",
+    "response": "TransferResource"
+  },
+  {
+    "operationId": "post_transfers_id_submit",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/transfers/{id}/submit",
+    "permission": "transfer.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_transfers_id_approve",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/transfers/{id}/approve",
+    "permission": "transfer.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_transfers_id_post",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/transfers/{id}/post",
+    "permission": "transfer.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_checks",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/checks",
+    "permission": "check.create",
+    "input": "CheckCreate",
+    "response": "CheckResource"
+  },
+  {
+    "operationId": "get_checks",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/checks",
+    "permission": "check.read",
+    "input": null,
+    "response": "CheckResourceList"
+  },
+  {
+    "operationId": "get_checks_id",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/checks/{id}",
+    "permission": "check.read",
+    "input": null,
+    "response": "CheckResource"
+  },
+  {
+    "operationId": "patch_checks_id",
+    "phase": "P06",
+    "method": "PATCH",
+    "path": "/checks/{id}",
+    "permission": "check.edit",
+    "input": "CheckCreate",
+    "response": "CheckResource"
+  },
+  {
+    "operationId": "post_checks_id_release",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/checks/{id}/release",
+    "permission": "check.release",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_checks_id_deposit",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/checks/{id}/deposit",
+    "permission": "check.deposit",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_checks_id_clear",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/checks/{id}/clear",
+    "permission": "check.clear",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_checks_id_dishonor",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/checks/{id}/dishonor",
+    "permission": "check.dishonor",
+    "input": "Reversal",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_cash_sessions",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/cash-sessions",
+    "permission": "cash_session.create",
+    "input": "CashSessionCreate",
+    "response": "CashSessionResource"
+  },
+  {
+    "operationId": "get_cash_sessions",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/cash-sessions",
+    "permission": "cash_session.read",
+    "input": null,
+    "response": "CashSessionResourceList"
+  },
+  {
+    "operationId": "get_cash_sessions_id",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/cash-sessions/{id}",
+    "permission": "cash_session.read",
+    "input": null,
+    "response": "CashSessionResource"
+  },
+  {
+    "operationId": "patch_cash_sessions_id",
+    "phase": "P06",
+    "method": "PATCH",
+    "path": "/cash-sessions/{id}",
+    "permission": "cash_session.edit",
+    "input": "CashSessionCreate",
+    "response": "CashSessionResource"
+  },
+  {
+    "operationId": "post_cash_sessions_id_count",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/cash-sessions/{id}/count",
+    "permission": "cash_session.count",
+    "input": "CashCount",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_cash_sessions_id_close",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/cash-sessions/{id}/close",
+    "permission": "cash_session.close",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_cash_sessions_id_handover",
+    "phase": "P06",
+    "method": "POST",
+    "path": "/cash-sessions/{id}/handover",
+    "permission": "cash_session.handover",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_returns",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/returns",
+    "permission": "return.create",
+    "input": "ReturnCreate",
+    "response": "ReturnResource"
+  },
+  {
+    "operationId": "get_returns",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/returns",
+    "permission": "return.read",
+    "input": null,
+    "response": "ReturnResourceList"
+  },
+  {
+    "operationId": "get_returns_id",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/returns/{id}",
+    "permission": "return.read",
+    "input": null,
+    "response": "ReturnResource"
+  },
+  {
+    "operationId": "patch_returns_id",
+    "phase": "P07",
+    "method": "PATCH",
+    "path": "/returns/{id}",
+    "permission": "return.edit",
+    "input": "ReturnCreate",
+    "response": "ReturnResource"
+  },
+  {
+    "operationId": "post_returns_id_prepare",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/returns/{id}/prepare",
+    "permission": "return.prepare",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_returns_id_approve",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/returns/{id}/approve",
+    "permission": "return.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_returns_id_filed",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/returns/{id}/filed",
+    "permission": "return.filed",
+    "input": "FilingEvidence",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_transmissions_id_reconcile",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/transmissions/{id}/reconcile",
+    "permission": "transmission.reconcile",
+    "input": "ReasonAction",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_transmissions_id_retry",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/transmissions/{id}/retry",
+    "permission": "transmission.retry",
+    "input": "ReasonAction",
+    "response": "Job"
+  },
+  {
+    "operationId": "get_transmissions_id",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/transmissions/{id}",
+    "permission": "transmission.read",
+    "input": null,
+    "response": "TransmissionResource"
+  },
+  {
+    "operationId": "post_registration_packs",
+    "phase": "P07",
+    "method": "POST",
+    "path": "/registration-packs",
+    "permission": "registration.prepare",
+    "input": "ReportRequest",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_source_ownership",
+    "phase": "P08",
+    "method": "POST",
+    "path": "/source-ownership",
+    "permission": "source_ownership.create",
+    "input": "SourceOwnershipCreate",
+    "response": "SourceOwnershipResource"
+  },
+  {
+    "operationId": "get_source_ownership",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-ownership",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceOwnershipResourceList"
+  },
+  {
+    "operationId": "get_source_ownership_id",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-ownership/{id}",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceOwnershipResource"
+  },
+  {
+    "operationId": "patch_source_ownership_id",
+    "phase": "P08",
+    "method": "PATCH",
+    "path": "/source-ownership/{id}",
+    "permission": "source_ownership.edit",
+    "input": "SourceOwnershipCreate",
+    "response": "SourceOwnershipResource"
+  },
+  {
+    "operationId": "post_source_ownership_id_approve",
+    "phase": "P08",
+    "method": "POST",
+    "path": "/source-ownership/{id}/approve",
+    "permission": "source_ownership.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_books",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/books",
+    "permission": "book.create",
+    "input": "BookCreate",
+    "response": "BookResource"
+  },
+  {
+    "operationId": "get_books",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/books",
+    "permission": "book.read",
+    "input": null,
+    "response": "BookResourceList"
+  },
+  {
+    "operationId": "get_books_id",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/books/{id}",
+    "permission": "book.read",
+    "input": null,
+    "response": "BookResource"
+  },
+  {
+    "operationId": "patch_books_id",
+    "phase": "P09",
+    "method": "PATCH",
+    "path": "/books/{id}",
+    "permission": "book.edit",
+    "input": "BookCreate",
+    "response": "BookResource"
+  },
+  {
+    "operationId": "post_books_id_activate",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/books/{id}/activate",
+    "permission": "book.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_fx_rates",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/fx-rates",
+    "permission": "fx_rate.create",
+    "input": "FxRateCreate",
+    "response": "FxRateResource"
+  },
+  {
+    "operationId": "get_fx_rates",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/fx-rates",
+    "permission": "fx_rate.read",
+    "input": null,
+    "response": "FxRateResourceList"
+  },
+  {
+    "operationId": "get_fx_rates_id",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/fx-rates/{id}",
+    "permission": "fx_rate.read",
+    "input": null,
+    "response": "FxRateResource"
+  },
+  {
+    "operationId": "patch_fx_rates_id",
+    "phase": "P09",
+    "method": "PATCH",
+    "path": "/fx-rates/{id}",
+    "permission": "fx_rate.edit",
+    "input": "FxRateCreate",
+    "response": "FxRateResource"
+  },
+  {
+    "operationId": "post_fx_rates_id_approve",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/fx-rates/{id}/approve",
+    "permission": "fx_rate.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_revaluations",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/revaluations",
+    "permission": "revaluation.create",
+    "input": "RevaluationCreate",
+    "response": "RevaluationResource"
+  },
+  {
+    "operationId": "get_revaluations",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/revaluations",
+    "permission": "revaluation.read",
+    "input": null,
+    "response": "RevaluationResourceList"
+  },
+  {
+    "operationId": "get_revaluations_id",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/revaluations/{id}",
+    "permission": "revaluation.read",
+    "input": null,
+    "response": "RevaluationResource"
+  },
+  {
+    "operationId": "patch_revaluations_id",
+    "phase": "P09",
+    "method": "PATCH",
+    "path": "/revaluations/{id}",
+    "permission": "revaluation.edit",
+    "input": "RevaluationCreate",
+    "response": "RevaluationResource"
+  },
+  {
+    "operationId": "post_revaluations_id_preview",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/revaluations/{id}/preview",
+    "permission": "revaluation.preview",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_revaluations_id_approve",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/revaluations/{id}/approve",
+    "permission": "revaluation.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_revaluations_id_post",
+    "phase": "P09",
+    "method": "POST",
+    "path": "/revaluations/{id}/post",
+    "permission": "revaluation.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_items",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/items",
+    "permission": "item.create",
+    "input": "ItemCreate",
+    "response": "ItemResource"
+  },
+  {
+    "operationId": "get_items",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/items",
+    "permission": "item.read",
+    "input": null,
+    "response": "ItemResourceList"
+  },
+  {
+    "operationId": "get_items_id",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/items/{id}",
+    "permission": "item.read",
+    "input": null,
+    "response": "ItemResource"
+  },
+  {
+    "operationId": "patch_items_id",
+    "phase": "P10",
+    "method": "PATCH",
+    "path": "/items/{id}",
+    "permission": "item.edit",
+    "input": "ItemCreate",
+    "response": "ItemResource"
+  },
+  {
+    "operationId": "post_stock_movements",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-movements",
+    "permission": "stock_movement.create",
+    "input": "StockMovementCreate",
+    "response": "StockMovementResource"
+  },
+  {
+    "operationId": "get_stock_movements",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-movements",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "StockMovementResourceList"
+  },
+  {
+    "operationId": "get_stock_movements_id",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-movements/{id}",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "StockMovementResource"
+  },
+  {
+    "operationId": "patch_stock_movements_id",
+    "phase": "P10",
+    "method": "PATCH",
+    "path": "/stock-movements/{id}",
+    "permission": "stock_movement.edit",
+    "input": "StockMovementCreate",
+    "response": "StockMovementResource"
+  },
+  {
+    "operationId": "post_stock_movements_id_submit",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-movements/{id}/submit",
+    "permission": "stock_movement.submit",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_stock_movements_id_approve",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-movements/{id}/approve",
+    "permission": "stock_movement.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_stock_movements_id_post",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-movements/{id}/post",
+    "permission": "stock_movement.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_stock_counts",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-counts",
+    "permission": "stock_count.create",
+    "input": "CountCreate",
+    "response": "CountResource"
+  },
+  {
+    "operationId": "get_stock_counts",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-counts",
+    "permission": "stock_count.read",
+    "input": null,
+    "response": "CountResourceList"
+  },
+  {
+    "operationId": "get_stock_counts_id",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-counts/{id}",
+    "permission": "stock_count.read",
+    "input": null,
+    "response": "CountResource"
+  },
+  {
+    "operationId": "patch_stock_counts_id",
+    "phase": "P10",
+    "method": "PATCH",
+    "path": "/stock-counts/{id}",
+    "permission": "stock_count.edit",
+    "input": "CountCreate",
+    "response": "CountResource"
+  },
+  {
+    "operationId": "post_stock_counts_id_approve",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-counts/{id}/approve",
+    "permission": "stock_count.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_stock_counts_id_post",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/stock-counts/{id}/post",
+    "permission": "stock_count.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_landed_costs",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/landed-costs",
+    "permission": "landed_cost.create",
+    "input": "LandedCostCreate",
+    "response": "LandedCostResource"
+  },
+  {
+    "operationId": "get_landed_costs",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/landed-costs",
+    "permission": "landed_cost.read",
+    "input": null,
+    "response": "LandedCostResourceList"
+  },
+  {
+    "operationId": "get_landed_costs_id",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/landed-costs/{id}",
+    "permission": "landed_cost.read",
+    "input": null,
+    "response": "LandedCostResource"
+  },
+  {
+    "operationId": "patch_landed_costs_id",
+    "phase": "P10",
+    "method": "PATCH",
+    "path": "/landed-costs/{id}",
+    "permission": "landed_cost.edit",
+    "input": "LandedCostCreate",
+    "response": "LandedCostResource"
+  },
+  {
+    "operationId": "post_landed_costs_id_preview",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/landed-costs/{id}/preview",
+    "permission": "landed_cost.preview",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_landed_costs_id_approve",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/landed-costs/{id}/approve",
+    "permission": "landed_cost.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_landed_costs_id_post",
+    "phase": "P10",
+    "method": "POST",
+    "path": "/landed-costs/{id}/post",
+    "permission": "landed_cost.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_assets",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/assets",
+    "permission": "asset.create",
+    "input": "AssetCreate",
+    "response": "AssetResource"
+  },
+  {
+    "operationId": "get_assets",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetResourceList"
+  },
+  {
+    "operationId": "get_assets_id",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets/{id}",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetResource"
+  },
+  {
+    "operationId": "patch_assets_id",
+    "phase": "P11",
+    "method": "PATCH",
+    "path": "/assets/{id}",
+    "permission": "asset.edit",
+    "input": "AssetCreate",
+    "response": "AssetResource"
+  },
+  {
+    "operationId": "post_assets_id_approve",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/assets/{id}/approve",
+    "permission": "asset.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_assets_id_events",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/assets/{id}/events",
+    "permission": "asset.events",
+    "input": "AssetEvent",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_schedules",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/schedules",
+    "permission": "schedule.create",
+    "input": "ScheduleCreate",
+    "response": "ScheduleResource"
+  },
+  {
+    "operationId": "get_schedules",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedules",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleResourceList"
+  },
+  {
+    "operationId": "get_schedules_id",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedules/{id}",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleResource"
+  },
+  {
+    "operationId": "patch_schedules_id",
+    "phase": "P11",
+    "method": "PATCH",
+    "path": "/schedules/{id}",
+    "permission": "schedule.edit",
+    "input": "ScheduleCreate",
+    "response": "ScheduleResource"
+  },
+  {
+    "operationId": "post_schedules_id_approve",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/schedules/{id}/approve",
+    "permission": "schedule.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_schedules_id_pause",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/schedules/{id}/pause",
+    "permission": "schedule.pause",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_schedule_runs",
+    "phase": "P11",
+    "method": "POST",
+    "path": "/schedule-runs",
+    "permission": "schedule.execute",
+    "input": "ScheduleRun",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_assistant_runs",
+    "phase": "P12",
+    "method": "POST",
+    "path": "/assistant/runs",
+    "permission": "assistant.suggest",
+    "input": "AiRequest",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_assistant_suggestions_id_review",
+    "phase": "P12",
+    "method": "POST",
+    "path": "/assistant/suggestions/{id}/review",
+    "permission": "assistant.review",
+    "input": "AiReview",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_assistant_suggestions_id",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/suggestions/{id}",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiSuggestionResource"
+  },
+  {
+    "operationId": "post_portal_invites",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/portal-invites",
+    "permission": "portal_invite.create",
+    "input": "PortalInvite",
+    "response": "PortalInviteResource"
+  },
+  {
+    "operationId": "get_portal_invites",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal-invites",
+    "permission": "portal_invite.read",
+    "input": null,
+    "response": "PortalInviteResourceList"
+  },
+  {
+    "operationId": "get_portal_invites_id",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal-invites/{id}",
+    "permission": "portal_invite.read",
+    "input": null,
+    "response": "PortalInviteResource"
+  },
+  {
+    "operationId": "patch_portal_invites_id",
+    "phase": "P13",
+    "method": "PATCH",
+    "path": "/portal-invites/{id}",
+    "permission": "portal_invite.edit",
+    "input": "PortalInvite",
+    "response": "PortalInviteResource"
+  },
+  {
+    "operationId": "post_portal_invites_id_revoke",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/portal-invites/{id}/revoke",
+    "permission": "portal_invite.revoke",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_message_requests",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/message-requests",
+    "permission": "message_request.create",
+    "input": "MessageCreate",
+    "response": "MessageResource"
+  },
+  {
+    "operationId": "get_message_requests",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/message-requests",
+    "permission": "message_request.read",
+    "input": null,
+    "response": "MessageResourceList"
+  },
+  {
+    "operationId": "get_message_requests_id",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/message-requests/{id}",
+    "permission": "message_request.read",
+    "input": null,
+    "response": "MessageResource"
+  },
+  {
+    "operationId": "patch_message_requests_id",
+    "phase": "P13",
+    "method": "PATCH",
+    "path": "/message-requests/{id}",
+    "permission": "message_request.edit",
+    "input": "MessageCreate",
+    "response": "MessageResource"
+  },
+  {
+    "operationId": "post_message_requests_id_send",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/message-requests/{id}/send",
+    "permission": "message_request.send",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payment_links",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/payment-links",
+    "permission": "payment_link.create",
+    "input": "PaymentLinkCreate",
+    "response": "PaymentLinkResource"
+  },
+  {
+    "operationId": "get_payment_links",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/payment-links",
+    "permission": "payment_link.read",
+    "input": null,
+    "response": "PaymentLinkResourceList"
+  },
+  {
+    "operationId": "get_payment_links_id",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/payment-links/{id}",
+    "permission": "payment_link.read",
+    "input": null,
+    "response": "PaymentLinkResource"
+  },
+  {
+    "operationId": "patch_payment_links_id",
+    "phase": "P13",
+    "method": "PATCH",
+    "path": "/payment-links/{id}",
+    "permission": "payment_link.edit",
+    "input": "PaymentLinkCreate",
+    "response": "PaymentLinkResource"
+  },
+  {
+    "operationId": "post_payment_links_id_cancel",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/payment-links/{id}/cancel",
+    "permission": "payment_link.cancel",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_firm_mandates",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm-mandates",
+    "permission": "firm_mandate.create",
+    "input": "FirmMandateCreate",
+    "response": "FirmMandateResource"
+  },
+  {
+    "operationId": "get_firm_mandates",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm-mandates",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmMandateResourceList"
+  },
+  {
+    "operationId": "get_firm_mandates_id",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm-mandates/{id}",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmMandateResource"
+  },
+  {
+    "operationId": "patch_firm_mandates_id",
+    "phase": "P14",
+    "method": "PATCH",
+    "path": "/firm-mandates/{id}",
+    "permission": "firm_mandate.edit",
+    "input": "FirmMandateCreate",
+    "response": "FirmMandateResource"
+  },
+  {
+    "operationId": "post_firm_mandates_id_approve",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm-mandates/{id}/approve",
+    "permission": "firm_mandate.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_firm_mandates_id_revoke",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm-mandates/{id}/revoke",
+    "permission": "firm_mandate.revoke",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_firm_assignments",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm-assignments",
+    "permission": "firm_assignment.create",
+    "input": "FirmAssignment",
+    "response": "FirmAssignmentResource"
+  },
+  {
+    "operationId": "get_firm_assignments",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm-assignments",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmAssignmentResourceList"
+  },
+  {
+    "operationId": "get_firm_assignments_id",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm-assignments/{id}",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmAssignmentResource"
+  },
+  {
+    "operationId": "patch_firm_assignments_id",
+    "phase": "P14",
+    "method": "PATCH",
+    "path": "/firm-assignments/{id}",
+    "permission": "firm_assignment.edit",
+    "input": "FirmAssignment",
+    "response": "FirmAssignmentResource"
+  },
+  {
+    "operationId": "post_groups",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/groups",
+    "permission": "group.create",
+    "input": "GroupCreate",
+    "response": "GroupResource"
+  },
+  {
+    "operationId": "get_groups",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups",
+    "permission": "group.read",
+    "input": null,
+    "response": "GroupResourceList"
+  },
+  {
+    "operationId": "get_groups_id",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups/{id}",
+    "permission": "group.read",
+    "input": null,
+    "response": "GroupResource"
+  },
+  {
+    "operationId": "patch_groups_id",
+    "phase": "P15",
+    "method": "PATCH",
+    "path": "/groups/{id}",
+    "permission": "group.edit",
+    "input": "GroupCreate",
+    "response": "GroupResource"
+  },
+  {
+    "operationId": "post_groups_id_activate",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/groups/{id}/activate",
+    "permission": "group.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_intercompany_pairs",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/intercompany-pairs",
+    "permission": "intercompany_pair.create",
+    "input": "IntercompanyCreate",
+    "response": "IntercompanyResource"
+  },
+  {
+    "operationId": "get_intercompany_pairs",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/intercompany-pairs",
+    "permission": "intercompany_pair.read",
+    "input": null,
+    "response": "IntercompanyResourceList"
+  },
+  {
+    "operationId": "get_intercompany_pairs_id",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/intercompany-pairs/{id}",
+    "permission": "intercompany_pair.read",
+    "input": null,
+    "response": "IntercompanyResource"
+  },
+  {
+    "operationId": "patch_intercompany_pairs_id",
+    "phase": "P15",
+    "method": "PATCH",
+    "path": "/intercompany-pairs/{id}",
+    "permission": "intercompany_pair.edit",
+    "input": "IntercompanyCreate",
+    "response": "IntercompanyResource"
+  },
+  {
+    "operationId": "post_intercompany_pairs_id_accept",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/intercompany-pairs/{id}/accept",
+    "permission": "intercompany_pair.accept",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_intercompany_pairs_id_post",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/intercompany-pairs/{id}/post",
+    "permission": "intercompany_pair.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_consolidations",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations",
+    "permission": "consolidation.create",
+    "input": "ConsolidationCreate",
+    "response": "ConsolidationResource"
+  },
+  {
+    "operationId": "get_consolidations",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/consolidations",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "ConsolidationResourceList"
+  },
+  {
+    "operationId": "get_consolidations_id",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/consolidations/{id}",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "ConsolidationResource"
+  },
+  {
+    "operationId": "patch_consolidations_id",
+    "phase": "P15",
+    "method": "PATCH",
+    "path": "/consolidations/{id}",
+    "permission": "consolidation.edit",
+    "input": "ConsolidationCreate",
+    "response": "ConsolidationResource"
+  },
+  {
+    "operationId": "post_consolidations_id_preview",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations/{id}/preview",
+    "permission": "consolidation.preview",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_consolidations_id_approve",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations/{id}/approve",
+    "permission": "consolidation.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_consolidations_id_publish",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations/{id}/publish",
+    "permission": "consolidation.publish",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_budgets",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/budgets",
+    "permission": "budget.create",
+    "input": "BudgetCreate",
+    "response": "BudgetResource"
+  },
+  {
+    "operationId": "get_budgets",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/budgets",
+    "permission": "budget.read",
+    "input": null,
+    "response": "BudgetResourceList"
+  },
+  {
+    "operationId": "get_budgets_id",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/budgets/{id}",
+    "permission": "budget.read",
+    "input": null,
+    "response": "BudgetResource"
+  },
+  {
+    "operationId": "patch_budgets_id",
+    "phase": "P16",
+    "method": "PATCH",
+    "path": "/budgets/{id}",
+    "permission": "budget.edit",
+    "input": "BudgetCreate",
+    "response": "BudgetResource"
+  },
+  {
+    "operationId": "post_budgets_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/budgets/{id}/approve",
+    "permission": "budget.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_budgets_id_activate",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/budgets/{id}/activate",
+    "permission": "budget.activate",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_allocation_runs",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-runs",
+    "permission": "allocation_run.create",
+    "input": "AllocationRunCreate",
+    "response": "AllocationRunResource"
+  },
+  {
+    "operationId": "get_allocation_runs",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-runs",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRunResourceList"
+  },
+  {
+    "operationId": "get_allocation_runs_id",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-runs/{id}",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRunResource"
+  },
+  {
+    "operationId": "patch_allocation_runs_id",
+    "phase": "P16",
+    "method": "PATCH",
+    "path": "/allocation-runs/{id}",
+    "permission": "allocation_run.edit",
+    "input": "AllocationRunCreate",
+    "response": "AllocationRunResource"
+  },
+  {
+    "operationId": "post_allocation_runs_id_preview",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-runs/{id}/preview",
+    "permission": "allocation_run.preview",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_allocation_runs_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-runs/{id}/approve",
+    "permission": "allocation_run.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_allocation_runs_id_post",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-runs/{id}/post",
+    "permission": "allocation_run.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_projects",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects",
+    "permission": "project.create",
+    "input": "ProjectCreate",
+    "response": "ProjectResource"
+  },
+  {
+    "operationId": "get_projects",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectResourceList"
+  },
+  {
+    "operationId": "get_projects_id",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectResource"
+  },
+  {
+    "operationId": "patch_projects_id",
+    "phase": "P16",
+    "method": "PATCH",
+    "path": "/projects/{id}",
+    "permission": "project.edit",
+    "input": "ProjectCreate",
+    "response": "ProjectResource"
+  },
+  {
+    "operationId": "post_projects_id_progress_billing",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/progress-billing",
+    "permission": "project.progress_billing",
+    "input": "ProgressBilling",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_leases",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases",
+    "permission": "lease.create",
+    "input": "LeaseCreate",
+    "response": "LeaseResource"
+  },
+  {
+    "operationId": "get_leases",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseResourceList"
+  },
+  {
+    "operationId": "get_leases_id",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases/{id}",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseResource"
+  },
+  {
+    "operationId": "patch_leases_id",
+    "phase": "P17A",
+    "method": "PATCH",
+    "path": "/leases/{id}",
+    "permission": "lease.edit",
+    "input": "LeaseCreate",
+    "response": "LeaseResource"
+  },
+  {
+    "operationId": "post_leases_id_approve",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases/{id}/approve",
+    "permission": "lease.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_discount_eligibility",
+    "phase": "P17B",
+    "method": "POST",
+    "path": "/discount-eligibility",
+    "permission": "discount_eligibility.create",
+    "input": "DiscountEligibility",
+    "response": "DiscountEligibilityResource"
+  },
+  {
+    "operationId": "get_discount_eligibility",
+    "phase": "P17B",
+    "method": "GET",
+    "path": "/discount-eligibility",
+    "permission": "discount_eligibility.read",
+    "input": null,
+    "response": "DiscountEligibilityResourceList"
+  },
+  {
+    "operationId": "get_discount_eligibility_id",
+    "phase": "P17B",
+    "method": "GET",
+    "path": "/discount-eligibility/{id}",
+    "permission": "discount_eligibility.read",
+    "input": null,
+    "response": "DiscountEligibilityResource"
+  },
+  {
+    "operationId": "patch_discount_eligibility_id",
+    "phase": "P17B",
+    "method": "PATCH",
+    "path": "/discount-eligibility/{id}",
+    "permission": "discount_eligibility.edit",
+    "input": "DiscountEligibility",
+    "response": "DiscountEligibilityResource"
+  },
+  {
+    "operationId": "post_discount_eligibility_id_approve",
+    "phase": "P17B",
+    "method": "POST",
+    "path": "/discount-eligibility/{id}/approve",
+    "permission": "discount_eligibility.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_report_definitions",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/report-definitions",
+    "permission": "report_definition.create",
+    "input": "ReportDefinitionCreate",
+    "response": "ReportDefinitionResource"
+  },
+  {
+    "operationId": "get_report_definitions",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/report-definitions",
+    "permission": "report_definition.read",
+    "input": null,
+    "response": "ReportDefinitionResourceList"
+  },
+  {
+    "operationId": "get_report_definitions_id",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/report-definitions/{id}",
+    "permission": "report_definition.read",
+    "input": null,
+    "response": "ReportDefinitionResource"
+  },
+  {
+    "operationId": "patch_report_definitions_id",
+    "phase": "P18A",
+    "method": "PATCH",
+    "path": "/report-definitions/{id}",
+    "permission": "report_definition.edit",
+    "input": "ReportDefinitionCreate",
+    "response": "ReportDefinitionResource"
+  },
+  {
+    "operationId": "post_report_definitions_id_publish",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/report-definitions/{id}/publish",
+    "permission": "report_definition.publish",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_rule_proposals",
+    "phase": "P18B",
+    "method": "POST",
+    "path": "/rule-proposals",
+    "permission": "rule_proposal.create",
+    "input": "RuleProposalCreate",
+    "response": "RuleProposalResource"
+  },
+  {
+    "operationId": "get_rule_proposals",
+    "phase": "P18B",
+    "method": "GET",
+    "path": "/rule-proposals",
+    "permission": "rule_proposal.read",
+    "input": null,
+    "response": "RuleProposalResourceList"
+  },
+  {
+    "operationId": "get_rule_proposals_id",
+    "phase": "P18B",
+    "method": "GET",
+    "path": "/rule-proposals/{id}",
+    "permission": "rule_proposal.read",
+    "input": null,
+    "response": "RuleProposalResource"
+  },
+  {
+    "operationId": "patch_rule_proposals_id",
+    "phase": "P18B",
+    "method": "PATCH",
+    "path": "/rule-proposals/{id}",
+    "permission": "rule_proposal.edit",
+    "input": "RuleProposalCreate",
+    "response": "RuleProposalResource"
+  },
+  {
+    "operationId": "post_rule_proposals_id_impact",
+    "phase": "P18B",
+    "method": "POST",
+    "path": "/rule-proposals/{id}/impact",
+    "permission": "rule_proposal.impact",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_rule_proposals_id_approve",
+    "phase": "P18B",
+    "method": "POST",
+    "path": "/rule-proposals/{id}/approve",
+    "permission": "rule_proposal.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tool_grants",
+    "phase": "P18C",
+    "method": "POST",
+    "path": "/tool-grants",
+    "permission": "tool_grant.create",
+    "input": "ToolGrantCreate",
+    "response": "ToolGrantResource"
+  },
+  {
+    "operationId": "get_tool_grants",
+    "phase": "P18C",
+    "method": "GET",
+    "path": "/tool-grants",
+    "permission": "tool_grant.read",
+    "input": null,
+    "response": "ToolGrantResourceList"
+  },
+  {
+    "operationId": "get_tool_grants_id",
+    "phase": "P18C",
+    "method": "GET",
+    "path": "/tool-grants/{id}",
+    "permission": "tool_grant.read",
+    "input": null,
+    "response": "ToolGrantResource"
+  },
+  {
+    "operationId": "patch_tool_grants_id",
+    "phase": "P18C",
+    "method": "PATCH",
+    "path": "/tool-grants/{id}",
+    "permission": "tool_grant.edit",
+    "input": "ToolGrantCreate",
+    "response": "ToolGrantResource"
+  },
+  {
+    "operationId": "post_tool_grants_id_approve",
+    "phase": "P18C",
+    "method": "POST",
+    "path": "/tool-grants/{id}/approve",
+    "permission": "tool_grant.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_tool_grants_id_revoke",
+    "phase": "P18C",
+    "method": "POST",
+    "path": "/tool-grants/{id}/revoke",
+    "permission": "tool_grant.revoke",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_packs_install",
+    "phase": "P18D",
+    "method": "POST",
+    "path": "/packs/install",
+    "permission": "pack.install",
+    "input": "PackInstall",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_demo_scenarios",
+    "phase": "P01",
+    "method": "POST",
+    "path": "/demo/scenarios",
+    "permission": "demo.select",
+    "input": "DemoScenario",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_demo_reset",
+    "phase": "P01",
+    "method": "POST",
+    "path": "/demo/reset",
+    "permission": "demo.reset",
+    "input": "ReasonAction",
+    "response": "Job"
+  },
+  {
+    "operationId": "post_demo_feedback",
+    "phase": "P01",
+    "method": "POST",
+    "path": "/demo/feedback",
+    "permission": "demo.feedback",
+    "input": "FeedbackCreate",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_health_live",
+    "phase": "P00",
+    "method": "GET",
+    "path": "/health/live",
+    "permission": "health.read",
+    "input": null,
+    "response": "Health"
+  },
+  {
+    "operationId": "get_health_ready",
+    "phase": "P00",
+    "method": "GET",
+    "path": "/health/ready",
+    "permission": "health.read",
+    "input": null,
+    "response": "Health"
+  }
+]

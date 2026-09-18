@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "envelope_required": [
+    "eventId",
+    "eventType",
+    "schemaVersion",
+    "tenantId",
+    "entityId",
+    "aggregateType",
+    "aggregateId",
+    "aggregateVersion",
+    "occurredAt",
+    "traceId",
+    "payload"
+  ],
+  "events": {
+    "document.posted.v1": [
+      "documentId",
+      "journalEntryId",
+      "ruleProfileVersion",
+      "payloadHash"
+    ],
+    "payment.released.v1": [
+      "paymentId",
+      "releaseKey",
+      "channel"
+    ],
+    "reconciliation.completed.v1": [
+      "reconciliationId",
+      "snapshotId"
+    ],
+    "period.locked.v1": [
+      "periodId",
+      "closeVersion",
+      "reportSnapshotIds"
+    ],
+    "transmission.status_changed.v1": [
+      "jobId",
+      "documentId",
+      "state",
+      "evidenceId"
+    ],
+    "evidence.available.v1": [
+      "evidenceId",
+      "sha256"
+    ],
+    "rule.activated.v1": [
+      "ruleProfileId",
+      "version",
+      "effectiveFrom"
+    ]
+  },
+  "consumer_invariants": [
+    "authorize scope before dereference",
+    "deduplicate consumer plus eventId",
+    "no automatic financial side effect without approved command/schedule authority",
+    "persist error and owned dead-letter task",
+    "unknown schema version quarantined"
+  ]
+}

@@ -1,0 +1,1 @@
+import pg from "pg";if(process.env.LARA_MODE!=="demo")throw new Error("Demo seeding requires LARA_MODE=demo");const db=new pg.Client({connectionString:process.env.DATABASE_URL});await db.connect();await db.query("insert into lara.demo_seed_runs(fixture_version,row_count) values($1,$2)",["phase0-v1",0]);await db.end();console.log("Demo seed complete.");

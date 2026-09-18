@@ -1,0 +1,87 @@
+{
+  "P02": {
+    "title": "Finance workspace",
+    "dependencies": "P01",
+    "spec": "phases\\p02-finance-workspace.md"
+  },
+  "P03": {
+    "title": "General ledger and close",
+    "dependencies": "P02",
+    "spec": "phases\\p03-general-ledger-and-close.md"
+  },
+  "P04": {
+    "title": "Sales invoicing and receivables",
+    "dependencies": "P03",
+    "spec": "phases\\p04-sales-invoicing-and-receivables.md"
+  },
+  "P05": {
+    "title": "Purchasing payables and expenses",
+    "dependencies": "P04",
+    "spec": "phases\\p05-purchasing-payables-and-expenses.md"
+  },
+  "P06": {
+    "title": "Treasury cash and bank reconciliation",
+    "dependencies": "P05",
+    "spec": "phases\\p06-treasury-cash-and-bank-reconciliation.md"
+  },
+  "P07": {
+    "title": "Tax compliance and e invoicing",
+    "dependencies": "P06",
+    "spec": "phases\\p07-tax-compliance-and-e-invoicing.md"
+  },
+  "P08": {
+    "title": "Financial institution coexistence",
+    "dependencies": "P07",
+    "spec": "phases\\p08-financial-institution-coexistence.md"
+  },
+  "P09": {
+    "title": "Multiple currencies and separate books",
+    "dependencies": "P08",
+    "spec": "phases\\p09-multiple-currencies-and-separate-books.md"
+  },
+  "P10": {
+    "title": "Inventory costing and three way matching",
+    "dependencies": "P06; P09 for FX items",
+    "spec": "phases\\p10-inventory-costing-and-three-way-matching.md"
+  },
+  "P11": {
+    "title": "Assets recurring work and recognition schedules",
+    "dependencies": "P03/P05; P09 for FX",
+    "spec": "phases\\p11-assets-recurring-work-and-recognition-schedules.md"
+  },
+  "P12": {
+    "title": "Evidence backed AI assistance",
+    "dependencies": "P07; enabled target modules",
+    "spec": "phases\\p12-evidence-backed-ai-assistance.md"
+  },
+  "P13": {
+    "title": "Customer supplier portals and messaging",
+    "dependencies": "P04\u2013P07",
+    "spec": "phases\\p13-customer-supplier-portals-and-messaging.md"
+  },
+  "P14": {
+    "title": "Accounting firm multi client workspace",
+    "dependencies": "P07/P13",
+    "spec": "phases\\p14-accounting-firm-multi-client-workspace.md"
+  },
+  "P15": {
+    "title": "Intercompany and consolidation",
+    "dependencies": "P09/P11",
+    "spec": "phases\\p15-intercompany-and-consolidation.md"
+  },
+  "P16": {
+    "title": "Budgets cost allocation and project accounting",
+    "dependencies": "P10/P11",
+    "spec": "phases\\p16-budgets-cost-allocation-and-project-accounting.md"
+  },
+  "P17": {
+    "title": "Local operations feature releases",
+    "dependencies": "P07/P09/P11/P16 as specified",
+    "spec": "phases\\p17-local-operations-feature-releases.md"
+  },
+  "P18": {
+    "title": "Controlled extensibility and advanced assistance",
+    "dependencies": "P12/P14\u2013P17 as applicable",
+    "spec": "phases\\p18-controlled-extensibility-and-advanced-assistance.md"
+  }
+}

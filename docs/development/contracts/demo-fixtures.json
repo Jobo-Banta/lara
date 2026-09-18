@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "synthetic_only": true,
+  "fixture_clock": "2026-09-18T02:00:00Z",
+  "isolation": "One run namespace per authenticated demo session; scenarios reset independently. No production data migration.",
+  "opening": {
+    "currency": "PHP",
+    "journal": [
+      {
+        "account": "Bank",
+        "debit": "100000.00",
+        "credit": "0.00"
+      },
+      {
+        "account": "Equity",
+        "debit": "0.00",
+        "credit": "100000.00"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "DEMO-01",
+      "cases": [
+        "AC-01",
+        "AC-02"
+      ],
+      "expected_bank": "111200.00",
+      "expected_ar": "0.00",
+      "expected_output_tax": "1200.00"
+    },
+    {
+      "id": "DEMO-02",
+      "cases": [
+        "AC-03",
+        "AC-04"
+      ],
+      "expected_bank": "89000.00",
+      "expected_ap": "0.00",
+      "expected_withholding_payable": "200.00"
+    },
+    {
+      "id": "DEMO-03",
+      "cases": [
+        "AC-01"
+      ],
+      "repeat_command": 100,
+      "expected_invoice_count": 1
+    },
+    {
+      "id": "DEMO-04",
+      "cases": [
+        "AC-01"
+      ],
+      "provider_script": [
+        "rejected_invalid_fixture_buyer",
+        "new_transport_payload_if_financial_facts_unchanged",
+        "accepted"
+      ],
+      "original_document_immutable": true
+    },
+    {
+      "id": "DEMO-05",
+      "cases": [
+        "AC-01",
+        "AC-02",
+        "AC-07"
+      ],
+      "statement_opening": "100000.00",
+      "statement_lines": [
+        "6000.00",
+        "5200.00",
+        "-50.00"
+      ],
+      "statement_closing": "111150.00",
+      "expected_bank": "111150.00"
+    },
+    {
+      "id": "DEMO-06",
+      "cases": [
+        "AC-01"
+      ],
+      "close_task_states": [
+        "missing_evidence",
+        "reviewed",
+        "locked"
+      ],
+      "late_post_error": "PERIOD_LOCKED"
+    },
+    {
+      "id": "DEMO-07",
+      "cases": [
+        "AC-01"
+      ],
+      "auditor_scope": "only current demo run and entity",
+      "cross_tenant_result": 404
+    },
+    {
+      "id": "DEMO-08",
+      "cases": [],
+      "concurrent_edit_error": 412,
+      "unsaved_input_preserved": true
+    }
+  ]
+}

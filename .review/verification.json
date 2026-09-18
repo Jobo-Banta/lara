@@ -1,0 +1,16 @@
+{
+  "source_ids": 323,
+  "revised_ids": 330,
+  "missing_original_ids": [],
+  "new_ids": [
+    "AI-033",
+    "AI-034",
+    "AI-035",
+    "AI-036",
+    "AI-037",
+    "OBJ-8",
+    "OBJ-9"
+  ],
+  "revision_section_count": 23,
+  "original_docx_sha256": "af901d88eceac4bc750f928f87717c2a7276fac3643246be33c39b96ff6a384a"
+}

@@ -1,0 +1,205 @@
+{
+  "purpose": "Synthetic fixtures only; not legal tax profiles. Each case is independent unless its test establishes the stated opening item.",
+  "cases": [
+    {
+      "id": "AC-01",
+      "name": "Invoice",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "AR",
+          "debit": "11200",
+          "credit": "0"
+        },
+        {
+          "account": "Revenue",
+          "debit": "0",
+          "credit": "10000"
+        },
+        {
+          "account": "OutputTax",
+          "debit": "0",
+          "credit": "1200"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "name": "Collection",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Bank",
+          "debit": "11200",
+          "credit": "0"
+        },
+        {
+          "account": "AR",
+          "debit": "0",
+          "credit": "11200"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "name": "Bill accrual withholding",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Expense",
+          "debit": "10000",
+          "credit": "0"
+        },
+        {
+          "account": "InputTax",
+          "debit": "1200",
+          "credit": "0"
+        },
+        {
+          "account": "AP",
+          "debit": "0",
+          "credit": "11000"
+        },
+        {
+          "account": "WithholdingPayable",
+          "debit": "0",
+          "credit": "200"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "name": "Supplier payment",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "AP",
+          "debit": "11000",
+          "credit": "0"
+        },
+        {
+          "account": "Bank",
+          "debit": "0",
+          "credit": "11000"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "name": "Customer withholding receipt",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Bank",
+          "debit": "11000",
+          "credit": "0"
+        },
+        {
+          "account": "WithholdingReceivable",
+          "debit": "200",
+          "credit": "0"
+        },
+        {
+          "account": "AR",
+          "debit": "0",
+          "credit": "11200"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "name": "Partial credit",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Revenue",
+          "debit": "5000",
+          "credit": "0"
+        },
+        {
+          "account": "OutputTax",
+          "debit": "600",
+          "credit": "0"
+        },
+        {
+          "account": "AR",
+          "debit": "0",
+          "credit": "5600"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "name": "Bank fee",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "BankFees",
+          "debit": "50",
+          "credit": "0"
+        },
+        {
+          "account": "Bank",
+          "debit": "0",
+          "credit": "50"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "name": "Depreciation",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Depreciation",
+          "debit": "2000",
+          "credit": "0"
+        },
+        {
+          "account": "AccumulatedDepreciation",
+          "debit": "0",
+          "credit": "2000"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "name": "FIFO issue",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "COGS",
+          "debit": "400",
+          "credit": "0"
+        },
+        {
+          "account": "Inventory",
+          "debit": "0",
+          "credit": "400"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "name": "FX settlement",
+      "functionalCurrency": "PHP",
+      "lines": [
+        {
+          "account": "Bank",
+          "debit": "5700",
+          "credit": "0"
+        },
+        {
+          "account": "AR",
+          "debit": "0",
+          "credit": "5600"
+        },
+        {
+          "account": "FXGain",
+          "debit": "0",
+          "credit": "100"
+        }
+      ]
+    }
+  ]
+}

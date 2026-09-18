@@ -1,0 +1,24 @@
+{
+  "name": "lara",
+  "private": true,
+  "version": "0.0.1",
+  "packageManager": "pnpm@9.15.5",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "assets:build": "node scripts/copy-brand-assets.mjs",
+    "status:check": "py -3.12 scripts/build_status.py check",
+    "dev": "pnpm --filter @lara/web dev",
+    "build": "pnpm assets:build && pnpm --filter @lara/web build",
+    "config:check": "node scripts/config-check.mjs",
+    "api": "pnpm --filter @lara/api dev",
+    "db:migrate": "pnpm --filter @lara/database migrate",
+    "db:seed:demo": "node scripts/seed-demo.mjs",
+    "backup:local": "node scripts/backup-local.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "db:backup:snapshot": "node scripts/backup-snapshot.mjs",
+    "db:restore:snapshot": "node scripts/restore-snapshot.mjs",
+    "release:manifest": "node scripts/release-manifest.mjs"
+  }
+}

@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "default_order": [
+    "P00",
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08",
+    "P09",
+    "P10",
+    "P11",
+    "P12",
+    "P13",
+    "P14",
+    "P15",
+    "P16",
+    "P17A",
+    "P17B",
+    "P17C",
+    "P17D",
+    "P17E",
+    "P18A",
+    "P18B",
+    "P18C",
+    "P18D"
+  ],
+  "releases": [
+    {
+      "id": "P00",
+      "title": "Engineering baseline",
+      "depends_on": [],
+      "conditional_dependencies": [],
+      "spec": "03-phase-00-setup.md",
+      "release_gate": "RG-01..08",
+      "purpose": "engineering"
+    },
+    {
+      "id": "P01",
+      "title": "UX prototype",
+      "depends_on": [
+        "P00"
+      ],
+      "conditional_dependencies": [],
+      "spec": "04-phase-01-prototype.md",
+      "release_gate": "RG-01..08",
+      "purpose": "synthetic_demo"
+    },
+    {
+      "id": "P02",
+      "title": "Finance workspace",
+      "depends_on": [
+        "P01"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p02-finance-workspace.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P03",
+      "title": "General ledger and close",
+      "depends_on": [
+        "P02"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p03-general-ledger-and-close.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P04",
+      "title": "Sales invoicing and receivables",
+      "depends_on": [
+        "P03"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p04-sales-invoicing-and-receivables.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P05",
+      "title": "Purchasing payables and expenses",
+      "depends_on": [
+        "P04"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p05-purchasing-payables-and-expenses.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P06",
+      "title": "Treasury cash and bank reconciliation",
+      "depends_on": [
+        "P05"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p06-treasury-cash-and-bank-reconciliation.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P07",
+      "title": "Tax compliance and e invoicing",
+      "depends_on": [
+        "P06"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p07-tax-compliance-and-e-invoicing.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P08",
+      "title": "Financial institution coexistence",
+      "depends_on": [
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p08-financial-institution-coexistence.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P09",
+      "title": "Multiple currencies and separate books",
+      "depends_on": [
+        "P08"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p09-multiple-currencies-and-separate-books.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P10",
+      "title": "Inventory costing and three way matching",
+      "depends_on": [
+        "P06"
+      ],
+      "conditional_dependencies": [
+        "P09 for foreign-currency operation"
+      ],
+      "spec": "phases\\p10-inventory-costing-and-three-way-matching.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P11",
+      "title": "Assets recurring work and recognition schedules",
+      "depends_on": [
+        "P03",
+        "P05"
+      ],
+      "conditional_dependencies": [
+        "P09 for foreign-currency operation"
+      ],
+      "spec": "phases\\p11-assets-recurring-work-and-recognition-schedules.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P12",
+      "title": "Evidence backed AI assistance",
+      "depends_on": [
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p12-evidence-backed-ai-assistance.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P13",
+      "title": "Customer supplier portals and messaging",
+      "depends_on": [
+        "P04",
+        "P05",
+        "P06",
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p13-customer-supplier-portals-and-messaging.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P14",
+      "title": "Accounting firm multi client workspace",
+      "depends_on": [
+        "P07",
+        "P13"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p14-accounting-firm-multi-client-workspace.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P15",
+      "title": "Intercompany and consolidation",
+      "depends_on": [
+        "P09",
+        "P11"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p15-intercompany-and-consolidation.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P16",
+      "title": "Budgets cost allocation and project accounting",
+      "depends_on": [
+        "P10",
+        "P11"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p16-budgets-cost-allocation-and-project-accounting.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P17A",
+      "title": "Lease billing",
+      "depends_on": [
+        "P07",
+        "P11"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p17-local-operations-feature-releases.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P17B",
+      "title": "Statutory discounts",
+      "depends_on": [
+        "P04",
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p17-local-operations-feature-releases.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P17C",
+      "title": "Marketplace and POS integration",
+      "depends_on": [
+        "P07",
+        "P10"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p17-local-operations-feature-releases.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P17D",
+      "title": "Payroll data and remittances",
+      "depends_on": [
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p17-local-operations-feature-releases.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P17E",
+      "title": "Local obligations",
+      "depends_on": [
+        "P05",
+        "P07"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p17-local-operations-feature-releases.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P18A",
+      "title": "Report and custom-field authoring",
+      "depends_on": [
+        "P07",
+        "P12"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p18-controlled-extensibility-and-advanced-assistance.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P18B",
+      "title": "Rule impact and tax proposals",
+      "depends_on": [
+        "P12"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p18-controlled-extensibility-and-advanced-assistance.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P18C",
+      "title": "Client draft tools",
+      "depends_on": [
+        "P12",
+        "P14"
+      ],
+      "conditional_dependencies": [],
+      "spec": "phases\\p18-controlled-extensibility-and-advanced-assistance.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    },
+    {
+      "id": "P18D",
+      "title": "Industry pack lifecycle",
+      "depends_on": [
+        "P15",
+        "P16",
+        "P17A",
+        "P17B",
+        "P17C",
+        "P17D",
+        "P17E"
+      ],
+      "conditional_dependencies": [
+        "every capability used by the selected pack/profile"
+      ],
+      "spec": "phases\\p18-controlled-extensibility-and-advanced-assistance.md",
+      "release_gate": "RG-01..08",
+      "purpose": "production_scoped"
+    }
+  ]
+}

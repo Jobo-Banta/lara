@@ -1,0 +1,733 @@
+Datum Consulting Philippines
+Product Office  |  Business Requirements Document
+Business Requirements Document
+LARA: AI-native Computerized Accounting System (CAS)
+What the system must do, for whom, and to what standard, so that it can be registered with the BIR, send electronic invoices to the BIR, and give Philippine finance teams a modern, AI-assisted way to keep their books.
+Document reference | BRD-LARA-2026-V1.0
+Supersedes | None. This is the initial draft.
+Version date | September 18, 2026
+Status | Initial draft for review
+Product | LARA (Ledger, Accounting, Reporting and Audit)
+Owner | DCP Product Office
+Accounting standard | PFRS / PFRS for SMEs, BIR CAS rules
+Confidential. Prepared for internal DCP product planning and client discussion. This document states product requirements and is not tax or legal advice.
+
+
+Contents
+If the contents list looks empty, open the file in Microsoft Word, press Ctrl+A, then F9 to refresh it.
+
+1. Executive summary
+LARA is a standalone DCP product: a complete, AI-native Computerized Accounting System (CAS) built for Philippine businesses. It keeps the books, issues BIR-compliant invoices, prepares tax files, and sends electronic invoices to the BIR on its own, without needing any other product. It is built from the ground up as a DCP product, so every business that adopts it runs on the same codebase through configuration rather than a custom build.
+The system must do three things well:
+Pass BIR registration and later examination. The design follows the BIR's Annex B checklist, which every registered system must strictly comply with.
+Produce valid electronic invoices. An invoice produced by a CAS only counts as an electronic invoice if the system can transmit the required data to the BIR. LARA includes this capability as a built-in module.
+Run a real finance operation. Double-entry ledger, receivables, payables, bank, inventory, fixed assets, tax, and reports, with AI that prepares work for people to approve.
+Stand up to an audit. Auditors, internal audit, and examiners get the evidence they ask for from the system itself, not from spreadsheets prepared by hand.
+Timing is driven by the e-invoicing mandate. Covered taxpayers must move to electronic invoicing by December 31, 2026, and later groups follow under separate BIR issuances. Phase 1 is therefore limited to what registration, the Permit to Issue, and electronic invoicing need, so the product is ready for the businesses that must comply first.
+Vision
+One product that fits any industry and any size of business. A sole proprietor, a mid-sized trading company, and a universal bank should all run the same release, differing only in configuration: chart of accounts, tax types, document series, approval rules, and the industry pack they switch on. Nothing in the design is written for one client, and no client gets a fork of the codebase.
+Where we start
+The first industry pack is for banks and other financial institutions, because that is where DCP is having its current conversations, and because banks sit inside the first e-invoicing group as Large Taxpayers Service registrants. Banks are also the hardest case: many branches, gross receipts tax instead of VAT, separate books for the regular banking unit and the foreign currency deposit unit, heavy documentary stamp tax, feeds from core banking, and examiners from the BIR, the BSP, and internal audit all asking for evidence. A system that satisfies a bank will satisfy a retailer with room to spare. The requirements in section 9.11 are therefore a pack that is switched on, not a change to the core, and the product is not limited to banks.
+2. Philippine business practices
+Local finance teams follow many habits that general accounting software does not handle out of the box. Covering them well removes the spreadsheets and paper logs that clients otherwise keep on the side. The full requirements are in section 9.10. In summary, they fall into six groups:
+Paper trail and approvals: check and disbursement vouchers with signature blocks, check signatory rules, counter receipts, check release days, and numbered supplementary receipts.
+Cash handling: post-dated checks, daily collection reports with cash count, deposit slips, revolving funds, and cash advance liquidation.
+Tax paperwork around each transaction: supplier and customer certificates (2303, sworn declarations, zero-rating certificates), 2307 follow-up, withholding timing under EOPT, tax payment records, and the BIR filing calendar.
+Organization: head office and branch accounts, per-branch books, and local government obligations such as business permits and real property tax.
+Local channels: local bank statement formats, InstaPay, PESONet, and QR Ph references, e-wallets, and online marketplace payouts.
+Industry habits: progress billing with retention, lease deposits and advance rent, statutory discounts, and employee loans.
+Rules to confirm with the tax advisor
+A few items depend on specific regulations that should be checked before build: output VAT relief on uncollected receivables under EOPT, withholding on online marketplace and e-wallet payouts, the scope of statutory discounts beyond senior citizens and PWDs, and current rules on binding and submitting loose-leaf books. Their requirements are written so the rates and rules are settings, not code.
+3. Business background
+Philippine businesses are moving to electronic invoicing and electronic sales reporting, which the BIR receives through its Electronic Invoicing System (EIS). Many of them still keep manual books or use general software that was not built for BIR rules. The first e-invoicing group includes e-commerce sellers (except micro), Large Taxpayers Service registrants, large taxpayers under the EOPT Act, and businesses using a CAS or CBA with electronic invoicing, so the immediate market is sizeable and time-bound.
+Problem. Without a registered CAS that produces compliant invoices and books and can send e-invoices, a business cannot meet the new rules, and faces penalties and disallowed deductions.
+Opportunity. LARA gives businesses one compliant system for books, invoices, tax files, and e-invoicing, with AI built around Philippine rules. For DCP, it is a new recurring product rather than a one-off build.
+4. Objectives and success measures
+ID | Objective | How we measure it
+OBJ-1 | Get a LARA installation registered with the BIR. | Acknowledgement Certificate issued; all Annex B items marked complied.
+OBJ-2 | Issue and transmit electronic invoices correctly. | Permit to Issue obtained; 100% of posted invoices transmitted within the BIR window once transmission is switched on.
+OBJ-3 | Make filing faster and more accurate. | Quarterly VAT and withholding files generated in under 1 hour; zero BIR validation rejections after the pre-filing check.
+OBJ-4 | Shorten month-end close. | Close in 5 working days or less by the third month after go-live.
+OBJ-5 | Reduce manual encoding. | At least 70% of supplier bills captured by AI with no field changes needed.
+OBJ-6 | Build a reusable product, not a one-off build. | A further business onboarded on the same codebase through configuration only.
+OBJ-7 | Serve any industry and size from one codebase. | A small business and a bank run the same release, differing only in configuration; no client branch of the code exists.
+
+5. Scope and phases
+In scope
+Company, branch, and user setup
+Audit trail
+General ledger
+Receivables and payables
+Cash and bank
+Inventory
+Fixed assets
+Tax engine
+BIR books and files
+Financial statements
+E-invoicing module (direct to the BIR EIS)
+AI assist layer
+API and imports
+Data migration
+Registration pack
+Interfaces to source systems, including core banking, for journals and subsidiary ledger balances
+Industry configuration packs, starting with banks and financial institutions
+Supplier e-invoice inbox (from Phase 2)
+Out of scope (for now)
+Full payroll. The system imports payroll journals and 2316 data instead.
+Manufacturing and MRP.
+CRM.
+POS terminal software. POS machines have their own registration; the CAS imports their sales.
+Filing returns directly on eFPS or eBIRForms. The system produces the files. From Phase 2 it can hand them to an accredited electronic tax service provider for filing and payment (FR-PH-030).
+Tax advisory services.
+Core banking, treasury, and lending systems. LARA takes their journals and balances and keeps the books of account; it does not replace them.
+Phases
+Phase | Content
+Phase 1 | Setup, security, and audit trail
+General ledger with dimensions
+Receivables and payables, with sales order to invoice and basic PO matching
+Advances, payment terms, payment reconciliation, and credit limits
+Post-dated checks, check printing, and cash advance liquidation
+Vouchers and signatories, daily collection report, supplementary documents, supplier and customer compliance files, 2307 tracking, filing calendar, and head office and branch accounts
+Cash and bank
+BIR invoice engine and memos
+BIR books
+2307, 2550Q with SLSP, and 1601-EQ with QAP
+E-invoicing module (direct to the BIR EIS)
+Registration pack
+AI bill capture, smart coding, pre-filing checks, and migration helper
+AI differentiators, kept to four in Phase 1: readiness score, missed-withholding finder, input VAT guard, and the registration copilot
+Permit to Issue pack, invoice QR code, e-invoice schema guard, and the registration copilot
+Banking pack: gross receipts tax, non-VAT invoicing for institutions under GRT, core banking journal interface, and branch books at bank scale
+Phase 2 | Inventory with costing
+Three-way matching with goods receipts
+Fixed assets
+Multi-currency
+Deferred revenue and expense, recurring invoices, budget control, and cost allocation
+Landed cost, bulk payments, and POS cashier closing import
+Bank statement parsing and AI matching
+SAWT, 1604-E, 2306, and 2316
+Financial statement pack
+Portals
+Anomaly watch, "ask your books", close helper, handwritten invoice reader, PDF bank statement reader, manual books digitizer, and the 2307 chaser
+Mock BIR audit, chat-app capture, contract to schedule, AI finance brief, second reviewer, fraud watch, report builder, and agent inbox
+Local government obligations, payroll remittances, leases, marketplace payouts, and statutory discounts
+Supplier e-invoice inbox, document chaser, cash flow actions, Taglish assistant on Viber and Teams, eTSP filing hand-off, and the rules time machine
+Banking pack: documentary stamp tax, separate regular banking unit and foreign currency deposit unit books, and a chart of accounts template aligned to BSP reporting
+Phase 3 | Multi-company consolidation
+Project costing reports
+Payroll integration
+Industry packs
+Rule-to-setting assistant, accounting firm cockpit, tax computation helper, and peer benchmarks
+Government withholding (deferred item)
+Further agent automation with approvals
+Examination response pack and client-built agents through GAIA
+Further industry packs: retail, services, construction, leasing, and non-profit
+Phase 1 scope discipline
+Phases are ordered by dependency, not by calendar date. Phase 1 holds only what a business needs to register the system, obtain the Permit to Issue, keep compliant books, and issue and transmit electronic invoices. Anything that does not serve those four goals belongs in a later phase, however useful it looks. Dates are set per release once the build team and scope are fixed.
+
+6. Stakeholders and user roles
+Stakeholders
+Client finance leadership: sponsor at each implementation; approves configuration and sign-off.
+Client accounting team: daily users of the ledger, receivables, payables, and close.
+Branch and treasury staff: daily users of collections, disbursements, and the branch close.
+Internal audit and compliance: review controls, access, and evidence; users of section 9.12.
+Client external auditor and tax advisor: review books, templates, and filings.
+Accounting and bookkeeping firms: run several client companies on the product; a channel as well as a user.
+BIR (RDO or LT Office): issues the Acknowledgement Certificate and the Permit to Issue; may post-evaluate.
+DCP product and engineering teams: build and support LARA; DCP co-signs the Joint Sworn Statement as system provider.
+Role and permission matrix
+Roles below are the starting set. "Approve" always means a different person from the one who created the item.
+Role | Journal entries | Invoices and memos | Bills and payments | Bank reconciliation | Tax files and books | Reports and audit log | Settings and users
+Accounts Clerk | Draft | Draft | Draft | View | None | View own work | None
+Billing / Cashier | None | Create and post invoices; request voids | Record collections | None | None | View own work | None
+Senior Accountant | Create, post | Approve memos | Approve, post | Execute | Generate | Full view | None
+Tax Officer | View | View | Review withholding codes | View | Generate, validate, mark as filed | Full view | Tax codes only
+Finance Director | Approve, reverse | Approve voids | Final approval above limits | Approve | Approve for filing | Full view | Approval limits, period close
+External Auditor / BIR Examiner | View | View | View | View | View, export | View, export audit log | None
+Security Administrator | None | None | None | None | None | Access log only | Users and roles, with approval
+System Administrator | None | None | None | None | None | System log only (cannot edit or delete) | Technical settings, backups
+Internal Auditor | View | View | View | View | View, export | Full view, export audit log | None
+
+Roles are configurable. The system warns when one person is given roles that break segregation of duties (for example, creating and approving the same bill).
+7. Regulatory basis
+The system must comply with the issuances below. They change often, so the tax advisor confirms the current list before registration.
+RR 9-2009: electronic records, mandatory fields in books, and audit trail. Records must show a trail from the source document to the summarized financial accounts.
+RMC 5-2021 and RMO 9-2021: simplified registration and the Annex B Standard Functional and Technical Requirements.
+RMC 10-2020: suspended the Permit to Use and replaced it with an Acknowledgement Certificate carrying a control number that must appear on the invoices the system produces.
+RR 7-2024 as amended by RR 11-2024, and RMC 77-2024 (EOPT): invoice content and the shift from official receipts to invoices.
+RR 11-2025 as amended by RR 26-2025: electronic invoicing and sales reporting.
+RR 16-2006: the Standard Audit File format for soft copies of books.
+RR 17-2013 as amended by RR 5-2014: record retention (10 years).
+RA 10173, the Data Privacy Act: protection of personal data such as names, addresses, and TINs.
+Draft circular on electronic invoices (consulted August 25, 2026): the Permit to Issue, the QR code, what counts as an electronic invoice, correction rules, and coverage. Still a draft, so every detail is held as a setting.
+Pending rule to watch
+The draft circular has since been discussed with industry and circulated. It confirms that covered taxpayers may use in-house systems, bought software, or a local solution provider, and it adds the Permit to Issue, the QR code, and the correction rules now written into sections 10 and 11. Commentators have asked for more time, and a foreign solution provider may not be allowed to serve Philippine taxpayers. Nothing is final until the circular is published, so section 11 keeps all of it as configuration.
+8. Core business processes
+Order to cash
+Quotation, then sales order, then delivery (if goods), then invoice posted with a BIR serial number, then sent to the BIR EIS by the e-invoicing module, then collection recorded, then withholding certificate received (2307) and logged, then bank reconciled.
+Procure to pay
+Purchase request, then purchase order, then goods receipt, then supplier invoice captured (AI) and matched, then withholding computed, then bill approved and posted, then payment and 2307 issued to supplier, then bank reconciled.
+Record to report
+Daily postings, then bank reconciliation, then accruals and depreciation, then close checklist, then period lock, then financial statements, then BIR books and tax files, then filing and archive.
+Correct a mistake
+Electronic invoice: never deleted or changed. To lower the amount, issue a credit note that refers to the original. To raise it, issue a new invoice that refers to the original. Non-electronic invoices keep the older route of void with a reason and approval, then reissue. Journal entry: reversing entry with a reference to the original. Nothing posted is ever edited or deleted.
+Close a period
+Checklist tasks assigned and worked through, then accounts substantiated with their schedules, then review and sign-off, then the period locked. Anything found later comes in as an approved audit adjustment that is shown separately, never as a change to what was already reported.
+9. Functional requirements
+Priority: M must, S should, C could.
+9.0 Shared building blocks
+The modules that follow are built from a small number of shared engines. Anything that looks like a new register, calendar, queue, or import is configuration of one of these, not a new piece of software. This keeps the product small enough to test, and it is why a new industry pack is settings rather than a build.
+ID | Shared building block | Priority | Phase
+FR-SH-001 | Posting engine. The only way anything reaches the ledger. Balance check, period control, dimensions, control accounts, audit trail, and reversal rules live here once. | M | 1
+FR-SH-002 | Document engine. One registry of document types (invoice, credit note, voucher, collection receipt, delivery receipt and so on), each with its own series, layout, rules, and whether it is an electronic invoice. New document types are configuration. | M | 1
+FR-SH-003 | Party master. Customers, suppliers, employees, and banks are one record with roles, so tax status, certificates, limits, and balances are held once. | M | 1
+FR-SH-004 | Tax engine. VAT, percentage taxes, withholding, and stamp taxes as rules with rates, effective dates, and evidence of the version used. Every module asks the engine; no module computes tax itself. | M | 1
+FR-SH-005 | Approval and limits engine. Approval routes, amount limits, signatory rules, credit limits, and segregation-of-duties checks in one place, used by every document type. | M | 1
+FR-SH-006 | Ingestion pipeline. One path for everything arriving from outside: spreadsheets, bank files, POS closings, core banking journals, payroll journals, supplier e-invoices, and migrations. Connect, stage, validate, map, then propose drafts; failures land in the work queue. | M | 1
+FR-SH-007 | Reconciliation framework. One way to match two sets of records and explain the difference: bank against ledger, payments against invoices, sub-ledgers against control accounts, books against returns, and documents against what the BIR accepted. | M | 1
+FR-SH-008 | Schedule engine. Anything that generates entries over time: depreciation, deferred revenue and expense, recurring invoices and journals, lease schedules, and amortisations. One engine, many schedule types. | S | 2
+FR-SH-009 | Obligations and reminders. One calendar for filings, permits, certificate expiries, business permits, binding of books, and any other dated duty, with owners, evidence, and escalation. | M | 1
+FR-SH-010 | One work queue. Approvals, AI drafts, import failures, rejected e-invoices, unmatched bank lines, and control exceptions arrive in a single inbox with the same explain, act, and log behaviour. | M | 1
+FR-SH-011 | Reporting layer. Statutory books and BIR outputs are locked templates over the ledger; everything else is built in the same report builder, with one place for headers, print templates, and exports. | M | 1
+9.1 Company, branch, and master data
+ID | Requirement | Priority | Phase
+FR-CO-001 | Store each company's registered name, trade name, registered address, TIN, VAT or Non-VAT status, RDO, and fiscal year. | M | 1
+FR-CO-002 | Store branches with five-digit branch codes and branch addresses; every transaction belongs to a branch. | M | 1
+FR-CO-003 | Store Acknowledgement Certificate number, date issued, and approved series ranges per branch and document type. | M | 1
+FR-CO-004 | Customer and supplier records with registered name, address, TIN and branch code; validate TIN format and block dummy TINs. | M | 1
+FR-CO-005 | Item and service catalog with unit of measure, default accounts, and tax codes. | M | 1
+FR-CO-006 | Register POS machines linked to the system (brand, model, serial, MIN, permit number) for declaration at registration. | S | 1
+FR-CO-007 | Store Permit to Issue (PTI) details for each registered system: number, date issued, branches covered, and the declared software name and version. | M | 1
+FR-CO-008 | Store the taxpayer classification (micro, small, medium, large, or Large Taxpayers Service) with its effective date, and warn when a change starts a new compliance period. | S | 1
+
+9.2 General ledger
+ID | Requirement | Priority | Phase
+FR-GL-001 | Hierarchical chart of accounts (assets, liabilities, equity, income, expense) with unlimited depth and a Philippine SME starter template. | M | 1
+FR-GL-002 | Block posting unless total debits equal total credits. | M | 1
+FR-GL-003 | Manual journal entries with date, reference, description, account, debit, credit, and attachments. | M | 1
+FR-GL-004 | Recurring and auto-reversing journal templates. | S | 1
+FR-GL-005 | Tag every GL line with branch, cost center, department, project, and business unit; dimensions configurable and optionally mandatory per account. | M | 1
+FR-GL-006 | Period open, soft close, and hard lock; no posting to locked periods. | M | 1
+FR-GL-007 | Year-end closing of income and expense to retained earnings. | M | 1
+FR-GL-008 | Multi-currency transactions with historical rates, revaluation, and automatic realized and unrealized exchange gain or loss entries. | S | 2
+FR-GL-009 | Multiple companies under one group, each with its own TIN, books, and series; intercompany entries and consolidation. | C | 3
+FR-GL-010 | Control accounts (receivables, payables, inventory, input and output VAT) accept postings only from their source modules, never from manual journals. | M | 1
+FR-GL-011 | Freeze individual accounts, and set a posting cut-off date before which only the Finance Director can post adjustments (never edit). | M | 1
+FR-GL-012 | Rounding account and a small tolerance setting for centavo differences. | M | 1
+FR-GL-013 | Deferred revenue and deferred expense (prepayments) with schedules that post monthly recognition entries automatically. | S | 2
+FR-GL-014 | Allocation rules that split one cost across several cost centers or branches by percentage. | S | 2
+FR-GL-015 | Budgets by account and dimension with control actions (warn or stop) on purchase orders, bills, and journals; budget versus actual report. | S | 2
+FR-GL-016 | Intercompany invoices and journal entries that create the matching entry in the other company. | C | 3
+FR-GL-017 | Close management: a checklist per period and entity with owners, dependencies, due dates, evidence attached to each task, and a sign-off that locks the period when complete. | M | 1
+FR-GL-018 | Account substantiation: every balance sheet account carries a supporting schedule, a preparer and reviewer, and an aging of reconciling items, with a report of accounts not yet substantiated. | M | 1
+FR-GL-019 | Parallel views of the same transactions for book and tax purposes, so permanent and timing differences are held once and reported both ways. | S | 2
+FR-GL-020 | Book-to-tax reconciliation and a deferred tax schedule built from the difference between the two views. | S | 2
+FR-GL-021 | Audit adjustments: entries proposed after a period is closed, approved, marked as audit adjustments, and shown separately in restated reports, with the original figures kept intact. | M | 1
+
+9.3 Sales and receivables
+ID | Requirement | Priority | Phase
+FR-AR-001 | Issue VAT and Non-VAT invoices meeting all content rules in COMP-INV. | M | 1
+FR-AR-002 | Line-level tax calculation for VATable, VAT-exempt, and zero-rated items, with summary breakdown on the invoice. | M | 1
+FR-AR-003 | Convert approved quotations and sales orders into invoices without re-entry. | M | 1
+FR-AR-004 | Credit memos and debit memos as sales adjustment documents with their own serial series. | M | 1
+FR-AR-005 | Senior citizen and PWD sales: capture ID numbers, apply 20% discount and VAT exemption (or 5% where applicable), show breakdown and signature space. | S | 1
+FR-AR-006 | Record collections, partial payments, and withholding tax deducted by customers; log 2307s received. | M | 1
+FR-AR-007 | Receivables aging, statement of account, and customer ledger. | M | 1
+FR-AR-008 | Import sales from POS and e-commerce channels as summarized or detailed entries. | S | 2
+FR-AR-009 | Payment links (GCash, Maya, cards) on emailed invoices. | C | 2
+FR-AR-010 | Customer portal to view invoices, statements, and upload 2307s. | C | 2
+FR-AR-011 | Payment terms templates (for example 30 days, or 50% down and 50% on delivery) that create due-date schedules on orders and invoices. | M | 1
+FR-AR-012 | Customer credit limits with a warning or block on sales orders and invoices, and an approved override. | S | 1
+FR-AR-013 | Customer advances and deposits recorded before invoicing and applied to invoices later. | M | 1
+FR-AR-014 | Payment reconciliation: apply, un-apply, and re-apply payments, advances, and credit memos to open invoices, with a log of every change. | M | 1
+FR-AR-015 | Recurring invoices and subscriptions (rent, retainers, service contracts) created on schedule as drafts for approval. | S | 2
+FR-AR-016 | Dunning: reminder levels and optional late charges, run from the collections work in FR-SH-010 rather than a separate module. | C | 2
+FR-AR-018 | Price lists and discount rules by customer, item, quantity, or date range. | S | 2
+FR-AR-019 | Sales to government agencies: record VAT and income tax withheld at source and match them to 2306 and 2307 certificates received. Deferred by decision. | Deferred | Later
+FR-AR-020 | Post-dated checks received: register, deposit calendar, clearing, and bounced check handling that reopens the invoice. | M | 1
+FR-AR-021 | Place a QR code on every electronic invoice, shown on both the electronic and the printed copy, carrying the data the BIR prescribes. | M | 1
+FR-AR-022 | Deliver invoices electronically by email, secure link, or mobile view; log every delivery; and print a copy when the buyer asks for one. | M | 1
+FR-AR-023 | Public verification page reached by scanning the invoice QR code, showing the invoice as issued and its status with the BIR. | S | 2
+
+9.4 Purchases and payables
+ID | Requirement | Priority | Phase
+FR-AP-001 | Purchase requests and purchase orders with approval limits. | M | 1
+FR-AP-002 | Supplier bills with input VAT, supplier TIN, and invoice number; flag bills missing required invoice details. | M | 1
+FR-AP-003 | Compute expanded and final withholding tax by ATC code; generate 2307 and 2306 per payee. | M | 1
+FR-AP-004 | Three-way match of purchase order, goods receipt, and supplier invoice, with quantity and price tolerances; exceptions routed for approval. | S | 2 (two-way in 1)
+FR-AP-005 | Payments by check, bank transfer, or cash; check voucher printing; supplier credits. | M | 1
+FR-AP-006 | Payables aging, supplier ledger, and duplicate bill detection. | M | 1
+FR-AP-007 | Vendor portal to submit invoices and download 2307s. | C | 2
+FR-AP-008 | Supplier advances and down payments applied to bills later. | M | 1
+FR-AP-009 | Employee expense claims and cash advance liquidation with receipts, approvals, and unliquidated advance aging. | M | 1
+FR-AP-010 | Checks issued: check register, bank-specific check printing, post-dated check release schedule, voids, and stale check tracking. | M | 1
+FR-AP-011 | Bulk supplier payments and bank payment upload files. | S | 2
+FR-AP-012 | Withholding categories by supplier type, with thresholds and running totals per supplier. | S | 1
+FR-AP-013 | Landed cost: add freight, duties, and brokerage to the cost of imported goods. | S | 2
+FR-AP-014 | Supplier e-invoice inbox: accept structured electronic invoices from suppliers by upload, email, or API, check them, and create draft bills without re-encoding. | S | 2
+
+9.5 Cash and bank
+ID | Requirement | Priority | Phase
+FR-CB-001 | Bank and cash accounts, deposits, transfers, and disbursements. | M | 1
+FR-CB-002 | Petty cash funds with replenishment. | S | 1
+FR-CB-003 | Manual bank reconciliation with reconciliation report. | M | 1
+FR-CB-004 | Import bank statements (CSV, MT940, Excel) and auto-match using rules and AI. | S | 2
+FR-CB-005 | Modes of payment (cash, check, bank transfer, GCash, Maya, card) each linked to a default account. | M | 1
+FR-CB-006 | Register of bank guarantees and surety bonds with expiry alerts, held as obligation types in FR-SH-009 rather than a separate register. | C | 3
+
+9.6 Inventory
+ID | Requirement | Priority | Phase
+FR-IN-001 | Warehouses, stock receipts, issues, transfers, and adjustments with GL posting. | M* | 2
+FR-IN-002 | FIFO and weighted average costing; valuation report. | M* | 2
+FR-IN-003 | Inventory Book with date, product, description, unit, price per unit, and amount. | M* | 1
+FR-IN-004 | Year-end inventory list export. | S | 2
+FR-IN-005 | Perpetual inventory: every stock movement posts to the ledger, with a stock versus ledger check report. | M* | 2
+FR-IN-006 | Batch and serial number tracking with expiry dates. | C | 2
+FR-IN-007 | Physical count with variance posting. | M* | 2
+
+* Must-have if the client sells goods. Move to Phase 1 if so.
+9.7 Fixed assets
+ID | Requirement | Priority | Phase
+FR-FA-001 | Asset register with category, location, custodian, cost, and useful life. | S | 2
+FR-FA-002 | Capitalize from bills; track additional capitalized costs. | S | 2
+FR-FA-003 | Straight-line, declining balance, and sum-of-the-years' digits depreciation with automatic monthly entries. | S | 2
+FR-FA-004 | Asset split, merge, transfer, disposal (with gain or loss), and write-off. | S | 2
+FR-FA-005 | Separate book and tax depreciation where they differ (separate "finance books"). | C | 3
+FR-FA-006 | Construction in progress: collect costs before an asset is ready, then capitalize. | S | 2
+FR-FA-007 | Asset value adjustments, impairment, and revaluation. | C | 3
+FR-FA-008 | Asset maintenance schedules and history. | C | 3
+
+9.8 Tax engine
+ID | Requirement | Priority | Phase
+FR-TX-001 | Configurable tax codes: 12% VAT, zero-rated, exempt, percentage tax, with effective dates. | M | 1
+FR-TX-002 | ATC code library for expanded and final withholding, with rates and effective dates, maintained centrally by DCP. | M | 1
+FR-TX-003 | Input VAT, output VAT, and withholding summaries per period and branch. | M | 1
+FR-TX-004 | Return worksheets for 2550Q, 0619-E, 1601-EQ, 1601-FQ, and 1604-E, with drill-down to transactions. | M | 1 and 2
+FR-TX-005 | Filing tracker: due dates, status, confirmation reference, and attached BIR acknowledgement email. | S | 1
+FR-TX-006 | Tax rules and item tax templates that pick the right VAT and withholding treatment from customer or supplier type, item, and location (for example ecozone zero-rated or VAT-exempt items). | M | 1
+FR-TX-007 | BIR correspondence tracker: letters of authority, notices, assessments, and requests, each with deadlines, assigned owner, documents submitted, and status. | M | 1
+FR-TX-008 | Annual income tax worksheet with the reconciliation from the financial statements to the return, including non-deductible items and timing differences. | S | 2
+FR-TX-009 | Year-end submission bundle for the audited financial statements and their attachments, assembled with the file names and formats the BIR expects. | S | 2
+FR-TX-010 | Sales and purchases reconciliation in one report: books against returns, against the summary lists, and against what was accepted by the BIR e-invoicing system, with differences explained line by line. | M | 1
+
+9.9 Documents, integrations, and platform
+ID | Requirement | Priority | Phase
+FR-PL-001 | Attach files to any record; attachments retained with the record for 10 years (JANUS may supply this service). | M | 1
+FR-PL-002 | REST API and webhooks for all main records, secured and rate-limited. | M | 1
+FR-PL-003 | Spreadsheet import templates with validation for customers, suppliers, items, opening balances, and open invoices, delivered through the ingestion pipeline (FR-SH-006). | M | 1
+FR-PL-004 | Approval workflows configurable by document type, amount, and branch. | M | 1
+FR-PL-005 | Offline capture of drafts only (for example expense receipts on mobile), synced before posting. | C | 2
+FR-PL-006 | Payroll journal import and 2316 and 1601-C data import from an external payroll system. | C | 3
+FR-PL-007 | Guided import from other accounting systems and spreadsheets, including opening balances and open invoices. | S | 1
+FR-PL-008 | Print template designer for letterheads and layouts, with BIR-required invoice fields locked and always shown. | M | 1
+FR-PL-009 | No-code custom fields and form rules, kept separate from BIR-controlled fields. | S | 2
+FR-PL-010 | Import POS cashier closings (X and Z readings) and reconcile them with deposits. | S | 2
+FR-PL-011 | Shareholder register and share transfers. Removed from scope: this is corporate secretarial work, not accounting, and it is better handled outside the product. | C | 3
+FR-PL-012 | Agent endpoint so clients can connect their own AI tools, working under the same permissions and audit trail as a person, delivered through DCP’s GAIA gateway. | S | 2
+FR-PL-013 | Messaging channels (Viber, WhatsApp, Microsoft Teams, and email) for capture, approvals, questions, and alerts, with identity checks on every user. | S | 2
+FR-PL-014 | No-code rule and agent builder for clients, limited to drafts, alerts, and reports; BIR-controlled behaviour cannot be changed. | C | 3
+FR-PL-015 | Guided setup and a simple mode: a short wizard with Philippine templates by business type and size, hiding advanced fields until they are switched on. | M | 1
+FR-PL-016 | Multi-client console for accounting and bookkeeping firms: one login across client companies, staff assignment, and a combined deadline and exception view, with strict data separation between clients. | S | 2
+
+9.10 Philippine business practices
+ID | Requirement | Priority | Phase
+Vouchers, approvals, and supplementary documents | Vouchers, approvals, and supplementary documents | Vouchers, approvals, and supplementary documents | Vouchers, approvals, and supplementary documents
+FR-PH-001 | Check vouchers and disbursement vouchers with "prepared, checked, approved, received by" blocks, a supporting-documents checklist, and scanned signed copies attached. | M | 1
+FR-PH-002 | Check signatory matrix per bank account: how many signatories are needed and who, by amount; release log showing who received the check, with ID or authorization letter. | M | 1
+FR-PH-003 | Counter receipts: supplier submits an invoice and gets a numbered counter receipt; payments follow set check release days; payables aging can run by counter date. | S | 1
+FR-PH-004 | Numbered supplementary documents (collection receipt, acknowledgement receipt, provisional receipt, delivery receipt, billing statement, statement of account), each marked "not valid for claim of input tax". | M | 1
+FR-PH-005 | Cash and charge invoice types (paid now versus on account), with separate series if the client prefers. | S | 1
+Cash handling | Cash handling | Cash handling | Cash handling
+FR-PH-006 | Daily collection report per cashier and branch, with cash count by bill and coin, deposit slip tracking, and cash over or short entries. | M | 1
+FR-PH-007 | Revolving funds and petty cash vouchers with replenishment reports and custodian accountability. | S | 1
+FR-PH-008 | Post-dated checks and cash advance liquidation (see FR-AR-020, FR-AP-009, FR-AP-010), plus a combined PDC calendar used by cash forecasting. | M | 1
+FR-PH-009 | Employee receivables (salary loans, cash advances) with deduction schedules shared with payroll. | S | 2
+Tax paperwork around each transaction | Tax paperwork around each transaction | Tax paperwork around each transaction | Tax paperwork around each transaction
+FR-PH-010 | Supplier compliance file: BIR Form 2303, sworn declaration of gross income (which affects some withholding rates), and exemption or zero-rating certificates, each with expiry reminders. Supplier VAT status decides whether input VAT can be claimed. | M | 1
+FR-PH-011 | Customer compliance file: 2303, ecozone zero-rating certificates, and tax exemption certificates, applied automatically by tax rules. | S | 1
+FR-PH-012 | 2307 received tracking: expected versus received per customer and period, follow-up list, and link to the collection (feeds SAWT). | M | 1
+FR-PH-013 | Withholding recorded at the earlier of accrual or payment, following the EOPT timing rule, with a warning if a bill is paid without it. | M | 1
+FR-PH-014 | Tax payment records: payment channel (eFPS, bank, e-wallet, online banking), reference numbers, proof of payment, and link to the return. | M | 1
+FR-PH-015 | BIR filing calendar based on the client's eFPS filing group, branches, and tax types, with reminders to preparers and approvers. | M | 1
+FR-PH-016 | Tracker for loose-leaf book binding and any required year-end submissions, per branch. | S | 1
+FR-PH-017 | Output VAT relief on uncollected receivables and the matching input VAT reversal for purchases not yet paid, where current EOPT rules allow (to confirm). | S | 2
+FR-PH-018 | Documentary stamp tax computation for loans, leases, and share issuances. Financial institutions use the fuller treatment in FR-FI-006. | C | 3
+Organization and government obligations | Organization and government obligations | Organization and government obligations | Organization and government obligations
+FR-PH-019 | Head office and branch accounts ("due to" and "due from"), inter-branch transfers, per-branch books, and head office roll-up. | M | 1
+FR-PH-020 | Local government obligations: business permit renewal, local business tax, real property tax, and community tax, with calendar and payables. | S | 2
+FR-PH-021 | Government contribution remittances from payroll (SSS, PhilHealth, Pag-IBIG contributions and loans) with remittance references. | S | 2
+FR-PH-022 | Statement layouts for full PFRS, PFRS for SMEs, and the small-entity framework; year-end pack for SEC and eAFS submissions. | S | 2
+Local channels | Local channels | Local channels | Local channels
+FR-PH-023 | Statement import and check layouts for major Philippine banks; InstaPay, PESONet, and QR Ph references used for matching. | S | 1
+FR-PH-024 | E-wallet and online marketplace payouts: split each payout into gross sales, platform fees, and any tax withheld by the platform, then reconcile the net deposit (rules to confirm). | S | 2
+FR-PH-025 | BSP reference exchange rates loaded for revaluation. | S | 2
+Industry habits | Industry habits | Industry habits | Industry habits
+FR-PH-026 | Progress billing with retention (for example 10%), down payment recoupment, and retention release. | C | 2
+FR-PH-027 | Leases: security deposits, advance rent, rent escalation, and 5% withholding. | S | 2
+FR-PH-028 | Statutory discounts beyond senior citizen and PWD as configurable discount types with ID capture (scope to confirm). | S | 2
+FR-PH-029 | Migration from manual columnar books, a common starting point for SMEs (see AI-022). | M | 1
+FR-PH-030 | Hand prepared returns and attachments to a BIR-accredited electronic tax service provider for filing and payment, and record the confirmation against the filing calendar. | S | 2
+FR-PH-031 | Branch daily close and shift handover: cut-off per branch, cash count and handover between cashiers with both signatures, and a daily pack that ties collections, documents issued, and deposits together. | M | 1
+9.11 Financial institutions (first industry pack)
+These requirements ship as a pack that is switched on for banks, quasi-banks, financing companies, and similar institutions. They are settings and modules on the same core, not a separate product.
+ID | Requirement | Priority | Phase
+FR-FI-001 | Gross receipts tax engine for institutions taxed under the percentage tax rules instead of VAT: rates by income type and by the remaining maturity of the instrument, with the return worksheet and drill-down to transactions. | M | 1
+FR-FI-002 | Gross receipts tax passed on to borrowers recorded as other fees and taxed at the rate for other income, so it is not missed at filing. | S | 1
+FR-FI-003 | Invoice behaviour for institutions not subject to VAT: non-VAT invoice layout and wording, with VAT still applied to any lines that remain VATable. | M | 1
+FR-FI-004 | Final withholding tax on interest and other passive income paid out, with per-payee certificates, alphalists, and remittance worksheets. | M | 1
+FR-FI-005 | Separate books for the regular banking unit and the foreign currency deposit unit, each with its own functional currency, ledgers, and reports, plus a combined view for management. | M | 2
+FR-FI-006 | Documentary stamp tax computed per transaction on loans, deposits, and other instruments, with a return worksheet and a payment record. | M | 2
+FR-FI-007 | Chart of accounts template aligned to the account structure used for BSP reporting, mapped to the statutory books and BIR outputs. | S | 2
+FR-FI-008 | Interface to core banking and other source systems: scheduled journals, subsidiary ledger balances, automatic reconciliation against control accounts, and a queue for rejected entries. | M | 1
+FR-FI-009 | Branch books at bank scale: hundreds of branches with their own TIN branch codes, inter-branch accounts, per-branch books and registration packs, and head office roll-up. | M | 1
+FR-FI-010 | Read-only, fully logged access for internal audit, external auditors, and regulators, with export of the records and logs they ask for. | M | 1
+FR-FI-011 | Trust and fiduciary books kept separate from the institution’s own books where a trust department exists. | C | 3
+9.12 Audit and control support
+Internal audit, external auditors, and examiners are users of the system, not visitors to it. These requirements give them what they normally ask for by email, and they are deterministic checks, not AI suggestions.
+ID | Requirement | Priority | Phase
+FR-AU-001 | Full population data extract for a chosen period in a standard format, with a checksum, so auditors can test every transaction rather than a sample taken from the screen. | M | 1
+FR-AU-002 | Journal entry testing view: all entries with who created, who approved, the time posted, the source module, round amounts, weekend and after-hours postings, and entries to unusual account pairs. | M | 1
+FR-AU-003 | Rule-based control monitoring, separate from the AI layer: segregation-of-duties conflicts, dormant or shared accounts, postings outside business hours, and approval limits bypassed, each with the evidence attached. | M | 1
+FR-AU-004 | Periodic user access review: the system asks owners to confirm or remove each person’s access on a schedule, and keeps the signed result. | M | 1
+FR-AU-005 | Auditor workspace: a request list (prepared by client) with owners and status, document upload against each item, and read-only drill-down from the trial balance to the source record. | S | 2
+FR-AU-006 | Balance confirmation letters to customers and suppliers, with replies logged against the account. | C | 2
+
+10. BIR compliance requirements
+Each item maps to the Annex B checklist. The completed checklist is signed by both the client and DCP at registration.
+10.1 Invoice content (COMP-INV)
+ID | Requirement | Notes
+COMP-INV-001 | The system, not the user, generates the serial number, printed prominently with at least six running digits and leading zeros. | Replaces the draft's five-digit example.
+COMP-INV-002 | Show seller's registered name, registered address, "VAT REG TIN" or "NON-VAT REG TIN" with branch code, and transaction date. | Trade name optional. Business style is no longer required.
+COMP-INV-003 | Show buyer's registered name, address, and TIN with branch code when required. | For VAT invoices, required for sales above ₱1,000.
+COMP-INV-004 | Show quantity, description, unit price, line and total amounts, VAT amount, and breakdown of VATable, exempt, and zero-rated sales for mixed transactions. | 
+COMP-INV-005 | Print "EXEMPT" prominently where transactions are not subject to VAT or percentage tax. | 
+COMP-INV-006 | Print Acknowledgement Certificate number, date issued, and series range at the bottom, pulled from setup. | Any required validity phrase to be confirmed against current EOPT rules.
+COMP-INV-007 | Print "THIS DOCUMENT IS NOT VALID FOR CLAIM OF INPUT TAX" on supplementary documents. | 
+COMP-INV-008 | Print "REPRINT" on every copy after the first; log each reprint with user and time. | 
+COMP-INV-009 | Produce at least an original for the buyer and a retained copy for the seller. | Electronic copies count as retained copy.
+COMP-INV-010 | Enforce issuance thresholds by setting: VAT-registered sellers issue invoices regardless of amount; others for ₱500 or more. | Threshold adjusts periodically; keep configurable.
+COMP-INV-011 | Warn when a series range is 80% used and block issuance past the registered range. | 
+COMP-INV-012 | Record manual invoices issued during system downtime under their own series, clearly labeled. | 
+COMP-INV-013 | Every electronic invoice carries a QR code that proves it is genuine, appears on the electronic and the printed copy, and holds the data the BIR prescribes. | From the draft circular. Confirm the exact content when it is final.
+COMP-INV-014 | An invoice counts as electronic only if it comes from a registered or approved system in a structured format, is issued to the buyer by electronic means, and its data can be pulled out and sent to the BIR. A PDF, scan, photo, or plain printout is not enough. | Drives the data model and the delivery log.
+COMP-INV-015 | Corrections to an issued electronic invoice: a lower amount uses a credit note, a higher amount uses a new invoice, and both must refer to the original, which is never deleted or changed. | Replaces void and reissue for electronic invoices. Confirm with the tax advisor.
+COMP-INV-016 | Record manual invoices used during downtime (system failure, no internet, power loss, cyber incident, or force majeure) and load them back into the system once it is running. | Extends COMP-INV-012 with the reasons named in the draft circular.
+COMP-INV-017 | Register of voided, cancelled, and unused document numbers, plus a gap report per series and branch, ready to print for an examiner. | Examiners ask for this early in a review.
+
+10.2 Books of accounts (COMP-BOA)
+ID | Requirement
+COMP-BOA-001 | One-click General Journal and General Ledger: date, reference, description, account title or code, debit, credit.
+COMP-BOA-002 | Sales Journal: date, customer TIN, customer name or code, address, description, document number, amount, discount, output VAT, net sales.
+COMP-BOA-003 | Purchase Journal: date, supplier TIN, supplier name or code, address, description, document number, amount, discount, input VAT, net purchases.
+COMP-BOA-004 | Cash Receipts Journal and Cash Disbursements Journal.
+COMP-BOA-005 | Inventory Book: date, product name or code, description, unit, price per unit, amount.
+COMP-BOA-006 | Every book, statement, and report shows registered name, address, TIN with branch code, software name and version, user who ran it, and date and time generated.
+COMP-BOA-007 | Reports cannot be edited inside the system; exports to CSV and DAT are available.
+COMP-BOA-008 | Loose-leaf printing with page numbering and binding-ready layout.
+COMP-BOA-009 | Annual soft copy of books in Standard Audit File format with a transmittal letter listing file names, types, and sizes, ready within 30 days after the close of the taxable year.
+COMP-BOA-010 | Certification page for printed or exported books, naming the responsible officer, the period covered, the number of pages or records, and the software name and version.
+
+10.3 Audit trail and controls (COMP-AUD)
+ID | Requirement
+COMP-AUD-001 | Append-only activity log of all creates, posts, voids, approvals, logins, report runs, exports, and setting changes, with before and after values.
+COMP-AUD-002 | Posting date is set by the system at the moment of posting.
+COMP-AUD-003 | No physical deletion or editing of posted records. Journal corrections use reversing entries; invoice corrections use void or memos. Voids keep their number and reason.
+COMP-AUD-004 | Every record stores the user ID of its creator and each approver.
+COMP-AUD-005 | Automatic cross-checking of totals (ledger vs. sub-ledgers, journals vs. GL) with alerts on any out-of-balance condition.
+COMP-AUD-006 | Log is tamper-evident (hash-chained) and protected from change by any role, including administrators.
+COMP-AUD-007 | Log can be filtered, printed, and exported for examiners.
+COMP-AUD-008 | Database-level changes to critical tables are also logged.
+
+10.4 Registration and change control (COMP-REG)
+ID | Requirement
+COMP-REG-001 | Generate a registration pack: sample invoices and memos, sample books, printed audit trail, pre-filled system description, and Annex B checklist.
+COMP-REG-002 | Support the Joint Sworn Statement process, since a system maintained by a third-party provider uses the joint form.
+COMP-REG-003 | Classify every release as minor or major. A major enhancement, such as a change in functionality, requires an updated registration. Major releases are flagged to clients with a re-registration pack.
+COMP-REG-004 | Display software name and version everywhere required, matching what was declared.
+COMP-REG-005 | Produce the Permit to Issue application pack: sworn statement of compliance, process flow, sample electronic invoice, and proof of system registration.
+COMP-REG-006 | Treat a change in product name, platform, or core system details as an event that needs a new or amended Permit to Issue, and warn before the release goes out.
+COMP-REG-007 | Export registration and permit packs as PDF, JPEG, or PNG within the file size limits of the BIR online registration system.
+COMP-REG-008 | One permit covers all branches using the same system. Adding a branch only needs a notice to the BIR, which the system prepares.
+
+11. E-invoicing module
+LARA sends electronic invoices and sales data to the BIR itself, so no separate middleware is needed. Where DCP’s SyncTax middleware already does part of this work, LARA reuses it rather than building a second transmission layer. Two duties are separate under the draft rules: issuing electronic invoices, which covered taxpayers must do by December 31, 2026, and reporting sales data, which follows its own guidelines and a BIR notice. LARA must be able to do both, with transmission switched on per company. Each client also needs a Permit to Issue before it can issue electronic invoices, separate from the Acknowledgement Certificate. For clients who prefer an outside provider, LARA can hand data over through its API, noting that the draft rules appear to allow local providers only.
+ID | Requirement | Priority
+INT-EIS-001 | On posting of an invoice, credit memo, debit memo, or void, place the document in the e-invoicing queue with all required fields; posting never waits on the BIR. | M
+INT-EIS-002 | Convert each document to the BIR's structured format, sign it, and send it. Covered taxpayers must transmit signed JSON through the API within three days. | M
+INT-EIS-003 | Each document shows transmission status: queued, sent, accepted, rejected; with timestamps and BIR reference. | M
+INT-EIS-004 | Rejected items go to a work queue with the reason and a suggested fix; resend after correction. | M
+INT-EIS-005 | Alert when any document is close to the three-day limit; automatic retries when the BIR service is unavailable. | M
+INT-EIS-006 | Daily reconciliation of documents issued versus documents accepted by the BIR. | M
+INT-EIS-007 | Onboarding guide for each client's own EIS credentials. Production transmission needs the taxpayer's own EIS certification and permit to transmit. | M
+INT-EIS-008 | Secure storage and rotation of each client's signing keys and credentials. | M
+INT-EIS-009 | Optional hand-off to an outside e-invoicing solution provider through the LARA API, for clients who prefer one. | S
+INT-EIS-010 | Transmission settings (formats, endpoints, deadlines) kept as configuration so BIR specification changes do not need a code release. | M
+INT-EIS-011 | Keep issuing and reporting separate: every invoice is built so its data can be sent, while live transmission is a setting turned on per company when the taxpayer is covered or notified. | M
+INT-EIS-012 | Check each document against the BIR data list before sending, explain failures in plain language, and offer a fix. | M
+INT-EIS-013 | Generate the invoice QR code and confirm it can be read back correctly. | M
+INT-EIS-014 | Keep a full evidence pack for each document: the file sent, the signature, the BIR reply, and any repair history, for the full retention period. | M
+INT-EIS-015 | Support credit notes as the correction route for electronic invoices, each referring to the original document. | M
+
+12. AI requirements and differentiators
+Guiding rule: AI prepares, a person posts.
+The BIR does not allow posted records to be edited, and a registered system must show who did what. So every AI feature in this document prepares work, and a named person reviews and posts it.
+12.1 Guardrails (apply to every AI feature)
+ID | Requirement
+AI-GR-001 | AI can only create drafts, suggestions, and alerts. It never posts, voids, approves, or changes a posted record.
+AI-GR-002 | Every suggestion is stored with model version, input reference, and confidence; the audit trail records the person who accepted or rejected it.
+AI-GR-003 | The AI layer is separate from the registered accounting rules, so model updates do not change how invoices or books are produced.
+AI-GR-004 | AI respects the user's permissions; it cannot show data the user cannot see.
+AI-GR-005 | Client data is not used to train shared models without written consent; personal data handled per the Data Privacy Act.
+AI-GR-006 | Each AI feature can be switched off per company.
+AI-GR-007 | Answers about numbers always show the source records they came from.
+
+12.2 Standard AI features
+These features are expected of any modern accounting system. We need them to be credible, but they are not what sets LARA apart.
+ID | Feature | Target | Phase
+AI-001 | Bill and receipt capture. Read supplier invoices (photo, PDF, email) and fill supplier, TIN, number, date, lines, VAT, and withholding; flag missing BIR invoice details. | 70% of bills need no field change | 1
+AI-002 | Smart coding. Suggest account, dimensions, tax code, and ATC code; learn from corrections. | 85% suggestion acceptance after 3 months | 1
+AI-003 | Pre-filing checks. Compare returns, DAT files, and ledger; catch dummy TINs, name format errors, and mismatches; explain issues in plain language. | Zero BIR validation rejections | 1
+AI-004 | E-invoice fix helper. Explain e-invoice rejections from the BIR and propose the correct memo or fix. | Rejections resolved within 1 day | 1
+AI-005 | Migration helper. Map old chart of accounts and spreadsheets to the new structure. | Migration effort cut by half | 1
+AI-006 | Bank matching. Match statement lines to invoices and bills, including partial and grouped payments. | 80% auto-matched | 2
+AI-007 | Anomaly watch. Flag duplicate bills, unusual amounts, odd-hour postings, void clusters, and segregation-of-duty breaches. | Weekly digest to Finance Director | 2
+AI-008 | Ask your books. Answer plain-language questions in English or Filipino with linked sources. | Answers traceable to records | 2
+AI-009 | Close helper. Run the close checklist, suggest accruals, and write variance explanations. | Close in 5 days or less | 2
+AI-010 | Collections helper. Predict late payers and draft reminders for a person to send. | Lower days sales outstanding | 2
+AI-011 | Audit helper. Assemble records and logs for an examiner's request; draft the registration system description. | Request packs in under 1 hour | 2
+AI-012 | Rule-change watch. Summarize new BIR issuances and propose setting or template updates for approval. | Review within 5 days of issuance | 3
+
+12.3 DCP differentiators
+These features are built around Philippine rules and habits, and they are where the product should stand out. All of them follow the guardrails in 12.1.
+To keep the product small, these features are not separate products. They are behaviours of six agents that share one inbox, one guardrail set, and one audit trail: capture (documents in), coding and matching (where things belong), compliance watch (permits, filings, and readiness), cash and collections, close, and audit support. A new AI feature is usually a new behaviour of an existing agent, not a new module.
+ID | Feature | What it does | Why it stands out | Phase
+Always ready for the BIR | Always ready for the BIR | Always ready for the BIR | Always ready for the BIR | Always ready for the BIR
+AI-013 | Examination readiness score | Checks the company's setup and records against Annex B and BIR rules every day and shows a score with a fix list. | Turns compliance from a yearly worry into a daily number. | 1
+AI-014 | Mock BIR audit | Runs the tests examiners commonly do (sales versus returns, expenses without withholding, input VAT without valid invoices, 2307 versus SAWT) and estimates possible exposure for the tax advisor to review. | Finds problems before the Letter of Authority arrives. | 2
+AI-015 | Missed-withholding finder | Finds paid or accrued expenses where withholding should have applied, and suggests the ATC and fix. | Targets one of the most common sources of tax findings. | 1
+AI-016 | Input VAT guard | Reads supplier invoices and 2303s, and flags input VAT from non-VAT suppliers or from invoices missing required details. | Protects VAT claims at the moment of entry, not at audit. | 1
+AI-026 | Rule-to-setting assistant | Turns a new BIR issuance into proposed setting changes and test cases, and shows the impact on past data before a person approves. | Keeps clients current without waiting for a software release. | 3
+AI-027 | Deadline and penalty guard | Warns about upcoming filings and estimates penalties if late, using rates DCP maintains. | Makes the cost of delay visible. | 2
+Capture the way Filipinos actually work | Capture the way Filipinos actually work | Capture the way Filipinos actually work | Capture the way Filipinos actually work | Capture the way Filipinos actually work
+AI-017 | Handwritten invoice reader | Reads handwritten and pre-printed manual invoices, including printer and authority-to-print details. | Many local suppliers still issue handwritten invoices. | 1
+AI-018 | Chat-app capture | Staff send receipt photos or type or say "Paid Meralco 12,500 from BDO" in English or Taglish via Viber, Messenger, or WhatsApp; the system creates drafts. | Meets users in the apps they already use daily. | 2
+AI-020 | PDF bank statement reader | Reads PDF statements from local banks that do not offer clean exports. | Removes manual encoding before reconciliation. | 1
+AI-022 | Manual books digitizer | Reads photos of columnar books and ledgers to build opening balances and history. | Makes switching from manual books fast. | 1
+AI-021 | Contract to schedule | Reads lease and service contracts (with JANUS) and proposes recurring billing, escalations, deposits, and withholding. | Sets up complex billing correctly without manual reading. | 2
+Cash and collections | Cash and collections | Cash and collections | Cash and collections | Cash and collections
+AI-019 | 2307 chaser | Predicts which customers still owe 2307s, drafts follow-ups, reads received 2307 files, and matches them to collections. | Solves a common local headache that global tools ignore. | 1
+AI-023 | AI finance brief | A monthly owner's brief in English or Filipino: what changed, why, and what to do, with a cash forecast that includes the post-dated check calendar. | Forecasts reflect how local businesses really get paid. | 2
+Control and fraud prevention | Control and fraud prevention | Control and fraud prevention | Control and fraud prevention | Control and fraud prevention
+AI-024 | Second reviewer | Gives each journal and bill a risk score with reasons before approval. | Adds a second set of eyes for small teams. | 2
+AI-025 | Fraud pattern watch | Flags suppliers whose TIN or bank account matches an employee, purchases split to stay under approval limits, check number gaps, and look-alike duplicate invoices. | Goes beyond simple duplicate checks. | 2
+Working with the system | Working with the system | Working with the system | Working with the system | Working with the system
+AI-028 | Report builder by conversation | "Show sales by branch compared with last year" becomes a saved, reusable report. | No report-writing skills needed. | 2
+AI-029 | Agent inbox | Payables, collections, close, and tax agents place ready-to-approve work in one inbox, each with an explanation and source links. | One place to approve AI work, fully logged for the BIR. | 2
+AI-030 | Accounting firm cockpit | For bookkeeping firms: ranks client companies by what needs attention (deadlines, missing 2307s, readiness score). | Opens a channel through local accounting firms. | 3
+AI-031 | Tax computation helper | Shows side-by-side computations such as itemized versus optional standard deduction, for the advisor to review. | Informs decisions without giving advice on its own. | 3
+AI-032 | Peer benchmarks | With client consent, compares margins and collection days against anonymized peers in the same industry. | Insight that grows as the client base grows. | 3
+Permits, e-invoicing, and agentic work | Permits, e-invoicing, and agentic work | Permits, e-invoicing, and agentic work | Permits, e-invoicing, and agentic work | Permits, e-invoicing, and agentic work
+1 | 1 | 1 | 1 | 1
+1 | 1 | 1 | 1 | 1
+2 | 2 | 2 | 2 | 2
+2 | 2 | 2 | 2 | 2
+2 | 2 | 2 | 2 | 2
+2 | 2 | 2 | 2 | 2
+2 | 2 | 2 | 2 | 2
+3 | 3 | 3 | 3 | 3
+3 | 3 | 3 | 3 | 3
+
+Positioning in one line
+LARA uses AI to keep the client ready for the BIR every day, and to fit the way Philippine businesses actually handle cash, checks, and paperwork.
+13. Reports and statutory outputs
+ID | Output | Rule | Phase
+RPT-001 | 2550Q worksheet with SLSP (RELIEF DAT) | SLSP must agree with the return and ledger before export. | 1
+RPT-002 | 0619-E and 1601-EQ worksheets with QAP DAT | One QAP file per month of the quarter. | 1
+RPT-003 | Form 2307 per payee, emailed with delivery log | Annex B asks how certificates are sent. | 1
+RPT-004 | SAWT DAT from 2307s received | Must match the certificates, or tax credits can be disallowed. | 2
+RPT-005 | 1604-E and annual alphalist | Must reconcile with the quarterly lists. | 2
+RPT-006 | Forms 2306 and 2316 | 2316 fed from payroll import. | 2
+RPT-007 | Trial balance, balance sheet, income statement, cash flow, changes in equity | By period, branch, and dimension; PFRS layout. | 1 and 2
+RPT-008 | Receivables and payables aging, statements, customer and supplier ledgers |  | 1
+RPT-009 | Management dashboards: cash position, sales, margins, tax due calendar |  | 2
+RPT-010 | Consolidated statements | For multi-company groups. | 3
+RPT-011 | Post-dated check register, check register, and unliquidated cash advance report | Daily use by treasury and accounting. | 1
+RPT-012 | Trial balance by customer and supplier, customer credit balances, budget versus actual, deferred revenue schedule | Frequently asked for by finance teams and auditors. | 2
+RPT-013 | Reconciliation pack: sales and purchases per books, per returns, per summary lists, and per documents accepted by the BIR | Differences explained line by line before filing. | 1
+RPT-014 | Close status and account substantiation report | Shows which tasks and accounts are still open, by entity and branch. | 1
+RPT-015 | Void, cancelled, and unused document register with series gaps | Printed for examiners on request. | 1
+
+14. Non-functional requirements
+14.1 Security (from Annex B and good practice)
+ID | Requirement
+NFR-SEC-001 | Documented request and approval process for giving access; access changes logged.
+NFR-SEC-002 | One active session per user ID; a new login ends or blocks the other.
+NFR-SEC-003 | Account lockout after a configurable number of failed logins (default 5).
+NFR-SEC-004 | Passwords with letters and numbers, changed every 30 days (as Annex B requires); MFA supported and recommended.
+NFR-SEC-005 | Access removed or changed the same day an employee leaves or moves roles; SSO de-provisioning supported.
+NFR-SEC-006 | Encryption in transit (TLS 1.2 or higher) and at rest.
+NFR-SEC-007 | Accounting data reachable only through the application's authorized functions, not directly.
+NFR-SEC-008 | Hosting in data centers that are access-controlled and protected from power loss and fire; firewall traffic monitored.
+NFR-SEC-009 | Tenant data isolation (row-level security or separate databases).
+NFR-SEC-010 | Segregation-of-duties rules enforced and conflicts reported.
+NFR-SEC-011 | Yearly penetration test and vulnerability scanning in the release pipeline.
+NFR-SEC-012 | Independent security certification (ISO/IEC 27001) targeted within the first year.
+NFR-SEC-013 | Deployment options that meet financial regulator expectations: private cloud or on-premise, Philippine data residency, documented outsourcing and vendor due diligence pack, and support for client security reviews and penetration tests.
+NFR-SEC-014 | Single sign-on and automated provisioning from the client’s identity system, so joiners, movers, and leavers are handled centrally and access reviews stay accurate.
+NFR-SEC-015 | Security events and the audit log can be forwarded to the client’s monitoring system in a standard format, without giving that system access to accounting data.
+
+14.2 Other quality requirements
+ID | Area | Requirement
+NFR-DAT-001 | Retention | All records, logs, attachments, and backups kept for at least 10 years; closed years available read-only.
+NFR-DAT-002 | Backup | Daily backups, point-in-time recovery, copies in a second location; restore tested every quarter and documented for registration.
+NFR-DAT-003 | Recovery | Recovery point of 15 minutes or less; recovery time of 4 hours or less.
+NFR-DAT-004 | Privacy | Data Privacy Act compliance: privacy notice, data processing agreement with each client, breach process, and data subject requests.
+NFR-DAT-005 | Residency | Hosting region agreed with each client and stated in the contract.
+NFR-PER-001 | Speed | Screens load in under 2 seconds for 95% of requests; invoice posting in under 1 second.
+NFR-PER-002 | Volume | Volume settings scale with the client: from a few thousand documents a year to tens of millions of ledger lines a year for a large institution, with a full-year General Ledger report in under 60 seconds.
+NFR-PER-003 | Concurrency | Serial numbers stay unique and gap-free under heavy simultaneous posting.
+NFR-AVL-001 | Availability | 99.5% monthly uptime, with planned maintenance outside business hours.
+NFR-USE-001 | Usability | Web app usable on desktop and mobile; plain-language screens; English first, Filipino for key screens and AI chat.
+NFR-USE-002 | Accessibility | Meets WCAG 2.1 AA for main workflows.
+NFR-OPS-001 | Monitoring | Error, performance, and e-invoicing queue monitoring with alerts.
+NFR-OPS-002 | Releases | Versioned releases with change notes; minor versus major classification per COMP-REG-003.
+NFR-DAT-006 | Privacy | Register the Data Protection Officer and the processing system with the National Privacy Commission, and keep the registration current.
+NFR-DAT-007 | Hosting | Philippine hosting offered as the default for clients who want their data kept in the country.
+NFR-OPS-003 | Rules | Every tax rule, rate, and template is versioned with effective dates, so any past period can be explained under the rules that applied then.
+NFR-DAT-008 | Non-production | Test and training environments use masked data, and never carry live TINs, names, or bank details.
+NFR-DAT-009 | Legal hold | Records under examination or dispute can be placed on hold so retention rules never remove them.
+
+15. Data migration and go-live
+Cut-over date. Agree it with the tax advisor, ideally at the start of a month or quarter, and after the Acknowledgement Certificate is issued.
+Migrate these records: 
+Chart of accounts
+Customers, suppliers, and items
+Opening trial balance
+Open receivables and payables
+Fixed asset register
+Inventory on hand
+Close the old series. Record the last number used in the old books or invoices, and state which books cover which months.
+Agree how much history to load. Examiners can look back several years, so decide which prior periods are migrated in full, which are summarised, and which stay in the old system with a documented handover.
+Test before going live. Use a sandbox to test e-invoice transmission, run a parallel month where possible, and get sign-off on reconciled opening balances.
+Train by role. Provide short videos and a printed quick guide for billing staff covering voids, reprints, and downtime invoices.
+16. Architecture and technology
+Decision: DCP builds and owns the system, written from the ground up with Claude Code. No third-party accounting product is embedded, extended, or copied, so no outside licence terms apply to LARA.
+The build stack is still to be chosen. Two options fit:
+Option | What it means | Pros | Cons
+A. Open-source Python framework | Use a permissively licensed, metadata-driven Python framework as the base and write every accounting module ourselves. | Metadata-driven forms and workflows come for free, which suits the localisation approach in the architecture principles. | MariaDB by default, and a smaller hiring pool than JavaScript stacks.
+B. DCP’s own stack | TypeScript (Next.js and NestJS, as in Daedalus) with PostgreSQL. | Full control; team familiarity; PostgreSQL row-level security and strong locking for serial numbers; shared tooling with other DCP products. | We design our own metadata layer.
+
+Guidance
+Because the code is written with Claude Code, the volume of code to be written matters less than it used to, and the choice should be made on what the team can review, test, and support with confidence. The posting engine, the tax rules, and the audit trail are the parts that deserve the most human review.
+Architecture principles
+A small, well-tested posting engine. It is the only way to write to the ledger. Every module posts through it.
+Metadata-driven records. Forms, fields, and workflows come from metadata, so Philippine localization lives in its own package (the "regional" pattern).
+Event-driven links. E-invoicing, AI, notifications, and integrations work from events.
+AI as its own service. The AI service reads data through the same permission checks and writes only drafts.
+Multi-tenant from day one. Clients are configured, not forked.
+Size and industry neutral. The same posting engine serves a small business and a bank. Differences are settings, industry packs, and infrastructure, never a separate build or a client-specific branch of the code.
+Build engines, not features. Before anything is built, the question is which shared building block in 9.0 it belongs to. A requirement that fits none of them is either genuinely new or, more often, a feature that should have been configuration.
+17. Streamlining and reuse
+The fastest way to deliver is to build less. DCP already owns most of the hard parts, and each reuse below also lowers the cost of onboarding every business after the first, which is objective OBJ-6.
+Reuse SyncTax for transmission. The BIR e-invoicing middleware already exists. LARA should call it rather than write a second transmission layer, and SyncTax keeps the permits, signing keys, and retry logic.
+Reuse JANUS for attachments and retention. Ten years of documents, versions, and search are a solved problem in JANUS (FR-PL-001).
+Reuse GAIA as the AI gateway. Model access, permissions, logging, and per-company switches come from GAIA, so the AI guardrails in 12.1 are enforced in one place.
+Build with Claude Code and Daedalus. The product is written from the ground up with Claude Code, with DCP engineers owning design, review, and testing. This is what makes a build of this size practical, and it keeps the code, the tests, and the documentation in one place.
+One BIR rules service. Rates, ATC codes, thresholds, form layouts, and deadlines maintained once by a small team and shared by LARA, SyncTax, and LISA, so a rule change is made in one place.
+One go-live cockpit. Registration pack, permit pack, migration, opening balances, and the parallel run in a single guided flow, run by the client with DCP checking, instead of a custom project each time.
+One approval inbox. The agent inbox (AI-029) becomes the single queue for bills, collections, close, and tax work, rather than a separate queue in every module.
+One treasury workflow. Vouchers, signatory rules, check release days, and the post-dated check calendar in one flow, not three screens that staff reconcile by hand.
+Industry configuration packs. Banking and financial institutions first, then retail, services, construction, leasing, and non-profit, each shipped as versioned settings so a new client is configured, not built.
+Self-serve trial with sample data. A sandbox company with realistic Philippine transactions lets buyers and examiners see the system without a demo call, and doubles as the test data for registration.
+What the review simplified
+A panel of accounting and process reviewers went through every module. Their conclusion was that the requirement list was long because the same idea appeared many times under different names. The decisions below cut the number of things to build without cutting what the product does.
+Decision | What it replaces | Effect
+One document engine (FR-SH-002) | Separate handling for invoices, credit and debit notes, vouchers, collection and acknowledgement receipts, delivery receipts, billing statements, and cash versus charge invoices. | Roughly a dozen document requirements become configuration of one type registry, and a new document type takes a setting instead of a release.
+One ingestion pipeline (FR-SH-006) | Spreadsheet import, guided migration, bank statement import, POS sales and cashier closing import, payroll journal import, core banking interface, and the supplier e-invoice inbox. | Seven import paths become one pipeline with adapters, one validation step, and one place where failures are fixed.
+One reconciliation framework (FR-SH-007) | Bank reconciliation, payment application, account substantiation, sub-ledger against control account, stock against ledger, books against returns, and books against what the BIR accepted. | One matching and explanation model, reused seven ways, and the same evidence trail for auditors every time.
+One obligations calendar (FR-SH-009) | Filing tracker, BIR calendar, certificate and permit expiries, loose-leaf binding tracker, local government obligations, correspondence deadlines, and bank guarantee expiries. | Seven registers become obligation types with owners and reminders.
+One work queue (FR-SH-010) | Approval queues per module, AI agent inbox, e-invoice rejection queue, import failure queue, unmatched bank lines, and control exceptions. | Staff learn one screen, and nothing waits in a queue nobody opens.
+One schedule engine (FR-SH-008) | Depreciation, deferred revenue and expense, recurring invoices and journals, lease schedules, and amortisations. | Five scheduled-entry features become one engine with different schedule types.
+One party master (FR-SH-003) | Separate customer, supplier, employee, and bank records, each with its own tax status, certificates, and limits. | A supplier who is also a customer is one record, so withholding, compliance files, and balances stop disagreeing.
+Six AI agents instead of a feature list | Forty-plus separately specified AI features. | The same behaviours ship as capture, coding and matching, compliance watch, cash and collections, close, and audit support, sharing one inbox and one guardrail set.
+Dropped or folded in | Shareholder register (removed), dunning as a module (folded into collections), bank guarantee register (folded into obligations). | Less to build, and nothing a finance team actually needs is lost.
+Phase 1 AI trimmed to four | Seven AI differentiators previously planned for Phase 1. | Registration and e-invoicing stay the focus; the readers and digitizers move to Phase 2 where they belong.
+18. Assumptions and constraints
+Each implementing business names a tax advisor to review templates and filings.
+Each implementing business applies for its own BIR permits and EIS credentials.
+BIR technical specifications may change during the build, so they are held as configuration rather than code.
+The system is delivered as cloud software by default; on-premise is optional and priced separately.
+Full payroll, manufacturing, and CRM stay out of scope.
+The December 31, 2026 date for the first covered group holds unless the Commissioner extends it again, which RR 26-2025 allows.
+19. Risks
+Risk | Impact | Response
+Phase 1 grows beyond what registration and e-invoicing need | High | Hold the Phase 1 line described in section 5; review every addition against the four Phase 1 goals; run the e-invoicing module as a parallel workstream.
+BIR rules change during the build | High | Keep tax rules, templates, and thresholds in configuration; track new issuances weekly.
+Examiner finds a gap after registration | High | Internal Annex B test suite run on every release; advisor review before filing.
+DCP liability as joint signatory | Medium | Contract terms on responsibilities, support levels, and re-registration duties.
+AI makes a wrong suggestion that gets approved | Medium | Confidence thresholds, clear "suggested" labels, sampling reviews, and the pre-filing checks.
+Poor source data during migration | Medium | Migration helper with validation; reconciled opening balances before go-live.
+The e-invoicing circular is still a draft | High | Keep permits, QR content, delivery, and correction rules as settings; watch for the final text; treat any change as configuration rather than code.
+Only local providers may act as e-invoicing solution providers | Medium | Confirm which Philippine DCP entity contracts, hosts, signs the Joint Sworn Statement, and acts as provider before the first client signs.
+Clients expect filing and payment inside the product | Medium | Partner with an accredited electronic tax service provider for Phase 2 rather than building filing and payment ourselves (FR-PH-030).
+The name LARA is already used elsewhere | Low | Check trademark records and domains before registration, and register a lockup such as "LARA by Datum". The declared software name is printed on every report, so changing it later needs an amended permit.
+Bank requirements pull the product toward custom work | High | Everything bank-specific ships as a configuration pack on the same core. Any request that cannot be expressed as settings, a pack, or a general feature is refused or generalised before it is built.
+Financial institution security and procurement reviews take longer than other sectors | Medium | Prepare the security, hosting, and outsourcing pack early (NFR-SEC-013) and treat it as a product deliverable rather than a per-deal effort.
+
+20. Open questions
+Coverage. Which taxpayer groups do we target first, and do we support voluntary adopters who are not yet covered?
+Institution types. Which institutions do we design the first pack around: universal and commercial banks, thrift and rural banks, or financing and lending companies?
+Inventory. Do we bring inventory into Phase 1 by default, since businesses selling goods need the Inventory Book at registration?
+Close and substantiation. Do close management and account substantiation ship in Phase 1 for everyone, or only for larger clients?
+Scale. What size of business do we design Phase 1 around: how many branches and companies, and is foreign currency needed on day one?
+Permit to Issue. What does the standard application flow look like, and does one permit cover a group of branches?
+QR code. What exact content will the final circular require, and who generates the code?
+Numbering. Do we allow yearly series resets as a setting, or require one continuous series per branch and document type?
+Invoice wording. Which validity or footer phrases still apply under current EOPT rules?
+Core banking. Which core banking and source systems do we interface with first, and do we take summarised journals, full subsidiary ledgers, or both?
+Trust books. Do we support trust and fiduciary books in the first pack, or leave them to a later phase?
+Payroll. Which payroll systems do we support for journal and 2316 import first?
+Technology. Which build stack do we choose, an open-source Python framework or DCP’s TypeScript stack, and who owns the decision?
+Hosting and deployment. Cloud by default, and do we offer on-premise and a Philippine region for clients whose regulators expect it?
+Filing partner. Which accredited electronic tax service provider do we work with for filing and payment?
+Provider entity. Which DCP company in the Philippines signs as system provider and, if needed, as e-invoicing solution provider?
+Point of sale. Do we need a POS partner for retail and food clients, or do we stay out of that market?
+Commercial model. Subscription, licence plus support, or a build fee plus subscription, and do accounting firms get their own plan?
+Name. Is LARA clear of trademarks in the software and services classes, is the domain available, and do we register the plain word or a lockup with Datum?
+21. Glossary
+AC: Acknowledgement Certificate, the BIR’s confirmation that a system is registered.
+Annex B: the BIR checklist of functional and technical requirements for a CAS.
+ATC: Alphanumeric Tax Code, used to classify withholding taxes.
+CAS / CBA: Computerized Accounting System / Computerized Books of Accounts.
+DAT file: the BIR’s text file format for alphalists and summary lists.
+DST: Documentary Stamp Tax.
+EIS: the BIR’s Electronic Invoicing System.
+EOPT: the Ease of Paying Taxes Act and its regulations.
+eTSP: Electronic Tax Service Provider, a company accredited by the BIR to file and pay taxes on behalf of taxpayers.
+EWT: Expanded Withholding Tax.
+FCDU: Foreign Currency Deposit Unit, the part of a bank whose foreign currency business is kept in separate books.
+GRT: Gross Receipts Tax, the percentage tax paid by banks and similar institutions instead of VAT.
+LARA: Ledger, Accounting, Reporting and Audit. DCP’s AI-native Computerized Accounting System described in this document, and the name of the assistant inside it.
+PFRS: Philippine Financial Reporting Standards.
+PTI: Permit to Issue, the BIR permit a taxpayer needs before issuing electronic invoices, separate from the Acknowledgement Certificate.
+QAP: Quarterly Alphalist of Payees.
+SAWT: Summary Alphalist of Withholding Taxes.
+SLSP: Summary List of Sales and Purchases.
+22. Regulatory references and sign-off
+RR 9-2009 on electronic records, mandatory fields in books, and the audit trail
+RMC 5-2021 and RMO 9-2021, including the Annex B Standard Functional and Technical Requirements
+RMC 10-2020 on the Acknowledgement Certificate
+RR 7-2024 as amended by RR 11-2024, and RMC 77-2024, on invoice content under the EOPT Act
+RR 11-2025 as amended by RR 26-2025 on electronic invoicing and sales reporting
+The draft circular on the issuance of electronic invoices and its annexes on sales data, still in draft
+RR 16-2006 on the Standard Audit File format
+RR 17-2013 as amended by RR 5-2014 on record retention
+RA 10173, the Data Privacy Act
+Approval
+DCP Product Manager (author)
+Name, signature, date | DCP Chief Product Officer
+Name, signature, date
+DCP Engineering Lead
+Name, signature, date | Tax advisor (review)
+Name, signature, date
+BRD-LARA-2026-V1.0 · Initial draft for review · Prepared September 18, 2026. This document is product requirements, not tax or legal advice. Confirm BIR requirements against the latest issuances before registration.

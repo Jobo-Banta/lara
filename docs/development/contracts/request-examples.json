@@ -1,0 +1,80 @@
+{
+  "examples": [
+    {
+      "schema": "DocumentCreate",
+      "name": "Synthetic invoice draft",
+      "value": {
+        "kind": "invoice",
+        "branchId": "00000000-0000-4000-8000-000000000001",
+        "bookId": "00000000-0000-4000-8000-000000000002",
+        "partyId": "00000000-0000-4000-8000-000000000003",
+        "documentDate": "2026-09-18",
+        "accountingDate": "2026-09-18",
+        "currency": "PHP",
+        "ruleProfileVersion": "DEMO-NOT-LEGAL-v1",
+        "lines": [
+          {
+            "description": "Synthetic service",
+            "quantity": "1",
+            "unitPrice": "10000.00",
+            "discount": "0.00",
+            "priceBasis": "exclusive",
+            "accountId": "00000000-0000-4000-8000-000000000004",
+            "taxCodeId": "00000000-0000-4000-8000-000000000005",
+            "dimensions": {}
+          }
+        ],
+        "evidenceIds": []
+      }
+    },
+    {
+      "schema": "JournalCreate",
+      "name": "Opening synthetic capital",
+      "value": {
+        "bookId": "00000000-0000-4000-8000-000000000002",
+        "accountingDate": "2026-09-01",
+        "documentDate": "2026-09-01",
+        "currency": "PHP",
+        "description": "Synthetic opening",
+        "lines": [
+          {
+            "accountId": "00000000-0000-4000-8000-000000000006",
+            "branchId": "00000000-0000-4000-8000-000000000001",
+            "debit": "100000.00",
+            "credit": "0",
+            "dimensions": {}
+          },
+          {
+            "accountId": "00000000-0000-4000-8000-000000000007",
+            "branchId": "00000000-0000-4000-8000-000000000001",
+            "debit": "0",
+            "credit": "100000.00",
+            "dimensions": {}
+          }
+        ],
+        "evidenceIds": []
+      }
+    },
+    {
+      "schema": "ApprovalDecision",
+      "name": "Independent content approval",
+      "value": {
+        "decision": "approve",
+        "contentVersion": 1,
+        "reason": "Synthetic review complete"
+      }
+    },
+    {
+      "schema": "ImportCreate",
+      "name": "Payroll tax data boundary",
+      "value": {
+        "kind": "payroll_tax",
+        "evidenceId": "00000000-0000-4000-8000-000000000020",
+        "mappingVersion": "DEMO-v1",
+        "sourceId": "synthetic-payroll",
+        "externalBatchId": "demo-2026-09",
+        "cutoffDate": "2026-09-30"
+      }
+    }
+  ]
+}

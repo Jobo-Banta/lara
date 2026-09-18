@@ -1,0 +1,21 @@
+{
+  "name": "LARA",
+  "short_name": "LARA",
+  "display": "standalone",
+  "background_color": "#F6F8F5",
+  "theme_color": "#125D66",
+  "icons": [
+    {
+      "src": "logos/lara-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "logos/lara-app-icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

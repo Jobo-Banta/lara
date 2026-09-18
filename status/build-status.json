@@ -1,0 +1,1308 @@
+{
+  "version": 1,
+  "tickets": {
+    "P00-01": {
+      "status": "in_progress",
+      "owner": "Codex",
+      "note": "Workspace baseline created; approved Ledger-L assets packaged; pnpm build and localhost smoke check passed.",
+      "evidence": "",
+      "updated_at": "2026-09-18T08:40:39+00:00"
+    },
+    "P00-02": {
+      "status": "done",
+      "owner": "Codex",
+      "note": "",
+      "evidence": "Strict configuration validator added; secret-free local validation passed.",
+      "updated_at": "2026-09-18T08:53:12+00:00"
+    },
+    "P00-03": {
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "Supabase migration runner applied and reran cleanly; lara_api pooler role provisioned and verified over TLS. Clean/prior-release database rehearsal remains.",
+      "evidence": "Applied 0001_phase0; rerun skipped it; runtime query returned lara_api.",
+      "updated_at": "2026-09-18T09:02:06+00:00"
+    },
+    "P00-04": {
+      "status": "blocked",
+      "owner": "Codex",
+      "note": "OIDC issuer and client credentials are not available; identity provider integration cannot be verified.",
+      "evidence": "",
+      "updated_at": "2026-09-18T08:53:13+00:00"
+    },
+    "P00-05": {
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "CI workflow and build-tracker check added.",
+      "evidence": "Build and tracker tests passed locally.",
+      "updated_at": "2026-09-18T08:53:14+00:00"
+    },
+    "P00-06": {
+      "status": "in_review",
+      "owner": "Codex",
+      "note": "Supabase demo schema is live; local seed remains demo-mode guarded.",
+      "evidence": "Supabase lara_api read succeeded; schema mutation was denied.",
+      "updated_at": "2026-09-18T09:03:37+00:00"
+    },
+    "P00-07": {
+      "status": "done",
+      "owner": "Codex",
+      "note": "",
+      "evidence": "API /health/live returned 200; /health/ready returned 503 with secret-free Invalid LARA_MODE when configuration was absent.",
+      "updated_at": "2026-09-18T08:53:15+00:00"
+    },
+    "P00-08": {
+      "status": "blocked",
+      "owner": "Codex",
+      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target.",
+      "evidence": "",
+      "updated_at": "2026-09-18T08:53:16+00:00"
+    },
+    "P01-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-07": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-08": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-09": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P01-10": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P02-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P03-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P04-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P05-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P06-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P07-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P08-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P09-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P10-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P11-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P12-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P13-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P14-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P15-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P16-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17A-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17B-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17C-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17D-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P17E-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18A-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18B-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18C-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-01": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-02": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-03": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-04": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-05": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    },
+    "P18D-06": {
+      "status": "not_started",
+      "owner": "",
+      "note": "",
+      "evidence": "",
+      "updated_at": null
+    }
+  },
+  "releases": {
+    "P00": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P01": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P02": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P03": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P04": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P05": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P06": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P07": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P08": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P09": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P10": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P11": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P12": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P13": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P14": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P15": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P16": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P17A": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P17B": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P17C": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P17D": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P17E": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P18A": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P18B": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P18C": {
+      "released_at": null,
+      "evidence": ""
+    },
+    "P18D": {
+      "released_at": null,
+      "evidence": ""
+    }
+  },
+  "history": [
+    {
+      "at": "2026-09-18T08:40:39+00:00",
+      "id": "P00-01",
+      "action": "in_progress",
+      "note": "Workspace baseline created; approved Ledger-L assets packaged; pnpm build and localhost smoke check passed."
+    },
+    {
+      "at": "2026-09-18T08:53:12+00:00",
+      "id": "P00-02",
+      "action": "done",
+      "note": ""
+    },
+    {
+      "at": "2026-09-18T08:53:13+00:00",
+      "id": "P00-03",
+      "action": "in_review",
+      "note": "Checksum-verified migration runner applied 0001_phase0 to Supabase and rerun was a no-op."
+    },
+    {
+      "at": "2026-09-18T08:53:13+00:00",
+      "id": "P00-04",
+      "action": "blocked",
+      "note": "OIDC issuer and client credentials are not available; identity provider integration cannot be verified."
+    },
+    {
+      "at": "2026-09-18T08:53:14+00:00",
+      "id": "P00-05",
+      "action": "in_review",
+      "note": "CI workflow and build-tracker check added."
+    },
+    {
+      "at": "2026-09-18T08:53:15+00:00",
+      "id": "P00-06",
+      "action": "in_review",
+      "note": "Demo-only seed guard and local PostgreSQL compose target added."
+    },
+    {
+      "at": "2026-09-18T08:53:15+00:00",
+      "id": "P00-07",
+      "action": "done",
+      "note": ""
+    },
+    {
+      "at": "2026-09-18T08:53:16+00:00",
+      "id": "P00-08",
+      "action": "blocked",
+      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
+    },
+    {
+      "at": "2026-09-18T09:02:06+00:00",
+      "id": "P00-03",
+      "action": "in_review",
+      "note": "Supabase migration runner applied and reran cleanly; lara_api pooler role provisioned and verified over TLS. Clean/prior-release database rehearsal remains."
+    },
+    {
+      "at": "2026-09-18T09:03:37+00:00",
+      "id": "P00-06",
+      "action": "in_review",
+      "note": "Supabase demo schema is live; local seed remains demo-mode guarded."
+    }
+  ],
+  "updated_at": "2026-09-18T09:03:37+00:00"
+}

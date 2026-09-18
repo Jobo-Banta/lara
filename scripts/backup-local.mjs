@@ -1,0 +1,1 @@
+import{spawn}from "node:child_process";if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");const out=process.env.BACKUP_OUTPUT||".local/backups/lara.dump";const p=spawn("pg_dump",["--format=custom","--file",out,process.env.DATABASE_URL],{stdio:"inherit"});p.on("exit",c=>process.exit(c??1));
