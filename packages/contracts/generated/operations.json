@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "244d82fb958dc4a226ecd12a5fc26d7d3ecdaad52984ec8cfc0407f9588f61d1",
+  "sha256": "753e15eeca1fa7f208bf888c65ba40a0dafd82bbfc276188f2a9e932b0f0a5ef",
   "operations": [
     {
       "method": "POST",
@@ -1766,6 +1766,21 @@
       "method": "GET",
       "path": "/bank-reconciliation",
       "operationId": "get_bank_reconciliation"
+    },
+    {
+      "method": "GET",
+      "path": "/returns/{id}/lines",
+      "operationId": "get_returns_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/transmissions",
+      "operationId": "get_transmissions"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/readiness",
+      "operationId": "get_compliance_readiness"
     }
   ]
 }

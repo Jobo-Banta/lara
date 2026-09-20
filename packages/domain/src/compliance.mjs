@@ -303,9 +303,10 @@ export async function transmit(tx,ctx,entityId,transmissionId,{transport,env=pro
  if(job.state==='accepted')return transmissionResource(job);
  if(job.state==='unknown')fail('STATE_CONFLICT','The last attempt has an unknown outcome; reconcile the remote status before any resend.');
  if(!['queued','retry_wait'].includes(job.state))fail('STATE_CONFLICT','Transmission is '+job.state+'.');
+ // A blocked send (no key, wrong taxpayer, expired profile) waits with its reason; nothing is sent and the operator retries after fixing the gate.
  let guard;
  try{guard=await guardTransmission(tx,ctx,entityId,job,env);}
- catch(e){const blocked=(await tx.query("update lara.transmission_jobs set state='retry_wait',reason=$3,next_attempt_at=now()+interval '1 hour' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,transmissionId,'blocked: '+e.message])).rows[0];await tx.query("update lara.documents set reporting_state='retry_wait' where tenant_id=$1 and id=$2",[ctx.tenantId,job.document_id]);await audit(tx,ctx,{entityId,action:'transmission.blocked',resourceType:'transmission',resourceId:transmissionId,resourceVersion:Number(blocked.version),reason:e.message});throw e;}
+ catch(e){if(!(e instanceof Error)||!e.code)throw e;const blocked=(await tx.query("update lara.transmission_jobs set state='retry_wait',reason=$3,next_attempt_at=now()+interval '1 hour' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,transmissionId,'blocked ('+e.code+'): '+e.message])).rows[0];await tx.query("update lara.documents set reporting_state='retry_wait' where tenant_id=$1 and id=$2",[ctx.tenantId,job.document_id]);await audit(tx,ctx,{entityId,action:'transmission.blocked',resourceType:'transmission',resourceId:transmissionId,resourceVersion:Number(blocked.version),reason:e.code+': '+e.message});return {...transmissionResource(blocked),blocked:e.code,reason:e.message};}
  await tx.query("update lara.transmission_jobs set state='sending',signature=$3 where tenant_id=$1 and id=$2",[ctx.tenantId,transmissionId,guard.signature]);
  await tx.query("update lara.documents set reporting_state='sending' where tenant_id=$1 and id=$2",[ctx.tenantId,job.document_id]);
  const attempt=job.attempt_count+1,requestHash=requestHashOf(job.destination,job.payload_hash);
@@ -341,9 +342,9 @@ export async function requestReconcile(tx,ctx,entityId,id,input){
  const job=(await tx.query('select * from lara.transmission_jobs where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];
  if(!job)fail('NOT_FOUND','Transmission not found.');
  if(!['unknown','sending','retry_wait','queued'].includes(job.state))fail('STATE_CONFLICT','Transmission is '+job.state+'; nothing to reconcile.');
- const jobId=await enqueueJob(tx,ctx,{entityId,kind:'einvoice.reconcile',payload:{transmissionId:id}});
+ const queued=await enqueueJob(tx,ctx,{entityId,kind:'einvoice.reconcile',payload:{transmissionId:id}});
  await audit(tx,ctx,{entityId,action:'transmission.reconcile',resourceType:'transmission',resourceId:id,resourceVersion:Number(job.version),reason:input.reason});
- return jobId;
+ return queued;
 }
 // Retry re-encodes the envelope as a new payload version after an envelope
 // rejection; a financial rejection needs a correction document, never a retry.
@@ -351,7 +352,7 @@ export async function requestRetry(tx,ctx,entityId,id,input){
  requirePermission(ctx,'transmission.retry');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const job=(await tx.query('select * from lara.transmission_jobs where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!job)fail('NOT_FOUND','Transmission not found.');
- if(job.state==='retry_wait'){const jobId=await enqueueJob(tx,ctx,{entityId,kind:'einvoice.transmit',payload:{transmissionId:id}});await audit(tx,ctx,{entityId,action:'transmission.retry',resourceType:'transmission',resourceId:id,resourceVersion:Number(job.version),reason:input.reason});return jobId;}
+ if(job.state==='retry_wait'){const queued=await enqueueJob(tx,ctx,{entityId,kind:'einvoice.transmit',payload:{transmissionId:id}});await audit(tx,ctx,{entityId,action:'transmission.retry',resourceType:'transmission',resourceId:id,resourceVersion:Number(job.version),reason:input.reason});return queued;}
  if(job.state!=='rejected')fail('STATE_CONFLICT','Transmission is '+job.state+'; only rejected or waiting transmissions retry.');
  if(job.rejection_class==='financial')fail('STATE_CONFLICT','The authority rejected the financial content; issue a correction document (credit note or additional invoice) instead of re-sending.');
  await tx.query("update lara.transmission_jobs set state='superseded' where tenant_id=$1 and id=$2",[ctx.tenantId,id]);

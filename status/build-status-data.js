@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T06:10:34+00:00",
+  "updated_at": "2026-09-20T07:30:53+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2150,15 +2150,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P06"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) passes locally on the dev database.",
+      "evidence": "Local: node scripts/test-p07-schema.mjs \u2192 P07-01 schema acceptance passed (8 groups); pnpm contracts:generate and validate_specifications pass. CI run pending.",
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P07-02",
@@ -2245,13 +2245,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups).",
+      "evidence": "Local: node scripts/test-p07-domain.mjs \u2192 P07-02 domain acceptance passed (7 groups); P04/P05/P06 domain suites pass with the transmission hook. CI run pending.",
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P07-03",
@@ -2338,13 +2338,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "Local: node scripts/test-p07-api.mjs \u2192 P07-03 API acceptance passed (5 groups). CI run pending.",
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P07-04",
@@ -2431,13 +2431,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; node scripts/test-demo-browser.mjs tests/browser/workspace.spec.mjs \u2192 10 passed (10.9m) including the compliance journey with WCAG checks. CI run pending.",
+      "updated_at": "2026-09-20T07:30:53+00:00"
     },
     {
       "id": "P07-05",
@@ -2524,13 +2524,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written.",
+      "evidence": "Local: p07 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P07-06",
@@ -2617,13 +2617,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.7.0 drafted (docs/development/releases/0.7.0-draft.md). Blocked on the 0.6.0 (P06) release, the tax lead's approval of official form artifacts and golden cases per enabled form, a certified provider adapter with sandbox certification, key and credential custody, contract operations for the compliance profile, regulatory profiles, artifacts and registration decisions, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P08-01",
@@ -5521,48 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T22:34:12+00:00",
-      "id": "P04-03",
-      "action": "in_review",
-      "note": "34 P04 operations served over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
-    },
-    {
-      "at": "2026-09-18T23:17:39+00:00",
-      "id": "P04-03",
-      "action": "done",
-      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI."
-    },
-    {
-      "at": "2026-09-18T23:17:39+00:00",
-      "id": "P04-04",
-      "action": "in_review",
-      "note": "workspace-sales.tsx: invoice list/editor/detail with four statuses and credit preview, orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-18T23:17:39+00:00",
-      "id": "P04-05",
-      "action": "in_review",
-      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile with unique-number assertion, P04-RUNBOOK.md, 0.4.0 release draft."
-    },
-    {
-      "at": "2026-09-18T23:17:39+00:00",
-      "id": "P04-06",
-      "action": "blocked",
-      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter."
-    },
-    {
-      "at": "2026-09-18T23:40:31+00:00",
-      "id": "P04-04",
-      "action": "done",
-      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-18T23:40:31+00:00",
-      "id": "P04-05",
-      "action": "done",
-      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft."
-    },
-    {
       "at": "2026-09-20T00:26:17+00:00",
       "id": "P05-01",
       "action": "in_review",
@@ -5699,6 +5657,48 @@ window.LARA_BUILD_STATUS = {
       "id": "P06-05",
       "action": "done",
       "note": "P06-T01..T05 in scripts/test-p06-domain.mjs and test-p06-api.mjs; docs/development/P06-REVIEW.md, P06-RUNBOOK.md and releases/0.6.0-draft.md written; later-phase probes moved to P07 operations."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-01",
+      "action": "in_review",
+      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) passes locally on the dev database."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-02",
+      "action": "in_review",
+      "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-03",
+      "action": "in_review",
+      "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-05",
+      "action": "in_review",
+      "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T07:07:06+00:00",
+      "id": "P07-06",
+      "action": "blocked",
+      "note": "Release 0.7.0 drafted (docs/development/releases/0.7.0-draft.md). Blocked on the 0.6.0 (P06) release, the tax lead's approval of official form artifacts and golden cases per enabled form, a certified provider adapter with sandbox certification, key and credential custody, contract operations for the compliance profile, regulatory profiles, artifacts and registration decisions, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T07:30:53+00:00",
+      "id": "P07-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs."
     }
   ]
 };

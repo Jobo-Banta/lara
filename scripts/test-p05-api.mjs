@@ -177,7 +177,7 @@ try{
  r=await call('purchaser','GET','/purchase-orders/'+bill.id,{headers:eh});assert.equal(r.status,404,'a bill is not addressable as a purchase order');
  r=await call('clerk','GET','/expense-claims/'+bill.id,{headers:eh});assert.equal(r.status,404);
  r=await call('treasury','GET','/payments/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
- r=await call('clerk','POST','/returns',{body:{},headers:{...key(),...eh}});assert.equal(r.status,409);assert.equal((await json(r)).code,'FEATURE_NOT_ENABLED');
+ r=await call('clerk','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.equal(r.status,409);assert.equal((await json(r)).code,'FEATURE_NOT_ENABLED');
  pass('unknown documents, foreign entities and mismatched families answer 404; P07 return operations stay gated');
  console.log('P05-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split('\n').slice(-15).join('\n'));throw e;}

@@ -3175,5 +3175,32 @@
     "permission": "bank_match.read",
     "input": null,
     "response": "BankReconciliationView"
+  },
+  {
+    "operationId": "get_returns_id_lines",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/returns/{id}/lines",
+    "permission": "return.read",
+    "input": null,
+    "response": "ReturnLinesView"
+  },
+  {
+    "operationId": "get_transmissions",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/transmissions",
+    "permission": "transmission.read",
+    "input": null,
+    "response": "TransmissionQueue"
+  },
+  {
+    "operationId": "get_compliance_readiness",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/compliance/readiness",
+    "permission": "return.read",
+    "input": null,
+    "response": "ComplianceReadiness"
   }
 ]

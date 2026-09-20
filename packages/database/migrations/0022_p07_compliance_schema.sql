@@ -185,6 +185,7 @@ create index return_source_links_event on lara.return_source_links (tenant_id, t
 create or replace function lara.return_lines_guard() returns trigger language plpgsql as $$
 declare run_state text; rid uuid;
 begin
+ if tg_op = 'DELETE' and current_setting('lara.maintenance', true) = 'teardown' and (exists (select 1 from pg_roles where rolname = current_user and (rolbypassrls or rolsuper)) or exists (select 1 from pg_tables where schemaname = tg_table_schema and tablename = tg_table_name and tableowner = current_user)) then return old; end if;
  rid := coalesce(new.run_id, old.run_id);
  select state into run_state from lara.return_runs where tenant_id = coalesce(new.tenant_id, old.tenant_id) and id = rid;
  if run_state in ('approved','filed','superseded') then raise exception 'STATE_CONFLICT: lines of an approved return are frozen' using errcode = 'check_violation'; end if;
@@ -252,7 +253,7 @@ begin
   raise exception 'STATE_CONFLICT: an accepted transmission is final' using errcode = 'check_violation';
  end if;
  if new.state <> old.state and not (
-  (old.state = 'queued' and new.state in ('sending','superseded')) or
+  (old.state = 'queued' and new.state in ('sending','retry_wait','superseded')) or
   (old.state = 'sending' and new.state in ('accepted','rejected','unknown','retry_wait')) or
   (old.state = 'retry_wait' and new.state in ('sending','superseded')) or
   (old.state = 'unknown' and new.state in ('accepted','rejected','sending')) or
@@ -339,5 +340,6 @@ grant select, insert, update on lara.regulatory_profiles, lara.schema_artifacts,
 grant select, insert, delete on lara.return_lines, lara.return_source_links to lara_api;
 grant select, insert on lara.filing_records, lara.transmission_attempts to lara_api;
 grant select on lara.regulatory_profiles, lara.schema_artifacts, lara.return_runs, lara.return_lines, lara.return_source_links, lara.filing_records, lara.transmission_jobs, lara.transmission_attempts, lara.registration_cases to lara_worker, lara_audit_reader;
-grant update on lara.transmission_jobs, lara.registration_cases to lara_worker;
+grant update on lara.transmission_jobs to lara_worker;
+grant insert, update on lara.registration_cases to lara_worker;
 grant insert on lara.transmission_attempts to lara_worker;

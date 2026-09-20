@@ -146,7 +146,7 @@ try{
  r=await call('billing','GET','/invoices/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
  r=await call('billing','GET','/invoices/'+inv.id,{headers:{'x-entity-id':randomUUID()}});assert.equal(r.status,404);
  r=await call('billing','GET','/sales-orders/'+inv.id,{headers:eh});assert.equal(r.status,404,'an invoice is not addressable as a sales order');
- r=await call('billing','POST','/returns',{body:{},headers:{...key(),...eh}});assert.equal(r.status,409);assert.equal((await json(r)).code,'FEATURE_NOT_ENABLED');
+ r=await call('billing','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.equal(r.status,409);assert.equal((await json(r)).code,'FEATURE_NOT_ENABLED');
  pass('unknown documents, foreign entities and mismatched kinds answer 404; P07 return operations stay gated');
  console.log('P04-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split('\n').slice(-15).join('\n'));throw e;}

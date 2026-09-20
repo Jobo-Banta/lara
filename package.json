@@ -47,7 +47,10 @@
     "test:p05-api": "node scripts/test-p05-api.mjs",
     "test:p06-schema": "node scripts/test-p06-schema.mjs",
     "test:p06-domain": "node scripts/test-p06-domain.mjs",
-    "test:p06-api": "node scripts/test-p06-api.mjs"
+    "test:p06-api": "node scripts/test-p06-api.mjs",
+    "test:p07-schema": "node scripts/test-p07-schema.mjs",
+    "test:p07-domain": "node scripts/test-p07-domain.mjs",
+    "test:p07-api": "node scripts/test-p07-api.mjs"
   },
   "pnpm": {
     "overrides": {

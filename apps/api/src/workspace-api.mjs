@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 
@@ -278,6 +278,25 @@ Object.assign(handlers,{
  post_cash_sessions_id_count:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.countCashSession(tx,ctx,entityId,params.id,body,version)),
  post_cash_sessions_id_close:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await treasury.closeCashSession(tx,ctx,entityId,params.id,body,version)),
  post_cash_sessions_id_handover:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.handoverCashSession(tx,ctx,entityId,params.id,body,version)),
+});
+// P07 compliance: return runs, transmissions and registration packs.
+const jobBody=(ctx,job)=>({status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}});
+Object.assign(handlers,{
+ post_returns:async(tx,ctx,{entityId,body})=>created(await compliance.createReturn(tx,ctx,entityId,body)),
+ get_returns:async(tx,ctx,{entityId,query})=>list(await compliance.listReturns(tx,ctx,entityId,query)),
+ get_returns_id:async(tx,ctx,{entityId,params})=>ok(await compliance.getReturn(tx,ctx,entityId,params.id)),
+ get_returns_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await compliance.returnLines(tx,ctx,entityId,params.id)}),
+ patch_returns_id:async(tx,ctx,{entityId,params,body,version})=>ok(await compliance.updateReturn(tx,ctx,entityId,params.id,version,body)),
+ post_returns_id_prepare:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await compliance.prepareReturn(tx,ctx,entityId,params.id,body,version,{store})),
+ post_returns_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await compliance.approveReturn(tx,ctx,entityId,params.id,body,version)),
+ post_returns_id_filed:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await compliance.fileReturn(tx,ctx,entityId,params.id,body,version)),
+ get_transmissions_id:async(tx,ctx,{entityId,params})=>ok(await compliance.getTransmission(tx,ctx,entityId,params.id)),
+ get_transmissions:async(tx,ctx,{entityId,query})=>list({items:await compliance.listTransmissions(tx,ctx,entityId,{state:query.state||null,documentId:isUuid(query.documentId)?query.documentId:null}),nextCursor:null}),
+ get_compliance_readiness:async(tx,ctx,{entityId})=>({status:200,body:await compliance.readiness(tx,ctx,entityId,process.env)}),
+ post_transmissions_id_reconcile:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestReconcile(tx,ctx,entityId,params.id,body)),
+ post_transmissions_id_retry:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestRetry(tx,ctx,entityId,params.id,body)),
+ // The registration pack is a job: reportType names the authority, the period the scope.
+ post_registration_packs:async(tx,ctx,{entityId,body})=>{if(!ctx.permissions.has('registration.prepare'))fail('FORBIDDEN','Permission registration.prepare is required.');await compliance.requireCompliance(tx,ctx,entityId);const job=await enqueueJob(tx,ctx,{entityId,kind:'registration.pack',payload:{authority:body.reportType.trim().toUpperCase().slice(0,100),scope:body.periodStart+'..'+body.periodEnd}});return jobBody(ctx,job);},
 });
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 

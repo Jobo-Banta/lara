@@ -8,6 +8,7 @@ import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,e
 import {linkEvidence} from './evidence.mjs';
 import {micros,decimal} from './ledger.mjs';
 import {checkGate} from './treasury.mjs';
+import {queueTransmission} from './compliance.mjs';
 
 const PICO=10n**12n;
 const MICRO=10n**6n;
@@ -350,7 +351,10 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  }
  await audit(tx,ctx,{entityId,action:row.kind+'.post',resourceType:'document',resourceId:id,resourceVersion:Number(updated.version),afterRef:entryId});
  await emit(tx,ctx,{entityId,aggregateType:'document',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'document.posted.v1',payload:{documentId:id,journalEntryId:entryId,ruleProfileVersion:row.rule_profile_version,payloadHash:row.payload_hash}});
- return result(updated,{journalEntryIds});
+ // Reporting-required profiles queue the e-invoice transmission with the issuance (P07); the job sends after commit.
+ let jobId=null;
+ if(profile.reportingRequired)jobId=(await queueTransmission(tx,ctx,entityId,id,{commandId})).jobId;
+ return result(updated,{journalEntryIds,...(jobId?{jobId}:{})});
 }
 // Corrections never edit a posted document: a credit note (partial, within the
 // remaining creditable amount per revenue account), an additional invoice, or a

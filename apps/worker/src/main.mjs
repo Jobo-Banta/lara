@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -19,8 +19,8 @@ const log=(event,extra={})=>console.log(JSON.stringify({service:'worker',event,t
 const warn=(event,extra={})=>console.error(JSON.stringify({service:'worker',event,severity:'error',time:new Date().toISOString(),...extra}));
 let stopping=false;
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{stopping=true;});
-let store,scanner;
-try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
+let store,scanner,transport;
+try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();transport=compliance.transportFromEnv(process.env,store);}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
 
 const client=()=>new pg.Client({...connectionOptions(url),connectionTimeoutMillis:5000,query_timeout:30000});
 
@@ -64,6 +64,10 @@ export const handlers={
   const current=await identity.assertJobStillAuthorized(tx,job,'import.commit');
   const r=await treasury.proposeMatches(tx,{...current,traceId:ctx.traceId},job.entity_id,{bankAccountId:job.payload_ref.bankAccountId,batchId:job.payload_ref.batchId});
   return {resourceType:'bank_account',resourceId:job.payload_ref.bankAccountId,state:'proposed',proposed:r.proposed.length,ambiguous:r.ambiguous.length};},
+ // E-invoice reporting: send once; unknown outcomes are reconciled by status query, never resent blindly.
+ 'einvoice.transmit':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,null);const r=await compliance.transmit(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.transmissionId,{transport,env:process.env});return {resourceType:'transmission',resourceId:r.id,state:r.state};},
+ 'einvoice.reconcile':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'transmission.reconcile');const r=await compliance.reconcile(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.transmissionId,{transport});return {resourceType:'transmission',resourceId:r.id,state:r.state};},
+ 'registration.pack':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'registration.prepare');const r=await compliance.generateRegistrationPack(tx,{...current,traceId:ctx.traceId},job.entity_id,{authority:job.payload_ref.authority,scope:job.payload_ref.scope,store});return {resourceType:'evidence',resourceId:r.evidenceId,state:'available',caseId:r.case.id,hash:r.hash};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){

@@ -21,7 +21,7 @@ test.beforeEach(()=>{test.skip(!process.env.LARA_E2E_DATABASE_URL||!suffix,'Requ
 let worker;
 test.beforeAll(()=>{
  if(!process.env.LARA_E2E_DATABASE_URL||!suffix)return;
- worker=spawn(process.execPath,['apps/worker/src/main.mjs'],{stdio:['ignore','pipe','pipe'],env:{...process.env,LARA_MODE:'local',WORKER_DATABASE_URL:process.env.WORKER_DATABASE_URL||process.env.SUPABASE_LARA_WORKER_DATABASE_URL,OBJECT_ADAPTER:'filesystem',OBJECT_BUCKET:'.local/e2e-workspace',WORKER_POLL_MS:'250'}});
+ worker=spawn(process.execPath,['apps/worker/src/main.mjs'],{stdio:['ignore','pipe','pipe'],env:{...process.env,LARA_MODE:'local',WORKER_DATABASE_URL:process.env.WORKER_DATABASE_URL||process.env.SUPABASE_LARA_WORKER_DATABASE_URL,OBJECT_ADAPTER:'filesystem',OBJECT_BUCKET:'.local/e2e-workspace',WORKER_POLL_MS:'250',EINVOICE_ADAPTER:'fixture',E2E_EINVOICE_KEY:'browser-signing-key',E2E_EINVOICE_CREDENTIALS:'000-111-222-333:secret'}});
  worker.stdout.on('data',()=>{});worker.stderr.on('data',()=>{});
 });
 test.afterAll(async()=>{if(worker&&worker.exitCode===null&&!worker.signalCode){const exited=new Promise(r=>worker.once('exit',r));worker.kill();await Promise.race([exited,new Promise(r=>setTimeout(r,5000))]);}});
@@ -613,14 +613,114 @@ test('treasury: capability activation, reviewed bank accounts, statement import 
  await controller.context.close();await preparer.context.close();await treasury.context.close();
 });
 
+// The compliance profile, the regulatory profile with its mapping artifact, the
+// reporting-required sales profile and the tax officer permissions have no
+// reviewed operations or seeded template yet; the journey seeds them through the
+// runtime role as an operator would. Everything else goes through the screens.
+async function seedCompliance(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const acct=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const settings=async(kind,payload,version)=>{const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,$3,$4,$5,$6,'approved',$7,now(),$8)",[tenantId,entity,kind,version,JSON.stringify(payload),hash,await principal('preparer'),await principal('controller')]);return hash;};
+  const hash=await settings('compliance_profile',{jurisdiction:'PH',taxpayerId:'000-111-222-333',transport:'fixture',destination:'fixture-authority',deadlineHours:72,signingKeyRef:'E2E_EINVOICE_KEY',credentialsRef:'E2E_EINVOICE_CREDENTIALS',profileVersion:'compliance-2026'},1);
+  await settings('sales_profile',{arAccountId:await acct('1200'),outputTaxAccountId:await acct('2200'),cashAccountId:await acct('1010'),scale:2,dueDays:30,reportingRequired:true},2);
+  const evidence=(await db.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='2550q-mapping.csv'",[tenantId,entity])).rows[0].id;
+  const registration=(await db.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='registration.pdf'",[tenantId,entity])).rows[0].id;
+  const profile=(await db.query("insert into lara.regulatory_profiles(tenant_id,entity_id,jurisdiction,version_number,coverage,valid_from,source_hash,evidence_ids,status,approved_by,activated_by,activated_at,created_by) values($1,$2,'PH',1,'[\"2550Q\"]','2026-01-01',$3,$4,'active',$5,$5,now(),$6) returning id",[tenantId,entity,hash,JSON.stringify([registration]),await principal('controller'),await principal('preparer')])).rows[0].id;
+  const sha=(await db.query('select sha256 from lara.evidence where tenant_id=$1 and id=$2',[tenantId,evidence])).rows[0].sha256;
+  await db.query("insert into lara.schema_artifacts(tenant_id,entity_id,profile_id,artifact_type,code,version_label,hash,evidence_id,status,approved_by,created_by) values($1,$2,$3,'form_mapping','2550Q','2026-v1',$4,$5,'approved',$6,$7)",[tenantId,entity,profile,sha,evidence,await principal('controller'),await principal('preparer')]);
+  // No seeded template gives the preparer return preparation; a tenant role covers the tax officer duties.
+  const role=(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,'tax_officer','Tax officer','[\"return.create\",\"return.edit\",\"return.read\",\"return.prepare\",\"return.filed\",\"transmission.read\",\"transmission.reconcile\",\"transmission.retry\",\"registration.prepare\"]','approved',$2,$3) returning id",[tenantId,hash,await principal('security')])).rows[0].id;
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,await principal('preparer'),role,await principal('security')]);
+ }finally{await db.end();}
+}
+test('compliance: capability activation, readiness gates, a return run prepared from the reviewed mapping with the ledger tie-out, approved and filed with evidence, a reporting-required invoice transmitted by the worker and shown accepted in the queue, and the registration pack',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),billing=await as(browser,'billing');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Tax compliance and e-invoicing'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Compliance go-live requested':'Reviewed compliance activation evidence');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ // The mapping artifact enters as CSV evidence, then the profiles are seeded.
+ const mapping=Buffer.from(['line_code,description,family,tax_type,recognition,kinds,measure,sign','12A,Vatable sales,sales,vat,any,invoice,basis,1','12B,Output tax due,sales,vat,any,invoice,amount,1','20A,Vatable purchases,purchases,vat,any,any,basis,1','20B,Input tax,purchases,vat,any,any,amount,1'].join('\n')+'\n');
+ await preparer.page.goto('/evidence');await settled(preparer.page);
+ await preparer.page.locator('input[type="file"]').setInputFiles({name:'2550q-mapping.csv',mimeType:'text/csv',buffer:mapping});
+ await preparer.page.getByRole('button',{name:'Upload evidence'}).click();
+ await expect(preparer.page.getByRole('status').filter({hasText:'Queued for scanning'})).toBeVisible({timeout:30000});
+ await preparer.page.getByRole('link',{name:'2550q-mapping.csv'}).click();
+ await expect(preparer.page.getByRole('status')).toContainText('Available',{timeout:60000});
+ await seedCompliance();
+ // Readiness and a return run for October (INV-000001 of 5 October, 10,000 + 1,200).
+ await preparer.page.goto('/compliance');await settled(preparer.page);
+ await expect(preparer.page.getByRole('listitem').filter({hasText:'Regulatory profile'})).toContainText('ready');
+ await expect(preparer.page.getByRole('listitem').filter({hasText:'Signing key'})).toContainText('ready');
+ await expect(preparer.page.getByRole('row').filter({hasText:'2550Q'}).first()).toContainText('ready');
+ await preparer.page.getByLabel('Form code').fill('2550Q');
+ await preparer.page.getByLabel('Period start').fill('2026-10-01');await preparer.page.getByLabel('Period end').fill('2026-10-31');
+ await preparer.page.getByRole('button',{name:'Create run'}).click();
+ const runRow=page=>page.getByRole('row').filter({hasText:'2026-10-01 → 2026-10-31'});
+ await expect(runRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await runRow(preparer.page).getByRole('button',{name:'Prepare'}).click();
+ await expect(runRow(preparer.page).getByRole('cell',{name:'prepared',exact:true})).toBeVisible();
+ await runRow(preparer.page).getByRole('button',{name:'Lines'}).click();
+ await expect(preparer.page.getByRole('row').filter({hasText:'12B'})).toContainText('₱1,200.00');
+ await expect(preparer.page.getByRole('status').filter({hasText:'Tie-out'})).toContainText('ties');
+ // The preparer holds the controller role since setup; the server still refuses the self-approval.
+ await runRow(preparer.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toContainText('cannot approve');
+ await controller.page.goto('/compliance');await settled(controller.page);
+ await runRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await preparer.page.reload();await settled(preparer.page);
+ await runRow(preparer.page).getByLabel('Filing reference').fill('EFPS-2026-10-001');
+ await runRow(preparer.page).getByRole('combobox',{name:'Acknowledgement evidence'}).selectOption({label:'registration.pdf'});
+ await runRow(preparer.page).getByRole('button',{name:'Record filing'}).click();
+ await expect(runRow(preparer.page).getByRole('cell',{name:'filed',exact:true})).toBeVisible();
+ // A reporting-required issuance: the worker sends it with the fixture transport; the queue shows it accepted.
+ await billing.page.goto('/sales/invoices');await settled(billing.page);
+ await pickCustomer(billing.page);
+ await billing.page.getByLabel('Document date').fill('2026-10-12');await billing.page.getByLabel('Accounting date').fill('2026-10-12');
+ await billing.page.getByRole('textbox',{name:'Line 1 description'}).fill('Reported services');
+ await billing.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('2000');
+ await billing.page.getByRole('combobox',{name:'Line 1 revenue account'}).selectOption({label:'4000 Service revenue'});
+ await billing.page.getByRole('combobox',{name:'Line 1 tax rule'}).selectOption({label:'VAT12 12%'});
+ await billing.page.getByRole('button',{name:'Save draft'}).click();
+ await expect(billing.page).toHaveURL(/\/sales\/invoices\/[0-9a-f-]{36}$/);
+ const reportedUrl=new URL(billing.page.url()).pathname;
+ await billing.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(billing.page.locator('.status-grid dd').first()).toHaveText('submitted');
+ await preparer.page.goto(reportedUrl);await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('approved');
+ await preparer.page.getByRole('button',{name:'Issue invoice'}).click();
+ await expect(preparer.page.locator('.status-grid dd').nth(2)).toHaveText('queued');
+ await expect.poll(async()=>{await preparer.page.reload();await settled(preparer.page);return preparer.page.locator('.status-grid dd').nth(2).textContent();},{timeout:90000}).toBe('accepted');
+ await preparer.page.goto('/compliance');await settled(preparer.page);
+ await expect(preparer.page.getByRole('row').filter({hasText:'INV-000002'})).toContainText('accepted');
+ // Registration pack job.
+ await preparer.page.getByRole('button',{name:'Generate pack'}).click();
+ await expect(preparer.page.getByRole('status').filter({hasText:'Pack job'})).toContainText('succeeded',{timeout:60000});
+ await noSeriousViolations(preparer.page,'compliance /compliance');
+ await controller.context.close();await preparer.context.close();await billing.context.close();
+});
+
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/compliance');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P07',{exact:false})).toBeVisible();
+ await clerk.page.goto('/inventory');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P10',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();
