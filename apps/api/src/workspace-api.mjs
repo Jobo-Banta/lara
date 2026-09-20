@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -164,7 +164,7 @@ Object.assign(handlers,{
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation','branch_rollup','institution_tax','feed_reconciliation','inventory_valuation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation','branch_rollup','institution_tax','feed_reconciliation','inventory_valuation','asset_register'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
  // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
@@ -327,6 +327,25 @@ Object.assign(handlers,{
  post_landed_costs_id_preview:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.previewLandedCost(tx,ctx,entityId,params.id,body,version)),
  post_landed_costs_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.approveLandedCost(tx,ctx,entityId,params.id,body,version)),
  post_landed_costs_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await inventory.postLandedCost(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ // P11 assets, recurring work and recognition schedules
+ get_asset_classes:async(tx,ctx,{entityId,query})=>list(await assets.listAssetClasses(tx,ctx,entityId,query)),
+ post_assets:async(tx,ctx,{entityId,body})=>created(await assets.createAsset(tx,ctx,entityId,body)),
+ get_assets:async(tx,ctx,{entityId,query})=>list(await assets.listAssets(tx,ctx,entityId,query)),
+ get_assets_id:async(tx,ctx,{entityId,params})=>ok(await assets.getAsset(tx,ctx,entityId,params.id)),
+ patch_assets_id:async(tx,ctx,{entityId,params,body,version})=>ok(await assets.updateAsset(tx,ctx,entityId,params.id,version,body)),
+ post_assets_id_approve:async(tx,ctx,{entityId,params,body,version})=>{const r=await assets.approveAsset(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ post_assets_id_events:async(tx,ctx,{entityId,params,body,version})=>{const r=await assets.recordAssetEvent(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ get_assets_id_events:async(tx,ctx,{entityId,params})=>({status:200,body:await assets.assetEvents(tx,ctx,entityId,params.id)}),
+ get_assets_id_layers:async(tx,ctx,{entityId,params})=>({status:200,body:await assets.bookTaxLayers(tx,ctx,entityId,params.id)}),
+ post_schedules:async(tx,ctx,{entityId,body})=>created(await assets.createSchedule(tx,ctx,entityId,body)),
+ get_schedules:async(tx,ctx,{entityId,query})=>list(await assets.listSchedules(tx,ctx,entityId,query)),
+ get_schedules_id:async(tx,ctx,{entityId,params})=>ok(await assets.getSchedule(tx,ctx,entityId,params.id)),
+ get_schedules_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await assets.scheduleLines(tx,ctx,entityId,params.id)}),
+ patch_schedules_id:async(tx,ctx,{entityId,params,body,version})=>ok(await assets.updateSchedule(tx,ctx,entityId,params.id,version,body)),
+ post_schedules_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await assets.approveSchedule(tx,ctx,entityId,params.id,body,version)),
+ post_schedules_id_pause:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await assets.pauseSchedule(tx,ctx,entityId,params.id,body,version)),
+ post_schedule_runs:async(tx,ctx,{entityId,body})=>jobBody(ctx,await assets.requestScheduleRun(tx,ctx,entityId,body)),
+ get_schedule_runs:async(tx,ctx,{entityId,query})=>list(await assets.listScheduleRuns(tx,ctx,entityId,query)),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),

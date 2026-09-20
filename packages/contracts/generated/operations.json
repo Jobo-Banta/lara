@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "a93063b977580672f33bb2874524088b8449f114447cd05721f8656b04fbcb0e",
+  "sha256": "e53d242e957211c000b3052fbe309b82939401d114c7b42ac4b5ebe8475c58df",
   "operations": [
     {
       "method": "POST",
@@ -1238,6 +1238,11 @@
       "operationId": "post_assets_id_events"
     },
     {
+      "method": "GET",
+      "path": "/assets/{id}/events",
+      "operationId": "get_assets_id_events"
+    },
+    {
       "method": "POST",
       "path": "/schedules",
       "operationId": "post_schedules"
@@ -1271,6 +1276,11 @@
       "method": "POST",
       "path": "/schedule-runs",
       "operationId": "post_schedule_runs"
+    },
+    {
+      "method": "GET",
+      "path": "/schedule-runs",
+      "operationId": "get_schedule_runs"
     },
     {
       "method": "POST",
@@ -1876,6 +1886,21 @@
       "method": "GET",
       "path": "/landed-costs/{id}/lines",
       "operationId": "get_landed_costs_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/asset-classes",
+      "operationId": "get_asset_classes"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/{id}/layers",
+      "operationId": "get_assets_id_layers"
+    },
+    {
+      "method": "GET",
+      "path": "/schedules/{id}/lines",
+      "operationId": "get_schedules_id_lines"
     }
   ]
 }

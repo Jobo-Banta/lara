@@ -1044,14 +1044,113 @@ test('inventory: capability activation, an item with its cost method, a goods re
  for(const route of ['/inventory','/inventory/movements','/inventory/counts','/inventory/landed-costs']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'inventory '+route);}
  await controller.context.close();await preparer.context.close();
 });
+// The asset profile, the register accounts, the class, the recognition
+// policy and the asset clerk and approver roles have no reviewed operations
+// or seeded template yet; the journey seeds them through the runtime role as
+// an operator would. The bill posted by the purchasing journey (BILL-000001,
+// 10,000 on 5000 Professional fees) stands as the capitalization source, so
+// that line's account is the asset clearing account of this profile.
+async function seedAssets(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const book=(await db.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({ast:1})])).rows[0].h;
+  const acct=async(code,name,category,side)=>(await db.query("insert into lara.accounts(tenant_id,entity_id,book_id,code,name,category,normal_side,control_type,allow_manual,content_hash,created_by) values($1,$2,$3,$4,$5,$6,$7,'none',true,$8,$9) on conflict (tenant_id,entity_id,book_id,code) do update set name=excluded.name returning id",[tenantId,entity,book,code,name,category,side,hash,await principal('preparer')])).rows[0].id;
+  const existing=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const equip=await acct('1700','Equipment','asset','debit'),accDep=await acct('1710','Accumulated depreciation','asset','debit'),depExp=await acct('6100','Depreciation expense','expense','debit'),gain=await acct('4300','Gain on disposal','income','credit'),loss=await acct('6300','Loss on disposal','expense','debit');
+  const settle=async(kind,payload)=>{const ph=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,$3,1,$4,$5,'approved',$6,now(),$7)",[tenantId,entity,kind,JSON.stringify(payload),ph,await principal('preparer'),await principal('controller')]);};
+  await settle('asset_profile',{assetClearingAccountId:await existing('5000'),disposalClearingAccountId:await existing('1010'),profileVersion:'assets-2026'});
+  await settle('recognition_policy_dep_monthly',{code:'dep_monthly',kind:'depreciation',proration:'monthly'});
+  await db.query("insert into lara.asset_classes(tenant_id,entity_id,book_id,code,name,asset_account_id,accumulated_depreciation_account_id,depreciation_expense_account_id,disposal_gain_account_id,disposal_loss_account_id,default_method,default_useful_life_months,tax_method,tax_useful_life_months,created_by) values($1,$2,$3,'EQUIP','Equipment',$4,$5,$6,$7,$8,'straight_line',60,'declining_balance',36,$9)",[tenantId,entity,book,equip,accDep,depExp,gain,loss,await principal('controller')]);
+  // No seeded template holds the asset or schedule authorities; tenant roles cover the clerk and the approver.
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const clerkRole=await role('asset_clerk',['asset.create','asset.edit','asset.read','schedule.create','schedule.edit','schedule.read']);
+  const approverRole=await role('asset_approver',['asset.approve','asset.events','asset.read','schedule.approve','schedule.pause','schedule.execute','schedule.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),clerkRole,await principal('security'),await principal('controller'),approverRole]);
+ }finally{await db.end();}
+}
+test('assets: capability activation, an asset drafted from the posted bill and capitalized by independent approval, the depreciation schedule previewed, approved and run by the worker for the open period, the book/tax comparison and a lifecycle event',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ const pickOption=async(box,text)=>{await expect(box.locator('option',{hasText:text})).toHaveCount(1);await box.selectOption(await box.locator('option',{hasText:text}).getAttribute('value'));};
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Assets, recurring work and recognition schedules'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Register goes live in October':'Reviewed the classes and the opening register');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedAssets();
+ // The clerk drafts the asset from the posted bill; the controller approves and the capitalization posts.
+ await preparer.page.goto('/assets');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Tag',exact:true}).fill('MACH-1');
+ await preparer.page.getByRole('combobox',{name:'Class',exact:true}).selectOption({label:'EQUIP Equipment'});
+ await preparer.page.getByRole('textbox',{name:'Cost',exact:true}).fill('10000');
+ await preparer.page.getByRole('textbox',{name:'In-service date',exact:true}).fill('2026-10-01');
+ await pickOption(preparer.page.getByRole('combobox',{name:'Source bill'}),/BILL-000001/);
+ await preparer.page.getByRole('button',{name:'Create asset'}).click();
+ const assetRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'MACH-1',exact:true})});
+ await expect(assetRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await expect(assetRow(preparer.page).getByRole('button',{name:'Approve',exact:true})).toHaveCount(0);
+ await controller.page.goto('/assets');await settled(controller.page);
+ await assetRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(assetRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:30000});
+ await assetRow(controller.page).getByRole('button',{name:'Open',exact:true}).click();
+ await expect(controller.page.getByText('carrying amount',{exact:false})).toContainText('₱10,000.00');
+ await expect(controller.page.getByText('capitalization entry',{exact:false})).toBeVisible();
+ // The schedule: previewed by the clerk (60 × 166.67), approved by the controller, run for October by the worker.
+ await preparer.page.goto('/assets/schedules');await settled(preparer.page);
+ await pickOption(preparer.page.getByRole('combobox',{name:'Asset',exact:true}),/MACH-1/);
+ await preparer.page.getByRole('textbox',{name:'Start date',exact:true}).fill('2026-10-01');
+ await preparer.page.getByRole('textbox',{name:'End date',exact:true}).fill('2031-09-30');
+ await preparer.page.getByRole('textbox',{name:'Basis amount',exact:true}).fill('10000');
+ await preparer.page.getByRole('textbox',{name:'Policy code',exact:true}).fill('dep_monthly');
+ await preparer.page.getByRole('button',{name:'Create schedule'}).click();
+ const schedRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'depreciation',exact:true})}).last();
+ await expect(schedRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:30000});
+ await schedRow(preparer.page).getByRole('button',{name:'Lines'}).click();
+ await expect(preparer.page.getByText('planned ₱10,000.00',{exact:false})).toBeVisible();
+ await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'2026-10',exact:true})}).first()).toContainText('₱166.67');
+ await controller.page.goto('/assets/schedules');await settled(controller.page);
+ await schedRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(schedRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:30000});
+ await pickOption(schedRow(controller.page).getByRole('combobox',{name:'Period'}),/2026-10/);
+ await schedRow(controller.page).getByRole('button',{name:'Run period'}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toHaveCount(0);
+ for(let i=0;i<30;i++){await controller.page.goto('/assets/schedules');await settled(controller.page);if(await controller.page.getByText('posted · entry',{exact:false}).count())break;await controller.page.waitForTimeout(2000);}
+ await expect(controller.page.getByText('posted · entry',{exact:false}).first()).toBeVisible();
+ await schedRow(controller.page).getByRole('button',{name:'Lines'}).click();
+ await expect(controller.page.getByText('executed ₱166.67',{exact:false})).toBeVisible();
+ // Book/tax comparison and a lifecycle event on the register.
+ await controller.page.goto('/assets');await settled(controller.page);
+ await assetRow(controller.page).getByRole('button',{name:'Book/tax'}).click();
+ await expect(controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'2026-10',exact:true})}).first()).toContainText('₱166.67');
+ await assetRow(controller.page).getByRole('button',{name:'Open',exact:true}).click();
+ await controller.page.getByRole('combobox',{name:'Kind',exact:true}).selectOption('transfer');
+ await controller.page.getByRole('textbox',{name:'Effective date',exact:true}).fill('2026-11-02');
+ await pickOption(controller.page.getByRole('combobox',{name:'Target location'}),/HQ/);
+ await controller.page.getByRole('combobox',{name:'Evidence',exact:true}).selectOption({label:'registration.pdf'});
+ await controller.page.getByRole('textbox',{name:'Reason',exact:true}).last().fill('Moved to the head office floor');
+ await controller.page.getByRole('button',{name:'Record event'}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toHaveCount(0);
+ await expect(controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'transfer',exact:true})}).first()).toContainText('Moved to the head office floor');
+ for(const route of ['/assets','/assets/schedules']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'assets '+route);}
+ await controller.context.close();await preparer.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/assets');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P11',{exact:false})).toBeVisible();
+ await clerk.page.goto('/assistant');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P12',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

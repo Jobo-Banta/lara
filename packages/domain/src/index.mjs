@@ -13,3 +13,4 @@ export * as compliance from './compliance.mjs';
 export * as fi from './fi.mjs';
 export * as fx from './fx.mjs';
 export * as inventory from './inventory.mjs';
+export * as assets from './assets.mjs';

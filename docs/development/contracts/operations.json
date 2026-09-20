@@ -3373,5 +3373,50 @@
     "permission": "landed_cost.read",
     "input": null,
     "response": "LandedCostPreviewView"
+  },
+  {
+    "operationId": "get_asset_classes",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/asset-classes",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetClassList"
+  },
+  {
+    "operationId": "get_assets_id_events",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets/{id}/events",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetEventsView"
+  },
+  {
+    "operationId": "get_assets_id_layers",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets/{id}/layers",
+    "permission": "asset.read",
+    "input": null,
+    "response": "BookTaxView"
+  },
+  {
+    "operationId": "get_schedules_id_lines",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedules/{id}/lines",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleLinesView"
+  },
+  {
+    "operationId": "get_schedule_runs",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedule-runs",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleRunList"
   }
 ]

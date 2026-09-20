@@ -506,46 +506,46 @@
       "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P11-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate.",
+      "evidence": "Local: scripts/test-p11-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
+      "updated_at": "2026-09-20T15:57:21+00:00"
     },
     "P11-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report.",
+      "evidence": "Local: scripts/test-p11-domain.mjs passes (6 groups: P11-T01..T05, AC-08 2,000/2,000). CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P11-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report.",
+      "evidence": "Local: scripts/test-p11-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P11-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite 14/14 passed (17.4m) including the assets journey. CI run pending.",
+      "updated_at": "2026-09-20T16:34:45+00:00"
     },
     "P11-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written.",
+      "evidence": "Local: p11 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P11-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.11.0 drafted (docs/development/releases/0.11.0-draft.md). Blocked on the 0.5.0 (P05) release, the controller's approved classes, recognition methods, opening register, impairment and revaluation journals and disclosure boundary, contract operations for classes, the asset profile, policies and the opening register import, asset clerk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P12-01": {
       "status": "not_started",
@@ -2388,7 +2388,49 @@
       "id": "P10-05",
       "action": "done",
       "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T15:57:21+00:00",
+      "id": "P11-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-02",
+      "action": "in_review",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-05",
+      "action": "in_review",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-06",
+      "action": "blocked",
+      "note": "Release 0.11.0 drafted (docs/development/releases/0.11.0-draft.md). Blocked on the 0.5.0 (P05) release, the controller's approved classes, recognition methods, opening register, impairment and revaluation journals and disclosure boundary, contract operations for classes, the asset profile, policies and the opening register import, asset clerk and approver role templates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T16:34:45+00:00",
+      "id": "P11-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
     }
   ],
-  "updated_at": "2026-09-20T15:47:12+00:00"
+  "updated_at": "2026-09-20T16:34:45+00:00"
 }

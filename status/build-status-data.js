@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T15:47:12+00:00",
+  "updated_at": "2026-09-20T16:34:45+00:00",
   "releases": [
     {
       "id": "P00",
@@ -3183,16 +3183,16 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P03",
         "P05"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate.",
+      "evidence": "Local: scripts/test-p11-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
+      "updated_at": "2026-09-20T15:57:21+00:00"
     },
     {
       "id": "P11-02",
@@ -3220,13 +3220,13 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report.",
+      "evidence": "Local: scripts/test-p11-domain.mjs passes (6 groups: P11-T01..T05, AC-08 2,000/2,000). CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     {
       "id": "P11-03",
@@ -3254,13 +3254,13 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report.",
+      "evidence": "Local: scripts/test-p11-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     {
       "id": "P11-04",
@@ -3288,13 +3288,13 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite 14/14 passed (17.4m) including the assets journey. CI run pending.",
+      "updated_at": "2026-09-20T16:34:45+00:00"
     },
     {
       "id": "P11-05",
@@ -3322,13 +3322,13 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written.",
+      "evidence": "Local: p11 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     {
       "id": "P11-06",
@@ -3356,13 +3356,13 @@ window.LARA_BUILD_STATUS = {
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.11.0 drafted (docs/development/releases/0.11.0-draft.md). Blocked on the 0.5.0 (P05) release, the controller's approved classes, recognition methods, opening register, impairment and revaluation journals and disclosure boundary, contract operations for classes, the asset profile, policies and the opening register import, asset clerk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     {
       "id": "P12-01",
@@ -5521,48 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T09:39:00+00:00",
-      "id": "P08-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T10:54:20+00:00",
-      "id": "P08-01",
-      "action": "done",
-      "note": "Migration 0023 (source systems, source ownership windows, mapping versions and frozen lines, source batches with manifests and staged rows, expected batches, balance snapshots, instrument facts, branch roll-ups); nine reads added to the reviewed contract (365 operations); feeds ride the reviewed import operations; scripts/test-p08-schema.mjs (7 groups) passes locally."
-    },
-    {
-      "at": "2026-09-20T10:54:21+00:00",
-      "id": "P08-02",
-      "action": "done",
-      "note": "packages/domain/src/fi.mjs: institution profile, source systems and approved ownership windows, mapping versions from reviewed CSV with diffs, the lara-feed-1 manifest contract through the import pipeline (duplicate rule, error workbench, one posting per batch, linked replacements, balance snapshots, instrument facts), expected batches raising close tasks on the affected period only, feed reconciliation, branch roll-up with interbranch elimination, institution tax worksheet through reviewed rule versions; scripts/test-p08-domain.mjs covers P08-T01..T05 (9 groups)."
-    },
-    {
-      "at": "2026-09-20T10:54:21+00:00",
-      "id": "P08-03",
-      "action": "done",
-      "note": "The 5 source-ownership operations plus nine reads served by apps/api/src/workspace-api.mjs; import operations carry the sourceFeed hook and period soft-close/lock carry the feeds hook; worker job feed.sweep and report types branch_rollup, institution_tax, feed_reconciliation; scripts/test-p08-api.mjs (5 groups) runs API and worker as processes."
-    },
-    {
-      "at": "2026-09-20T10:54:21+00:00",
-      "id": "P08-04",
-      "action": "done",
-      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T10:54:21+00:00",
-      "id": "P08-05",
-      "action": "done",
-      "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written."
-    },
-    {
-      "at": "2026-09-20T11:17:04+00:00",
-      "id": "P09-01",
-      "action": "in_review",
-      "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally."
-    },
-    {
       "at": "2026-09-20T11:17:04+00:00",
       "id": "P09-02",
       "action": "in_review",
@@ -5699,6 +5657,48 @@ window.LARA_BUILD_STATUS = {
       "id": "P10-05",
       "action": "done",
       "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T15:57:21+00:00",
+      "id": "P11-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-02",
+      "action": "in_review",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-05",
+      "action": "in_review",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T15:57:22+00:00",
+      "id": "P11-06",
+      "action": "blocked",
+      "note": "Release 0.11.0 drafted (docs/development/releases/0.11.0-draft.md). Blocked on the 0.5.0 (P05) release, the controller's approved classes, recognition methods, opening register, impairment and revaluation journals and disclosure boundary, contract operations for classes, the asset profile, policies and the opening register import, asset clerk and approver role templates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T16:34:45+00:00",
+      "id": "P11-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
     }
   ]
 };
