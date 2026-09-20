@@ -408,4 +408,3 @@ grant select on lara.asset_classes, lara.assets, lara.asset_events, lara.asset_c
 -- rolls the register forward, creates the recurring drafts and raises tasks.
 grant update on lara.schedule_lines, lara.schedule_runs, lara.recognition_schedules, lara.assets to lara_worker;
 grant insert on lara.book_tax_layers, lara.journal_drafts, lara.documents, lara.document_lines, lara.document_relations, lara.tasks to lara_worker;
-grant update on lara.documents, lara.journal_drafts to lara_worker;
