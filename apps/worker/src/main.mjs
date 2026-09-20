@@ -35,7 +35,7 @@ export const handlers={
  'report.generate':async(tx,ctx,job)=>{
   const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
   const actor={...current,traceId:ctx.traceId};
-  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd})}});
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'})}});
   const format=job.payload_ref.format||'json';
   let content,mime;
   if(format==='csv'){const rows=snap.payload.lines||snap.payload.parties.flatMap(p=>p.items.map(i=>({party:p.legalName,...i})));const cols=snap.payload.lines?['code','name','category','debit','credit','balance']:['party','officialNumber','dueDate','daysPastDue','outstanding'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...rows.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}

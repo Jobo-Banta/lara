@@ -188,7 +188,7 @@ try{
  // AC-02 / AC-05: receipt with customer withholding, allocation, double allocation refused, reversal of one allocation and of the receipt.
  const receiptBody=(over={})=>({direction:'receipt',partyId:customer.id,currency:'PHP',valueDate:'2026-09-25',grossAmount:'5600.00',cashAmount:'5500.00',withholdingAmount:'100.00',method:'transfer',allocations:[{openItemId:item.id,amount:'5600.00'}],evidenceIds:[],...over});
  await rejects(run(bill,tx=>sales.createCollection(tx,bill,entityId,receiptBody({cashAmount:'5000.00'}))),'VALIDATION_FAILED','gross not equal to cash plus withholding');
- await rejects(run(bill,tx=>sales.createCollection(tx,bill,entityId,receiptBody({direction:'payment'}))),'FEATURE_NOT_ENABLED','supplier payments before P05');
+ await rejects(run(bill,tx=>sales.createCollection(tx,bill,entityId,receiptBody({direction:'payment'}))),'VALIDATION_FAILED','supplier payments are proposed through settlements');
  await rejects(run(bill,tx=>sales.createCollection(tx,bill,entityId,receiptBody({allocations:[{openItemId:item.id,amount:'5600.01'}]}))),'ALLOCATION_EXCEEDS_BALANCE','allocations beyond the receipt');
  const rc=await run(bill,tx=>sales.createCollection(tx,bill,entityId,receiptBody()));
  assert.deepEqual([rc.state,rc.grossAmount,rc.allocations.length],['draft','5600.00',1]);

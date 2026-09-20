@@ -7,3 +7,4 @@ export * as workflow from './workflow.mjs';
 export * from './adapters.mjs';
 export * as ledger from './ledger.mjs';
 export * as sales from './sales.mjs';
+export * as purchasing from './purchasing.mjs';

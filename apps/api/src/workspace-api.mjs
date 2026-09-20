@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing} from '@lara/domain';
 
 const MAX_JSON=1048576,MAX_UPLOAD=20971520;
 const buckets=new Map();
@@ -160,7 +160,7 @@ Object.assign(handlers,{
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements','aging'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging','ap_aging'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
  // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
@@ -197,6 +197,47 @@ Object.assign(handlers,{
  post_collections_id_allocations:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await sales.allocateCollection(tx,ctx,entityId,params.id,body,version)),
  post_allocations_id_reverse:async(tx,ctx,{entityId,params,body})=>result(ctx,await sales.reverseAllocation(tx,ctx,entityId,params.id,body)),
  get_open_items:async(tx,ctx,{entityId,query})=>list(await sales.listOpenItems(tx,ctx,entityId,query)),
+});
+// P05 purchasing: bills and supplier credits, purchase orders, expense claims, payment proposals and payment orders.
+const posting=(ctx,r)=>({status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds||[]}});
+const family=(kinds,label)=>(tx,ctx,{entityId,body})=>{if(!kinds.includes(body.kind))fail('VALIDATION_FAILED','This operation creates '+label+'.',{fieldErrors:[{path:'kind',message:kinds.join(' or ')}]});return purchasing.createDocument(tx,ctx,entityId,body).then(created);};
+Object.assign(handlers,{
+ post_bills:family(['bill'],'bills'),
+ get_bills:async(tx,ctx,{entityId,query})=>list(await purchasing.listDocuments(tx,ctx,entityId,query,{kinds:['bill','credit_note']})),
+ get_bills_id:async(tx,ctx,{entityId,params})=>ok(await purchasing.getDocument(tx,ctx,entityId,params.id,{kinds:['bill','credit_note']})),
+ patch_bills_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updateDocument(tx,ctx,entityId,params.id,version,body)),
+ post_bills_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitDocument(tx,ctx,entityId,params.id,body,version)),
+ post_bills_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.approveDocument(tx,ctx,entityId,params.id,body,version)),
+ post_bills_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.postDocument(tx,ctx,entityId,params.id,body,version)),
+ post_bills_id_correct:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.correctDocument(tx,ctx,entityId,params.id,body,version)),
+ post_purchase_orders:family(['purchase_order'],'purchase orders'),
+ get_purchase_orders:async(tx,ctx,{entityId,query})=>list(await purchasing.listDocuments(tx,ctx,entityId,query,{kinds:['purchase_order']})),
+ get_purchase_orders_id:async(tx,ctx,{entityId,params})=>ok(await purchasing.getDocument(tx,ctx,entityId,params.id,{kinds:['purchase_order']})),
+ patch_purchase_orders_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updateDocument(tx,ctx,entityId,params.id,version,body)),
+ post_purchase_orders_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitDocument(tx,ctx,entityId,params.id,body,version)),
+ post_purchase_orders_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.approveDocument(tx,ctx,entityId,params.id,body,version)),
+ post_purchase_orders_id_cancel:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.cancelDocument(tx,ctx,entityId,params.id,body,version)),
+ post_expense_claims:family(['expense_claim'],'expense claims'),
+ get_expense_claims:async(tx,ctx,{entityId,query})=>list(await purchasing.listDocuments(tx,ctx,entityId,query,{kinds:['expense_claim']})),
+ get_expense_claims_id:async(tx,ctx,{entityId,params})=>ok(await purchasing.getDocument(tx,ctx,entityId,params.id,{kinds:['expense_claim']})),
+ patch_expense_claims_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updateDocument(tx,ctx,entityId,params.id,version,body)),
+ post_expense_claims_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitDocument(tx,ctx,entityId,params.id,body,version)),
+ post_expense_claims_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.approveDocument(tx,ctx,entityId,params.id,body,version)),
+ post_expense_claims_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.postDocument(tx,ctx,entityId,params.id,body,version)),
+ post_settlements:async(tx,ctx,{entityId,body})=>created(await purchasing.createSettlement(tx,ctx,entityId,body)),
+ get_settlements:async(tx,ctx,{entityId,query})=>list(await purchasing.listSettlements(tx,ctx,entityId,query)),
+ get_settlements_id:async(tx,ctx,{entityId,params})=>ok(await purchasing.getSettlement(tx,ctx,entityId,params.id)),
+ patch_settlements_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updateSettlement(tx,ctx,entityId,params.id,version,body)),
+ post_settlements_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitSettlement(tx,ctx,entityId,params.id,body,version)),
+ post_payments:async(tx,ctx,{entityId,body})=>created(await purchasing.createPayment(tx,ctx,entityId,body)),
+ get_payments:async(tx,ctx,{entityId,query})=>list(await purchasing.listPayments(tx,ctx,entityId,query)),
+ get_payments_id:async(tx,ctx,{entityId,params})=>ok(await purchasing.getPayment(tx,ctx,entityId,params.id)),
+ patch_payments_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updatePayment(tx,ctx,entityId,params.id,version,body)),
+ post_payments_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitPayment(tx,ctx,entityId,params.id,body,version)),
+ post_payments_id_authorize:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.authorizePayment(tx,ctx,entityId,params.id,body,version)),
+ post_payments_id_release:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.releasePayment(tx,ctx,entityId,params.id,body,version)),
+ post_payments_id_settle:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.settlePayment(tx,ctx,entityId,params.id,body,version)),
+ post_payments_id_return:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.returnPayment(tx,ctx,entityId,params.id,body,version)),
 });
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 

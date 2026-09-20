@@ -254,25 +254,25 @@
       "updated_at": "2026-09-18T23:17:39+00:00"
     },
     "P05-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds.",
+      "evidence": "Local: scripts/test-p05-schema.mjs passed against Supabase; CI run pending",
+      "updated_at": "2026-09-20T00:26:17+00:00"
     },
     "P05-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups).",
+      "evidence": "Local: scripts/test-p05-domain.mjs and P04 regression passed; CI run pending",
+      "updated_at": "2026-09-20T00:26:18+00:00"
     },
     "P05-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI.",
+      "evidence": "Local: scripts/test-p05-api.mjs passed; CI run pending",
+      "updated_at": "2026-09-20T00:26:18+00:00"
     },
     "P05-04": {
       "status": "not_started",
@@ -1962,7 +1962,25 @@
       "id": "P04-05",
       "action": "done",
       "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft."
+    },
+    {
+      "at": "2026-09-20T00:26:17+00:00",
+      "id": "P05-01",
+      "action": "in_review",
+      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds."
+    },
+    {
+      "at": "2026-09-20T00:26:18+00:00",
+      "id": "P05-02",
+      "action": "in_review",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
+    },
+    {
+      "at": "2026-09-20T00:26:18+00:00",
+      "id": "P05-03",
+      "action": "in_review",
+      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI."
     }
   ],
-  "updated_at": "2026-09-18T23:40:31+00:00"
+  "updated_at": "2026-09-20T00:26:18+00:00"
 }
