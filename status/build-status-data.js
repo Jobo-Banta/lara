@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T06:02:37+00:00",
+  "updated_at": "2026-09-20T06:10:34+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1872,15 +1872,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P05"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Migration 0021 (bank accounts, statement batches and lines, reconciliation matches and guarded allocations, checks, transfers, cash sessions with counts and handovers, bank file runs); GET /bank-statement-lines and GET /bank-reconciliation added to the reviewed contract (353 operations); scripts/test-p06-schema.mjs (9 groups) in CI.",
-      "evidence": "Local: scripts/test-p06-schema.mjs passed; CI run pending",
-      "updated_at": "2026-09-20T03:37:26+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-02",
@@ -1911,13 +1911,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups).",
-      "evidence": "Local: scripts/test-p06-domain.mjs and P03/P04/P05 regressions passed; CI run pending",
-      "updated_at": "2026-09-20T03:37:27+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-03",
@@ -1948,13 +1948,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "36 P06 operations served by apps/api/src/workspace-api.mjs (imports carry the treasury hooks, payments carry the bank-file generator, dishonor carries the settlement reversal); worker bank.propose_matches job and bank_reconciliation report; scripts/test-p06-api.mjs (8 groups) in CI.",
-      "evidence": "Local: scripts/test-p06-api.mjs passed; CI run pending",
-      "updated_at": "2026-09-20T03:37:27+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-04",
@@ -1985,13 +1985,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "workspace-treasury.tsx: bank accounts, reconciliation workbench (difference breakdown, statement lines, counterparts, journal allocations, proposals with confirm/reject/reverse), transfers, check register with release calendar, cashier sessions with denomination counts and handover; imports screen offers bank statements; routes /bank/*; browser treasury journey.",
-      "evidence": "Local: tsc, pnpm build and the workspace journeys (9 tests) pass against Supabase; full suite and CI pending",
-      "updated_at": "2026-09-20T06:02:37+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-05",
@@ -2022,13 +2022,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "P06-T01..T05 in scripts/test-p06-domain.mjs and test-p06-api.mjs; docs/development/P06-REVIEW.md, P06-RUNBOOK.md and releases/0.6.0-draft.md written; later-phase probes moved to P07 operations.",
-      "evidence": "Local suites pass; CI run pending",
-      "updated_at": "2026-09-20T06:02:37+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-06",
@@ -5521,36 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T21:40:19+00:00",
-      "id": "P04-01",
-      "action": "in_progress",
-      "note": "Designing the sales and tax-kernel schema: documents and lines with server-computed tax snapshots, relations, series with single-use official numbering, tax rule versions and tax events, open items with derived outstanding, settlements with append-only allocation events, payment terms, credit limits, deliveries and party snapshots."
-    },
-    {
-      "at": "2026-09-18T21:53:17+00:00",
-      "id": "P04-01",
-      "action": "in_review",
-      "note": "Migration 0016 adds tax_rule_versions, document_series/number_events, payment_terms, credit_limits, deliveries, documents/lines/relations/party_snapshots, tax_events, open_items, settlements and append-only allocation_events with RLS, grants and trigger-enforced invariants; scripts/test-p04-schema.mjs (8 groups) runs in CI; docs/development/P04-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T21:57:19+00:00",
-      "id": "P04-01",
-      "action": "done",
-      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T22:22:08+00:00",
-      "id": "P04-02",
-      "action": "in_review",
-      "note": "packages/domain/src/sales.mjs: tax kernel (line/document rounding, residual allocation), tax rule lifecycle, documents with single-effect issuance and numbering, corrections, collections and allocations, orders, deliveries, open items and aging; migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) in CI."
-    },
-    {
-      "at": "2026-09-18T22:34:12+00:00",
-      "id": "P04-02",
-      "action": "done",
-      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
-    },
-    {
       "at": "2026-09-18T22:34:12+00:00",
       "id": "P04-03",
       "action": "in_review",
@@ -5699,6 +5669,36 @@ window.LARA_BUILD_STATUS = {
       "id": "P06-06",
       "action": "blocked",
       "note": "Release 0.6.0 drafted (docs/development/releases/0.6.0-draft.md). Blocked on the 0.5.0 (P05) release, pilot bank format acceptance by bank and customer, signer matrix and outbound custody controls, contract operations for the treasury profile, statement batches, bank file runs and cash counts, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T06:10:34+00:00",
+      "id": "P06-01",
+      "action": "done",
+      "note": "Migration 0021 (bank accounts, statement batches and lines, reconciliation matches and guarded allocations, checks, transfers, cash sessions with counts and handovers, bank file runs); GET /bank-statement-lines and GET /bank-reconciliation added to the reviewed contract (353 operations); scripts/test-p06-schema.mjs (9 groups) in CI."
+    },
+    {
+      "at": "2026-09-20T06:10:34+00:00",
+      "id": "P06-02",
+      "action": "done",
+      "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups)."
+    },
+    {
+      "at": "2026-09-20T06:10:34+00:00",
+      "id": "P06-03",
+      "action": "done",
+      "note": "36 P06 operations served by apps/api/src/workspace-api.mjs (imports carry the treasury hooks, payments carry the bank-file generator, dishonor carries the settlement reversal); worker bank.propose_matches job and bank_reconciliation report; scripts/test-p06-api.mjs (8 groups) in CI."
+    },
+    {
+      "at": "2026-09-20T06:10:34+00:00",
+      "id": "P06-04",
+      "action": "done",
+      "note": "workspace-treasury.tsx: bank accounts, reconciliation workbench (difference breakdown, statement lines, counterparts, journal allocations, proposals with confirm/reject/reverse), transfers, check register with release calendar, cashier sessions with denomination counts and handover; imports screen offers bank statements; routes /bank/*; browser treasury journey."
+    },
+    {
+      "at": "2026-09-20T06:10:34+00:00",
+      "id": "P06-05",
+      "action": "done",
+      "note": "P06-T01..T05 in scripts/test-p06-domain.mjs and test-p06-api.mjs; docs/development/P06-REVIEW.md, P06-RUNBOOK.md and releases/0.6.0-draft.md written; later-phase probes moved to P07 operations."
     }
   ]
 };
