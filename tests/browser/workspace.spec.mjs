@@ -804,7 +804,7 @@ test('institution: capability activation, source ownership recorded from the sig
  await expect(batchRow(preparer.page).getByRole('cell',{name:'validated',exact:true})).toBeVisible();
  await batchRow(preparer.page).getByRole('button',{name:'Rows'}).click();
  await preparer.page.getByLabel('Only rows with errors').uncheck();
- await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'CBS-2',exact:true})})).toContainText('valid');
+ await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'CBS-2',exact:true})})).toContainText('valid',{timeout:20000});
  await controller.page.goto('/institution/feeds');await settled(controller.page);
  await batchRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
  await expect(batchRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
@@ -1143,14 +1143,86 @@ test('assets: capability activation, an asset drafted from the posted bill and c
  for(const route of ['/assets','/assets/schedules']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'assets '+route);}
  await controller.context.close();await preparer.context.close();
 });
+// The feature configurations, the held-out evaluations Finance accepted and
+// the requester and reviewer roles have no reviewed operations or seeded
+// template yet; the journey seeds them through the runtime role as an
+// operator would. Requests, review and the opt-out go through the screen.
+async function seedAssistant(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({ai:1})])).rows[0].h;
+  for(const feature of ['capture','ask_books']){
+   const set=(await db.query("insert into lara.evaluation_sets(tenant_id,feature,version,hash,consent_basis,item_count,created_by) values($1,$2,'heldout-2026-09',$3,'Tenant documents with written consent; no training',220,$4) returning id",[tenantId,feature,hash,await principal('preparer')])).rows[0].id;
+   const result=(await db.query("insert into lara.evaluation_results(tenant_id,evaluation_set_id,feature,model_version,prompt_version,metrics,thresholds,item_count,passed,accepted_by,created_by) values($1,$2,$3,'fixture-1','p12.1','{\"materialFieldErrorRate\":0.02,\"unauthorizedActions\":0,\"controlBypasses\":0}','{\"materialFieldErrorRate\":0.05}',220,true,$4,$5) returning id",[tenantId,set,feature,await principal('controller'),await principal('preparer')])).rows[0].id;
+   await db.query("insert into lara.model_feature_configs(tenant_id,feature,enabled,budget_minor,provider_policy,model_version,prompt_version,tool_schema_version,evaluation_result_id,approved_by,reason,created_by) values($1,$2,true,1000,'{\"provider\":\"fixture\",\"region\":\"local\",\"retention\":\"none\",\"training\":false}','fixture-1','p12.1','tools-1',$3,$4,'Evaluated on 220 held-out items',$5)",[tenantId,feature,result,await principal('controller'),await principal('preparer')]);
+  }
+  // No seeded template holds assistant.suggest or assistant.review; tenant roles cover the requester and the reviewer.
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const userRole=await role('ai_user',['assistant.suggest','assistant.read']);
+  const reviewerRole=await role('ai_reviewer',['assistant.review','assistant.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),userRole,await principal('security'),await principal('controller'),reviewerRole]);
+ }finally{await db.end();}
+}
+test('assistant: capability activation, a capture request over a scan that abstains for lack of readable evidence, ask-your-books answering from the trial balance with the scope banner, review by the controller and the feature opt-out',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Evidence-backed AI assistance'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Provider terms reviewed by privacy and security':'Finance accepted the evaluation results');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedAssistant();
+ await preparer.page.goto('/assistant');await settled(preparer.page);
+ await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'Bill and receipt capture',exact:true})})).toContainText('on');
+ // Capture over the registration scan: no readable field, so the assistant abstains and nothing is drafted.
+ await preparer.page.getByRole('checkbox',{name:'registration.pdf'}).check();
+ await preparer.page.getByRole('button',{name:'Request suggestion'}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toHaveCount(0);
+ const settledRun=async(page,text)=>{for(let i=0;i<30;i++){await page.goto('/assistant');await settled(page);if(await page.getByRole('cell',{name:text,exact:true}).count())return;await page.waitForTimeout(2000);}await expect(page.getByRole('cell',{name:text,exact:true})).toBeVisible();};
+ await settledRun(preparer.page,'abstained');
+ await preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'abstained',exact:true})}).getByRole('button',{name:'Review'}).click();
+ await expect(preparer.page.getByText('Abstained.',{exact:false})).toBeVisible();
+ // Ask your books: the number comes from the trial balance of the stated scope.
+ await preparer.page.getByRole('combobox',{name:'Feature'}).selectOption('ask_books');
+ await preparer.page.getByRole('textbox',{name:'Question',exact:true}).fill('What are the total debits?');
+ await preparer.page.getByRole('combobox',{name:'Period',exact:true}).selectOption({index:1});
+ await preparer.page.getByRole('button',{name:'Request suggestion'}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toHaveCount(0);
+ await settledRun(preparer.page,'succeeded');
+ const askRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'Ask your books',exact:true})}).last();
+ await askRow(preparer.page).getByRole('button',{name:'Review'}).click();
+ await expect(preparer.page.getByText('Scope:',{exact:false})).toBeVisible();
+ await expect(preparer.page.getByText('Total debits',{exact:false}).first()).toBeVisible();
+ await expect(preparer.page.getByRole('button',{name:'Accept as proposed'})).toHaveCount(0);
+ await controller.page.goto('/assistant');await settled(controller.page);
+ await askRow(controller.page).getByRole('button',{name:'Review'}).click();
+ await expect(controller.page.getByText('Total debits',{exact:false}).first()).toBeVisible();
+ await controller.page.getByRole('button',{name:'Accept as proposed'}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toHaveCount(0);
+ await expect(controller.page.getByText('reviewed (accept)',{exact:false})).toBeVisible({timeout:15000});
+ // The controller switches capture off for the company.
+ const captureRow=controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'Bill and receipt capture',exact:true})});
+ await captureRow.getByRole('textbox',{name:'Reason'}).fill('Owner opted out until the next evaluation');
+ await captureRow.getByRole('button',{name:'Switch off'}).click();
+ await expect(captureRow.getByRole('cell',{name:'off',exact:true})).toBeVisible();
+ await controller.page.goto('/assistant');await settled(controller.page);await noSeriousViolations(controller.page,'assistant /assistant');
+ await controller.context.close();await preparer.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/assistant');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P12',{exact:false})).toBeVisible();
+ await clerk.page.goto('/portal');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P13',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

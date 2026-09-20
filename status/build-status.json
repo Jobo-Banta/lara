@@ -506,39 +506,39 @@
       "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P11-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate.",
-      "evidence": "Local: scripts/test-p11-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
-      "updated_at": "2026-09-20T15:57:21+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     "P11-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report.",
-      "evidence": "Local: scripts/test-p11-domain.mjs passes (6 groups: P11-T01..T05, AC-08 2,000/2,000). CI run pending.",
-      "updated_at": "2026-09-20T15:57:22+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     "P11-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report.",
-      "evidence": "Local: scripts/test-p11-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
-      "updated_at": "2026-09-20T15:57:22+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     "P11-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite 14/14 passed (17.4m) including the assets journey. CI run pending.",
-      "updated_at": "2026-09-20T16:34:45+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     "P11-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written.",
-      "evidence": "Local: p11 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T15:57:22+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     "P11-06": {
       "status": "blocked",
@@ -548,46 +548,46 @@
       "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P12-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate.",
+      "evidence": "Local: scripts/test-p12-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
+      "updated_at": "2026-09-20T17:32:29+00:00"
     },
     "P12-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider.",
+      "evidence": "Local: scripts/test-p12-domain.mjs passes (6 groups: P12-T01..T05). CI run pending.",
+      "updated_at": "2026-09-20T17:32:29+00:00"
     },
     "P12-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only).",
+      "evidence": "Local: scripts/test-p12-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-20T17:32:29+00:00"
     },
     "P12-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; the assistant journey passed in the full browser run of 2026-09-21 (13 passed, one unrelated timing flake in the institution journey on the shared dev database in later runs). CI run pending.",
+      "updated_at": "2026-09-20T19:01:16+00:00"
     },
     "P12-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written.",
+      "evidence": "Local: p12 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T17:32:29+00:00"
     },
     "P12-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.12.0 drafted (docs/development/releases/0.12.0-draft.md). Blocked on the 0.7.0 (P07) release, privacy/security approval of a hosted provider's region, retention, training terms and subprocessors, the provider adapter itself (only the local fixture exists), a real held-out evaluation (200 local bills with handwriting and poor scans) accepted by Finance, Product's review-time measurement, contract operations for configuration and evaluation, requester and reviewer role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T17:32:30+00:00"
     },
     "P13-01": {
       "status": "not_started",
@@ -1243,66 +1243,6 @@
     }
   },
   "history": [
-    {
-      "at": "2026-09-18T08:40:39+00:00",
-      "id": "P00-01",
-      "action": "in_progress",
-      "note": "Workspace baseline created; approved Ledger-L assets packaged; pnpm build and localhost smoke check passed."
-    },
-    {
-      "at": "2026-09-18T08:53:12+00:00",
-      "id": "P00-02",
-      "action": "done",
-      "note": ""
-    },
-    {
-      "at": "2026-09-18T08:53:13+00:00",
-      "id": "P00-03",
-      "action": "in_review",
-      "note": "Checksum-verified migration runner applied 0001_phase0 to Supabase and rerun was a no-op."
-    },
-    {
-      "at": "2026-09-18T08:53:13+00:00",
-      "id": "P00-04",
-      "action": "blocked",
-      "note": "OIDC issuer and client credentials are not available; identity provider integration cannot be verified."
-    },
-    {
-      "at": "2026-09-18T08:53:14+00:00",
-      "id": "P00-05",
-      "action": "in_review",
-      "note": "CI workflow and build-tracker check added."
-    },
-    {
-      "at": "2026-09-18T08:53:15+00:00",
-      "id": "P00-06",
-      "action": "in_review",
-      "note": "Demo-only seed guard and local PostgreSQL compose target added."
-    },
-    {
-      "at": "2026-09-18T08:53:15+00:00",
-      "id": "P00-07",
-      "action": "done",
-      "note": ""
-    },
-    {
-      "at": "2026-09-18T08:53:16+00:00",
-      "id": "P00-08",
-      "action": "blocked",
-      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
-    },
-    {
-      "at": "2026-09-18T09:02:06+00:00",
-      "id": "P00-03",
-      "action": "in_review",
-      "note": "Supabase migration runner applied and reran cleanly; lara_api pooler role provisioned and verified over TLS. Clean/prior-release database rehearsal remains."
-    },
-    {
-      "at": "2026-09-18T09:03:37+00:00",
-      "id": "P00-06",
-      "action": "in_review",
-      "note": "Supabase demo schema is live; local seed remains demo-mode guarded."
-    },
     {
       "at": "2026-09-18T09:06:05+00:00",
       "id": "P00-08",
@@ -2430,7 +2370,79 @@
       "id": "P11-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T17:32:29+00:00",
+      "id": "P12-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate."
+    },
+    {
+      "at": "2026-09-20T17:32:29+00:00",
+      "id": "P12-02",
+      "action": "in_review",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider."
+    },
+    {
+      "at": "2026-09-20T17:32:29+00:00",
+      "id": "P12-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only)."
+    },
+    {
+      "at": "2026-09-20T17:32:29+00:00",
+      "id": "P12-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T17:32:29+00:00",
+      "id": "P12-05",
+      "action": "in_review",
+      "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T17:32:30+00:00",
+      "id": "P12-06",
+      "action": "blocked",
+      "note": "Release 0.12.0 drafted (docs/development/releases/0.12.0-draft.md). Blocked on the 0.7.0 (P07) release, privacy/security approval of a hosted provider's region, retention, training terms and subprocessors, the provider adapter itself (only the local fixture exists), a real held-out evaluation (200 local bills with handwriting and poor scans) accepted by Finance, Product's review-time measurement, contract operations for configuration and evaluation, requester and reviewer role templates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T17:32:40+00:00",
+      "id": "P11-01",
+      "action": "done",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate."
+    },
+    {
+      "at": "2026-09-20T17:32:40+00:00",
+      "id": "P11-02",
+      "action": "done",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report."
+    },
+    {
+      "at": "2026-09-20T17:32:40+00:00",
+      "id": "P11-03",
+      "action": "done",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report."
+    },
+    {
+      "at": "2026-09-20T17:32:40+00:00",
+      "id": "P11-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T17:32:40+00:00",
+      "id": "P11-05",
+      "action": "done",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T19:01:16+00:00",
+      "id": "P12-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs."
     }
   ],
-  "updated_at": "2026-09-20T16:34:45+00:00"
+  "updated_at": "2026-09-20T19:01:16+00:00"
 }

@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -346,6 +346,15 @@ Object.assign(handlers,{
  post_schedules_id_pause:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await assets.pauseSchedule(tx,ctx,entityId,params.id,body,version)),
  post_schedule_runs:async(tx,ctx,{entityId,body})=>jobBody(ctx,await assets.requestScheduleRun(tx,ctx,entityId,body)),
  get_schedule_runs:async(tx,ctx,{entityId,query})=>list(await assets.listScheduleRuns(tx,ctx,entityId,query)),
+ // P12 evidence-backed AI assistance: runs are jobs; suggestions are reviewed by a named principal; nothing here posts.
+ post_assistant_runs:async(tx,ctx,{entityId,body})=>jobBody(ctx,await assistant.requestRun(tx,ctx,entityId,body)),
+ get_assistant_runs:async(tx,ctx,{entityId,query})=>list(await assistant.listRuns(tx,ctx,entityId,query)),
+ get_assistant_runs_id:async(tx,ctx,{entityId,params})=>ok(await assistant.getRun(tx,ctx,entityId,params.id)),
+ get_assistant_suggestions:async(tx,ctx,{entityId,query})=>list(await assistant.listSuggestions(tx,ctx,entityId,query)),
+ get_assistant_suggestions_id:async(tx,ctx,{entityId,params})=>ok(await assistant.getSuggestion(tx,ctx,entityId,params.id)),
+ post_assistant_suggestions_id_review:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await assistant.reviewSuggestion(tx,ctx,entityId,params.id,body,version)),
+ get_assistant_features:async(tx,ctx,{entityId})=>list(await assistant.listFeatures(tx,ctx,entityId)),
+ patch_assistant_features_feature:async(tx,ctx,{entityId,params,body,version})=>ok(await assistant.updateFeature(tx,ctx,entityId,params.feature,version,body)),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),

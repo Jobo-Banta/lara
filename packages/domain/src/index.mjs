@@ -14,3 +14,5 @@ export * as fi from './fi.mjs';
 export * as fx from './fx.mjs';
 export * as inventory from './inventory.mjs';
 export * as assets from './assets.mjs';
+export * as assistant from './assistant.mjs';
+export * from './ai-provider.mjs';

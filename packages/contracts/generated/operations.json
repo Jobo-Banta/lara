@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "e53d242e957211c000b3052fbe309b82939401d114c7b42ac4b5ebe8475c58df",
+  "sha256": "f02920c99d4d2f999bf6d9677279580f26424438cb313afdd16c8f721a99d625",
   "operations": [
     {
       "method": "POST",
@@ -1288,6 +1288,11 @@
       "operationId": "post_assistant_runs"
     },
     {
+      "method": "GET",
+      "path": "/assistant/runs",
+      "operationId": "get_assistant_runs"
+    },
+    {
       "method": "POST",
       "path": "/assistant/suggestions/{id}/review",
       "operationId": "post_assistant_suggestions_id_review"
@@ -1901,6 +1906,26 @@
       "method": "GET",
       "path": "/schedules/{id}/lines",
       "operationId": "get_schedules_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/assistant/runs/{id}",
+      "operationId": "get_assistant_runs_id"
+    },
+    {
+      "method": "GET",
+      "path": "/assistant/suggestions",
+      "operationId": "get_assistant_suggestions"
+    },
+    {
+      "method": "GET",
+      "path": "/assistant/features",
+      "operationId": "get_assistant_features"
+    },
+    {
+      "method": "PATCH",
+      "path": "/assistant/features/{feature}",
+      "operationId": "patch_assistant_features_feature"
     }
   ]
 }

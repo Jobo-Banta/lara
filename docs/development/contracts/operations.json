@@ -3418,5 +3418,50 @@
     "permission": "schedule.read",
     "input": null,
     "response": "ScheduleRunList"
+  },
+  {
+    "operationId": "get_assistant_runs",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/runs",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiRunList"
+  },
+  {
+    "operationId": "get_assistant_runs_id",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/runs/{id}",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiRunResource"
+  },
+  {
+    "operationId": "get_assistant_suggestions",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/suggestions",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiSuggestionList"
+  },
+  {
+    "operationId": "get_assistant_features",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/features",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiFeatureList"
+  },
+  {
+    "operationId": "patch_assistant_features_feature",
+    "phase": "P12",
+    "method": "PATCH",
+    "path": "/assistant/features/{feature}",
+    "permission": "assistant.review",
+    "input": "AiFeatureUpdate",
+    "response": "AiFeatureResource"
   }
 ]

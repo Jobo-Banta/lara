@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi,inventory,assets} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi,inventory,assets,assistant,aiProviderFromEnv} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -19,8 +19,8 @@ const log=(event,extra={})=>console.log(JSON.stringify({service:'worker',event,t
 const warn=(event,extra={})=>console.error(JSON.stringify({service:'worker',event,severity:'error',time:new Date().toISOString(),...extra}));
 let stopping=false;
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{stopping=true;});
-let store,scanner,transport;
-try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();transport=compliance.transportFromEnv(process.env,store);}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
+let store,scanner,transport,aiProvider;
+try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();transport=compliance.transportFromEnv(process.env,store);aiProvider=aiProviderFromEnv(process.env);}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
 
 const client=()=>new pg.Client({...connectionOptions(url),connectionTimeoutMillis:5000,query_timeout:30000});
 
@@ -72,6 +72,8 @@ export const handlers={
  'registration.pack':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'registration.prepare');const r=await compliance.generateRegistrationPack(tx,{...current,traceId:ctx.traceId},job.entity_id,{authority:job.payload_ref.authority,scope:job.payload_ref.scope,store});return {resourceType:'evidence',resourceId:r.evidenceId,state:'available',caseId:r.case.id,hash:r.hash};},
  // Schedule run: the requesting principal's schedule.execute authority is rechecked; lines post once, recurring kinds draft, a closed period raises a task.
  'schedule.run':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'schedule.execute');const r=await assets.executeScheduleRun(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.runId,{sales,ledger});return {resourceType:'schedule_run',resourceId:r.id,state:r.state,results:r.results.length};},
+ // AI run: the requester's authority is rechecked at start and at completion; the domain gates every tool and stores minimized output.
+ 'assistant.run':async(tx,ctx,job)=>{const r=await assistant.executeRun(tx,{tenantId:job.tenant_id,principalId:job.requested_by,traceId:ctx.traceId},job.entity_id,job.payload_ref.runId,{provider:aiProvider,store,ledger});return {resourceType:'ai_run',resourceId:r.id,state:r.state,suggestionId:r.suggestionId};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){
