@@ -117,10 +117,12 @@ export async function updatePeriod(tx,ctx,entityId,id,expectedVersion,input){
  return periodResource(updated);
 }
 async function loadPeriod(tx,ctx,entityId,id){const row=(await tx.query('select * from lara.periods where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Period not found.');return row;}
-export async function softClosePeriod(tx,ctx,entityId,id,input,expectedVersion){
+export async function softClosePeriod(tx,ctx,entityId,id,input,expectedVersion,{feeds=null}={}){
  requirePermission(ctx,'period.soft_close');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const row=await loadPeriod(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status!=='open')fail('STATE_CONFLICT','Period is '+row.status+'.');
+ // Expected source feeds that are overdue for this book and period become required close tasks here (P08).
+ if(feeds)await feeds.beforeClose(tx,ctx,entityId,row);
  const updated=(await tx.query("update lara.periods set status='soft_closed' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id])).rows[0];
  await audit(tx,ctx,{entityId,action:'period.soft_close',resourceType:'period',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});
  return {resourceType:'period',resourceId:id,version:Number(updated.version),state:'soft_closed'};
@@ -128,10 +130,11 @@ export async function softClosePeriod(tx,ctx,entityId,id,input,expectedVersion){
 // Lock requires every required close task of the current close version complete
 // and every substantiation reviewed; the period then refuses postings. Locking
 // principal must differ from whoever prepared open substantiations.
-export async function lockPeriod(tx,ctx,entityId,id,input,expectedVersion){
+export async function lockPeriod(tx,ctx,entityId,id,input,expectedVersion,{feeds=null}={}){
  requirePermission(ctx,'period.lock');requireEntity(ctx,entityId);assertInput('ReasonAction',input);
  const row=await loadPeriod(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status!=='soft_closed')fail('STATE_CONFLICT','Soft close the period before locking it.');
+ if(feeds)await feeds.beforeClose(tx,ctx,entityId,row);
  const openTasks=(await tx.query("select requirement from lara.close_tasks where tenant_id=$1 and period_id=$2 and close_version=$3 and required and status<>'complete'",[ctx.tenantId,id,row.close_version])).rows;
  if(openTasks.length)fail('STATE_CONFLICT','Required close tasks are open: '+openTasks.map(t=>t.requirement).join(', ')+'.',{fieldErrors:openTasks.map(t=>({path:t.requirement,message:'Complete with evidence before locking'}))});
  const unreviewed=(await tx.query("select count(*)::int n from lara.substantiations where tenant_id=$1 and period_id=$2 and state<>'reviewed'",[ctx.tenantId,id])).rows[0].n;
@@ -315,9 +318,18 @@ export async function snapshotReport(tx,ctx,entityId,input,{ruleVersion='p03.1',
 // accounts, approved independently and committed through the posting function.
 // ---------------------------------------------------------------------------
 export const importResource=b=>resource({...b,status:b.state},{kind:b.kind,evidenceId:b.evidence_id,mappingVersion:b.mapping_version,sourceId:b.source_id,externalBatchId:b.external_batch_id,cutoffDate:iso(b.cutoff)});
-export async function createImport(tx,ctx,entityId,input,{bookId}={}){
+export async function createImport(tx,ctx,entityId,input,{bookId,sourceFeed=null}={}){
  requirePermission(ctx,'import.create');requireEntity(ctx,entityId);assertInput('ImportCreate',input);await requireLedger(tx,ctx,entityId);
- if(!['openings','bank_statement'].includes(input.kind))fail('FEATURE_NOT_ENABLED','Import kind '+input.kind+' arrives with its owning module.');
+ if(!['openings','bank_statement','journal','source_balances'].includes(input.kind))fail('FEATURE_NOT_ENABLED','Import kind '+input.kind+' arrives with its owning module.');
+ let feed=null;
+ if(['journal','source_balances'].includes(input.kind)){
+  // Canonical source feeds are owned by the institution module: source
+  // ownership, mapping version and duplicate batch checks happen before staging.
+  if(!sourceFeed)fail('FEATURE_NOT_ENABLED','Source feed imports arrive with financial institution coexistence (P08).');
+  feed=await sourceFeed.prepare(tx,ctx,entityId,input);
+  if(feed.existing)return importResource(feed.existing);
+  bookId=feed.bookId;
+ }
  if(input.kind==='bank_statement'){
   // sourceId names the approved bank account; the treasury capability must be active.
   const treasury=(await tx.query("select 1 from lara.capability_activations where tenant_id=$1 and entity_id=$2 and capability='treasury' and status='active'",[ctx.tenantId,entityId])).rowCount;
@@ -333,6 +345,7 @@ export async function createImport(tx,ctx,entityId,input,{bookId}={}){
  if(evidence.mime!=='text/csv')fail('VALIDATION_FAILED','Imports read CSV evidence.',{fieldErrors:[{path:'evidenceId',message:'CSV required'}]});
  const row=(await tx.query('insert into lara.opening_batches(tenant_id,entity_id,book_id,kind,evidence_id,checksum,cutoff,source_id,external_batch_id,mapping_version,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning *',[ctx.tenantId,entityId,bookId,input.kind,input.evidenceId,evidence.sha256,input.cutoffDate,input.sourceId.trim(),input.externalBatchId.trim(),input.mappingVersion.trim(),ctx.principalId])).rows[0];
  await audit(tx,ctx,{entityId,action:'import.create',resourceType:'import',resourceId:row.id,resourceVersion:1,afterRef:evidence.sha256});
+ if(feed)await sourceFeed.created(tx,ctx,entityId,row,feed);
  return importResource(row);
 }
 export function parseOpeningCsv(text){
@@ -344,7 +357,7 @@ export function parseOpeningCsv(text){
  for(const r of required)if(!header.includes(r))fail('VALIDATION_FAILED','CSV header lacks '+r+'.',{fieldErrors:[{path:'header',message:'Missing '+r}]});
  return lines.slice(1).map((l,i)=>{const c=cells(l);const row={};header.forEach((h,j)=>{row[h]=c[j]??'';});row.rowNo=i+1;row.dimensions={};for(const h of header)if(h.startsWith('dim_')&&row[h])row.dimensions[h.slice(4)]=row[h];return row;});
 }
-export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{store,bankStatement=null}){
+export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{store,bankStatement=null,sourceFeed=null}){
  requirePermission(ctx,'import.validate');requireEntity(ctx,entityId);assertInput('Action',input||{});
  const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!batch)fail('NOT_FOUND','Import not found.');if(expectedVersion!==undefined)expectVersion(batch,expectedVersion);
@@ -352,6 +365,17 @@ export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{s
  const evidence=(await tx.query('select object_key,sha256 from lara.evidence where tenant_id=$1 and id=$2',[ctx.tenantId,batch.evidence_id])).rows[0];
  const bytes=await store.get(evidence.object_key);
  if(sha(bytes)!==batch.checksum)fail('STATE_CONFLICT','Evidence content no longer matches the import checksum.');
+ if(['journal','source_balances'].includes(batch.kind)){
+  // Feed validation is owned by the institution module: manifest, mapping, currency, balance and instrument facts.
+  if(!sourceFeed)fail('FEATURE_NOT_ENABLED','Source feed validation arrives with financial institution coexistence (P08).');
+  const v=await sourceFeed.validate(tx,ctx,entityId,batch,bytes.toString('utf8'));
+  const state=v.errors?'staged':'validated';
+  const updated=(await tx.query('update lara.opening_batches set state=$3,row_count=$4,error_count=$5,debit_total=$6,credit_total=$7 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,state,v.rows,v.errors,v.debit,v.credit])).rows[0];
+  await audit(tx,ctx,{entityId,action:'import.validate',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),reason:v.errors?v.errors+' error(s)':'valid'});
+  // Feed errors stay on the staged rows for the error workbench; the batch
+  // simply is not validated, so approval is refused until a clean re-validation.
+  return {resourceType:'import',resourceId:id,version:Number(updated.version),state,rows:v.rows,errors:v.errors,fieldErrors:v.fieldErrors,message:v.message};
+ }
  if(batch.kind==='bank_statement'){
   // Statement validation is owned by treasury: balances, currency, single-use line keys.
   if(!bankStatement)fail('FEATURE_NOT_ENABLED','Bank statement validation arrives with treasury (P06).');
@@ -397,7 +421,7 @@ export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{s
  if(debit!==credit)fail('UNBALANCED_ENTRY','Opening debits '+decimal(debit)+' differ from credits '+decimal(credit)+'.',{fieldErrors:[{path:'rows',message:'Difference '+decimal(debit-credit)}]});
  return {resourceType:'import',resourceId:id,version:Number(updated.version),state,rows:rows.length,errors};
 }
-export async function approveImport(tx,ctx,entityId,id,input,expectedVersion){
+export async function approveImport(tx,ctx,entityId,id,input,expectedVersion,{sourceFeed=null}={}){
  requirePermission(ctx,'import.approve');requireEntity(ctx,entityId);assertInput('ApprovalDecision',input);
  const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!batch)fail('NOT_FOUND','Import not found.');if(expectedVersion!==undefined)expectVersion(batch,expectedVersion);
@@ -407,17 +431,26 @@ export async function approveImport(tx,ctx,entityId,id,input,expectedVersion){
  const state=input.decision==='approve'?'approved':'rejected';
  const updated=(await tx.query('update lara.opening_batches set state=$3,approved_by=$4 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,state,input.decision==='approve'?ctx.principalId:null])).rows[0];
  await audit(tx,ctx,{entityId,action:'import.'+input.decision,resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason||null});
+ if(['journal','source_balances'].includes(batch.kind)&&sourceFeed)await sourceFeed.decided(tx,ctx,entityId,updated,input);
  return {resourceType:'import',resourceId:id,version:Number(updated.version),state};
 }
 // Commit posts one opening entry for the batch through the posting function.
 // The same batch committed twice returns the same entry; another committed
 // openings batch with an overlapping cutoff for the book is refused.
-export async function commitImport(tx,ctx,entityId,id,input,expectedVersion,{commandId=null,store=null,bankStatement=null}={}){
+export async function commitImport(tx,ctx,entityId,id,input,expectedVersion,{commandId=null,store=null,bankStatement=null,sourceFeed=null}={}){
  requirePermission(ctx,'import.commit');requireEntity(ctx,entityId);assertInput('Action',input||{});
  const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!batch)fail('NOT_FOUND','Import not found.');if(expectedVersion!==undefined)expectVersion(batch,expectedVersion);
  if(batch.state==='committed')return {resourceType:'import',resourceId:id,version:Number(batch.version),state:'committed',journalEntryIds:batch.committed_entry_id?[batch.committed_entry_id]:[]};
  if(batch.state!=='approved')fail('STATE_CONFLICT','Approve the import before committing.');
+ if(['journal','source_balances'].includes(batch.kind)){
+  if(!sourceFeed)fail('FEATURE_NOT_ENABLED','Source feed commit arrives with financial institution coexistence (P08).');
+  const r=await sourceFeed.commit(tx,ctx,entityId,batch,{commandId});
+  const updated=(await tx.query("update lara.opening_batches set state='committed',committed_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,r.entryId||null])).rows[0];
+  await audit(tx,ctx,{entityId,action:'import.commit',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),afterRef:r.entryId||r.batchId});
+  if(r.entryId)await emit(tx,ctx,{entityId,aggregateType:'import',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'document.posted.v1',payload:{importId:id,entryId:r.entryId,bookId:batch.book_id,sourceBatchId:r.batchId}});
+  return {resourceType:'import',resourceId:id,version:Number(updated.version),state:'committed',journalEntryIds:r.entryId?[r.entryId]:[],batchId:r.batchId};
+ }
  if(batch.kind==='bank_statement'){
   if(!bankStatement||!store)fail('FEATURE_NOT_ENABLED','Bank statement commit arrives with treasury (P06).');
   const evidence=(await tx.query('select object_key from lara.evidence where tenant_id=$1 and id=$2',[ctx.tenantId,batch.evidence_id])).rows[0];

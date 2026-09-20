@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -35,7 +35,7 @@ export const handlers={
  'report.generate':async(tx,ctx,job)=>{
   const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
   const actor={...current,traceId:ctx.traceId};
-  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'}),bank_reconciliation:(t,c,e,input)=>treasury.reconciliationReport(t,c,e,{bankAccountId:input.dimensions?.bankAccountId,asOf:input.periodEnd})}});
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'}),bank_reconciliation:(t,c,e,input)=>treasury.reconciliationReport(t,c,e,{bankAccountId:input.dimensions?.bankAccountId,asOf:input.periodEnd}),...fi.reportBuilders}});
   const format=job.payload_ref.format||'json';
   let content,mime;
   if(format==='csv'){const rows=snap.payload.lines||snap.payload.parties.flatMap(p=>p.items.map(i=>({party:p.legalName,...i})));const cols=snap.payload.lines?['code','name','category','debit','credit','balance']:['party','officialNumber','dueDate','daysPastDue','outstanding'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...rows.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}
@@ -67,6 +67,8 @@ export const handlers={
  // E-invoice reporting: send once; unknown outcomes are reconciled by status query, never resent blindly.
  'einvoice.transmit':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,null);const r=await compliance.transmit(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.transmissionId,{transport,env:process.env});return {resourceType:'transmission',resourceId:r.id,state:r.state};},
  'einvoice.reconcile':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'transmission.reconcile');const r=await compliance.reconcile(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.transmissionId,{transport});return {resourceType:'transmission',resourceId:r.id,state:r.state};},
+ // Feed calendar sweep: overdue expected batches raise their close tasks (also run before every soft close and lock).
+ 'feed.sweep':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,null);const r=await fi.sweepExpectedBatches(tx,{...current,traceId:ctx.traceId},job.entity_id,{bookId:job.payload_ref.bookId||null});return {resourceType:'expected_batch',resourceId:job.entity_id,state:'swept',missing:r.missing,tasks:r.tasks};},
  'registration.pack':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'registration.prepare');const r=await compliance.generateRegistrationPack(tx,{...current,traceId:ctx.traceId},job.entity_id,{authority:job.payload_ref.authority,scope:job.payload_ref.scope,store});return {resourceType:'evidence',resourceId:r.evidenceId,state:'available',caseId:r.case.id,hash:r.hash};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };

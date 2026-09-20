@@ -3,9 +3,11 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
+// Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
+const sourceFeed=fi.sourceFeed,feeds=fi.feeds;
 
 const MAX_JSON=1048576,MAX_UPLOAD=20971520;
 const buckets=new Map();
@@ -146,23 +148,23 @@ Object.assign(handlers,{
  get_periods:async(tx,ctx,{entityId,query})=>list(await ledger.listPeriods(tx,ctx,entityId,query)),
  get_periods_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getPeriod(tx,ctx,entityId,params.id)),
  patch_periods_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updatePeriod(tx,ctx,entityId,params.id,version,body)),
- post_periods_id_soft_close:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.softClosePeriod(tx,ctx,entityId,params.id,body,version)),
- post_periods_id_lock:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.lockPeriod(tx,ctx,entityId,params.id,body,version)),
+ post_periods_id_soft_close:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.softClosePeriod(tx,ctx,entityId,params.id,body,version,{feeds})),
+ post_periods_id_lock:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.lockPeriod(tx,ctx,entityId,params.id,body,version,{feeds})),
  post_periods_id_reopen:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.reopenPeriod(tx,ctx,entityId,params.id,body,version)),
  get_periods_id_close_tasks:async(tx,ctx,{entityId,params,query})=>list(await ledger.listCloseTasks(tx,ctx,entityId,params.id,query)),
  post_periods_id_close_tasks:async(tx,ctx,{entityId,params,body})=>created(await ledger.addCloseTask(tx,ctx,entityId,params.id,body)),
  post_close_tasks_id_complete:async(tx,ctx,{entityId,params,body,version})=>{const r=await ledger.completeCloseTask(tx,ctx,entityId,params.id,{evidenceId:(body.evidenceIds||[])[0],waiverReason:(body.evidenceIds||[]).length?undefined:body.reason},version);return result(ctx,r);},
- post_imports:async(tx,ctx,{entityId,body})=>created(await ledger.createImport(tx,ctx,entityId,body)),
+ post_imports:async(tx,ctx,{entityId,body})=>created(await ledger.createImport(tx,ctx,entityId,body,{sourceFeed})),
  get_imports:async(tx,ctx,{entityId,query})=>list(await ledger.listImports(tx,ctx,entityId,query)),
  get_imports_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getImport(tx,ctx,entityId,params.id)),
  patch_imports_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateImport(tx,ctx,entityId,params.id,version,body)),
- post_imports_id_validate:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await ledger.validateImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement})),
- post_imports_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.approveImport(tx,ctx,entityId,params.id,body,version)),
- post_imports_id_commit:async(tx,ctx,{entityId,params,body,version,store})=>{const r=await ledger.commitImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement});return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ post_imports_id_validate:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await ledger.validateImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement,sourceFeed})),
+ post_imports_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.approveImport(tx,ctx,entityId,params.id,body,version,{sourceFeed})),
+ post_imports_id_commit:async(tx,ctx,{entityId,params,body,version,store})=>{const r=await ledger.commitImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement,sourceFeed});return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation','branch_rollup','institution_tax','feed_reconciliation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
  // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
@@ -294,6 +296,21 @@ Object.assign(handlers,{
  get_transmissions:async(tx,ctx,{entityId,query})=>list({items:await compliance.listTransmissions(tx,ctx,entityId,{state:query.state||null,documentId:isUuid(query.documentId)?query.documentId:null}),nextCursor:null}),
  get_compliance_readiness:async(tx,ctx,{entityId})=>({status:200,body:await compliance.readiness(tx,ctx,entityId,process.env)}),
  post_transmissions_id_reconcile:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestReconcile(tx,ctx,entityId,params.id,body)),
+ // P08 financial institution coexistence
+ post_source_ownership:async(tx,ctx,{entityId,body})=>created(await fi.createSourceOwnership(tx,ctx,entityId,body)),
+ get_source_ownership:async(tx,ctx,{entityId,query})=>list(await fi.listSourceOwnership(tx,ctx,entityId,query)),
+ get_source_ownership_id:async(tx,ctx,{entityId,params})=>ok(await fi.getSourceOwnership(tx,ctx,entityId,params.id)),
+ patch_source_ownership_id:async(tx,ctx,{entityId,params,body,version})=>ok(await fi.updateSourceOwnership(tx,ctx,entityId,params.id,version,body)),
+ post_source_ownership_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await fi.approveSourceOwnership(tx,ctx,entityId,params.id,body,version)),
+ get_source_systems:async(tx,ctx,{entityId,query})=>list(await fi.listSourceSystems(tx,ctx,entityId,query)),
+ get_mapping_versions:async(tx,ctx,{entityId,query})=>list(await fi.listMappingVersions(tx,ctx,entityId,query)),
+ get_mapping_versions_id_lines:async(tx,ctx,{entityId,params,query})=>({status:200,body:await fi.mappingLines(tx,ctx,entityId,params.id,{againstId:query.againstId||null})}),
+ get_source_batches:async(tx,ctx,{entityId,query})=>list(await fi.listSourceBatches(tx,ctx,entityId,query)),
+ get_source_batches_id_rows:async(tx,ctx,{entityId,params,query})=>({status:200,body:await fi.sourceBatchRows(tx,ctx,entityId,params.id,{status:query.status||null})}),
+ get_expected_batches:async(tx,ctx,{entityId,query})=>list(await fi.listExpectedBatches(tx,ctx,entityId,query)),
+ get_feed_reconciliation:async(tx,ctx,{entityId,query})=>({status:200,body:await fi.feedReconciliation(tx,ctx,entityId,{bookId:query.bookId,asOf:query.asOf})}),
+ get_branch_rollup:async(tx,ctx,{entityId,query})=>({status:200,body:await fi.branchRollup(tx,ctx,entityId,{bookId:query.bookId,periodStart:query.periodStart,periodEnd:query.periodEnd})}),
+ get_institution_tax_worksheet:async(tx,ctx,{entityId,query})=>({status:200,body:await fi.institutionTaxWorksheet(tx,ctx,entityId,{periodStart:query.periodStart,periodEnd:query.periodEnd})}),
  post_transmissions_id_retry:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestRetry(tx,ctx,entityId,params.id,body)),
  // The registration pack is a job: reportType names the authority, the period the scope.
  post_registration_packs:async(tx,ctx,{entityId,body})=>{if(!ctx.permissions.has('registration.prepare'))fail('FORBIDDEN','Permission registration.prepare is required.');await compliance.requireCompliance(tx,ctx,entityId);const job=await enqueueJob(tx,ctx,{entityId,kind:'registration.pack',payload:{authority:body.reportType.trim().toUpperCase().slice(0,100),scope:body.periodStart+'..'+body.periodEnd}});return jobBody(ctx,job);},

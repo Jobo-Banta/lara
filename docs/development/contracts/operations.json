@@ -3202,5 +3202,86 @@
     "permission": "return.read",
     "input": null,
     "response": "ComplianceReadiness"
+  },
+  {
+    "operationId": "get_source_systems",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-systems",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceSystemList"
+  },
+  {
+    "operationId": "get_mapping_versions",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/mapping-versions",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "MappingVersionList"
+  },
+  {
+    "operationId": "get_mapping_versions_id_lines",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/mapping-versions/{id}/lines",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "MappingLinesView"
+  },
+  {
+    "operationId": "get_source_batches",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-batches",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceBatchList"
+  },
+  {
+    "operationId": "get_source_batches_id_rows",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-batches/{id}/rows",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceRowList"
+  },
+  {
+    "operationId": "get_expected_batches",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/expected-batches",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "ExpectedBatchList"
+  },
+  {
+    "operationId": "get_feed_reconciliation",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/feed-reconciliation",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "FeedReconciliationView"
+  },
+  {
+    "operationId": "get_branch_rollup",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/branch-rollup",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "BranchRollupView"
+  },
+  {
+    "operationId": "get_institution_tax_worksheet",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/institution-tax-worksheet",
+    "permission": "tax_rule.read",
+    "input": null,
+    "response": "InstitutionTaxWorksheet"
   }
 ]

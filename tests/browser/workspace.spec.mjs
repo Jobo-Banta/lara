@@ -8,6 +8,7 @@ import AxeBuilder from '@axe-core/playwright';
 import {spawn} from 'node:child_process';
 import {seal} from '../../packages/config/src/session-cookie.mjs';
 import {createRequire} from 'node:module';
+import {createHash} from 'node:crypto';
 import {connectionOptions} from '../../packages/database/src/connection.mjs';
 
 const suffix=process.env.LARA_E2E_WORKSPACE_SUFFIX;
@@ -713,6 +714,116 @@ test('compliance: capability activation, readiness gates, a return run prepared 
  await controller.context.close();await preparer.context.close();await billing.context.close();
 });
 
+// The institution profile, the source system, the reviewed mapping version,
+// the feed calendar and the GRT rule have no reviewed operations or seeded
+// template yet; the journey seeds them through the runtime role as an
+// operator would. Ownership, staging, validation, approval, posting and every
+// read go through the screens.
+async function seedInstitution(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const acct=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const book=(await db.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({fi:1})])).rows[0].h;
+  const payload={instrumentRules:[{incomeCategory:'interest_income',instrumentType:'loan',maxMaturityYears:5,ruleCode:'GRT5'}],profileVersion:'fi-2026'};
+  const ph=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'fi_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),ph,await principal('preparer'),await principal('controller')]);
+  const system=(await db.query("insert into lara.source_systems(tenant_id,entity_id,code,name,owner_name,granularity,created_by) values($1,$2,'CBS','Core banking','IT operations','detail',$3) returning id",[tenantId,entity,await principal('controller')])).rows[0].id;
+  const mapping=(await db.query("select id,sha256 from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='cbs-map.csv'",[tenantId,entity])).rows[0];
+  const mv=(await db.query("insert into lara.mapping_versions(tenant_id,entity_id,source_system_id,version_label,evidence_id,hash,line_count,created_by) values($1,$2,$3,'cbs-2026-v1',$4,$5,2,$6) returning id",[tenantId,entity,system,mapping.id,mapping.sha256,await principal('preparer')])).rows[0].id;
+  // Lines are written while the version is a draft; approval freezes them.
+  for(const [src,code] of [['100100','1010'],['410100','4000']])await db.query("insert into lara.mapping_lines(tenant_id,entity_id,mapping_version_id,source_account,target_account_id,dimensions_json) values($1,$2,$3,$4,$5,'{}')",[tenantId,entity,mv,src,await acct(code)]);
+  await db.query("update lara.mapping_versions set status='approved',approved_by=$2 where id=$1",[mv,await principal('controller')]);
+  await db.query("insert into lara.expected_batches(tenant_id,entity_id,source_system_id,book_id,kind,period_start,period_end,deadline_at,created_by) values($1,$2,$3,$4,'journal','2026-10-01','2026-10-31','2026-09-15T00:00:00Z',$5)",[tenantId,entity,system,book,await principal('controller')]);
+  const registration=(await db.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='registration.pdf'",[tenantId,entity])).rows[0].id;
+  await db.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,content_hash,created_by,status,approved_by,activated_by,activated_at) values($1,$2,'GRT5',1,'grt','2026-01-01',0.05,'instrument','profile_event','line_half_up',gen_random_uuid(),$3,'[\"GRT-5Y\"]',$4,$5,'active',$6,$6,now())",[tenantId,entity,JSON.stringify([registration]),hash,await principal('preparer'),await principal('controller')]);
+  // No seeded template holds source_ownership.create; a tenant role covers the institution officer duties.
+  const role=(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,'fi_officer','Institution officer','[\"source_ownership.create\",\"source_ownership.edit\",\"source_ownership.read\",\"import.create\",\"import.validate\",\"import.read\"]','approved',$2,$3) returning id",[tenantId,hash,await principal('security')])).rows[0].id;
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,await principal('preparer'),role,await principal('security')]);
+ }finally{await db.end();}
+}
+test('institution: capability activation, source ownership recorded from the signed matrix and approved, a canonical feed batch staged from CSV evidence, validated, approved and posted once with the calendar satisfied, the branch roll-up and the institution tax worksheet',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Financial institution coexistence'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Pilot institution go-live requested':'Reviewed the signed feed matrix');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ // The mapping and the feed enter as CSV evidence.
+ const dataLines=['CBS-1,2026-10-15,MAIN,HQ,100100,PHP,2000.00,0,INT-9,,,,,,','CBS-2,2026-10-15,MAIN,HQ,410100,PHP,0,2000.00,INT-9,,,LN-9,loan,2029-10-15,interest_income'];
+ const manifest=['MANIFEST','','','','count=2;sha256='+createHash('sha256').update(dataLines.join('\n')).digest('hex'),'','2000.00','2000.00','','','','','','',''].join(',');
+ const feed=Buffer.from(['external_line_id,accounting_date,book_code,branch_code,account_code,currency,debit,credit,source_document_ref,dimensions,tax_event_ref,instrument_ref,instrument_type,maturity_date,income_category',...dataLines,manifest].join('\n')+'\n');
+ const mapping=Buffer.from(['source_account,target_account_code,dimensions,tax_profile','100100,1010,,','410100,4000,,interest_income'].join('\n')+'\n');
+ for(const [name,buffer] of [['cbs-map.csv',mapping],['CBS-20261015.csv',feed]]){
+  await preparer.page.goto('/evidence');await settled(preparer.page);
+  await preparer.page.locator('input[type="file"]').setInputFiles({name,mimeType:'text/csv',buffer});
+  await preparer.page.getByRole('button',{name:'Upload evidence'}).click();
+  await expect(preparer.page.getByRole('status').filter({hasText:'Queued for scanning'})).toBeVisible({timeout:30000});
+  await preparer.page.getByRole('link',{name}).click();
+  await expect(preparer.page.getByRole('status')).toContainText('Available',{timeout:60000});
+ }
+ await seedInstitution();
+ // Ownership from the signed matrix: the preparer records, the controller approves.
+ await preparer.page.goto('/institution/ownership');await settled(preparer.page);
+ await expect(preparer.page.getByRole('cell',{name:'CBS',exact:true})).toBeVisible();
+ await preparer.page.getByRole('combobox',{name:'Source system'}).selectOption({label:'CBS · Core banking'});
+ await preparer.page.getByRole('combobox',{name:'Transaction family'}).selectOption('journal');
+ await preparer.page.getByLabel('Effective from').fill('2026-01-01');
+ await preparer.page.getByRole('combobox',{name:'Evidence (signed matrix)'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Record ownership'}).click();
+ const ownRow=page=>page.getByRole('row').filter({hasText:'journal'}).filter({hasText:'CBS'});
+ await expect(ownRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ // The preparer holds the controller role since setup; the server refuses the self-approval.
+ await ownRow(preparer.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toContainText('cannot approve');
+ await controller.page.goto('/institution/ownership');await settled(controller.page);
+ await ownRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(ownRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ // The feed: calendar shows the overdue expectation; the batch is staged, validated, approved and posted once.
+ await preparer.page.goto('/institution/feeds');await settled(preparer.page);
+ await expect(preparer.page.getByRole('row').filter({hasText:'2026-10-01 → 2026-10-31'})).toContainText('missing');
+ await preparer.page.getByRole('combobox',{name:'Kind'}).selectOption('journal');
+ await preparer.page.getByRole('combobox',{name:'Source system'}).selectOption({label:'CBS'});
+ await preparer.page.getByRole('combobox',{name:'Feed CSV evidence'}).selectOption({label:'CBS-20261015.csv'});
+ await preparer.page.getByRole('combobox',{name:'Mapping version'}).selectOption({label:'cbs-2026-v1'});
+ await preparer.page.getByLabel('External batch id').fill('CBS-20261015');
+ await preparer.page.getByLabel('Cutoff date').fill('2026-10-31');
+ await preparer.page.getByRole('button',{name:'Stage batch'}).click();
+ const batchRow=page=>page.getByRole('row').filter({hasText:'CBS-20261015'});
+ await expect(batchRow(preparer.page).getByRole('cell',{name:'staged',exact:true})).toBeVisible();
+ await batchRow(preparer.page).getByRole('button',{name:'Validate'}).click();
+ await expect(batchRow(preparer.page).getByRole('cell',{name:'validated',exact:true})).toBeVisible();
+ await batchRow(preparer.page).getByRole('button',{name:'Rows'}).click();
+ await preparer.page.getByLabel('Only rows with errors').uncheck();
+ await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'CBS-2',exact:true})})).toContainText('valid');
+ await controller.page.goto('/institution/feeds');await settled(controller.page);
+ await batchRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(batchRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await batchRow(controller.page).getByRole('button',{name:'Post',exact:true}).click();
+ await expect(batchRow(controller.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible();
+ await expect(controller.page.getByRole('row').filter({hasText:'2026-10-01 → 2026-10-31'})).toContainText('received');
+ // Branch roll-up and the worksheet.
+ await controller.page.goto('/institution/branches');await settled(controller.page);
+ await controller.page.getByRole('textbox',{name:'From',exact:true}).fill('2026-10-01');await controller.page.getByRole('textbox',{name:'To',exact:true}).fill('2026-10-31');
+ await expect(controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'HQ',exact:true})}).first()).toBeVisible();
+ await expect(controller.page.getByRole('status').filter({hasText:'Entity roll-up'})).toContainText('interbranch pairs cancel');
+ await expect(controller.page.getByText('Every expected batch up to the cutoff was received.')).toBeVisible();
+ await preparer.page.goto('/institution/tax');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'From',exact:true}).fill('2026-10-01');await preparer.page.getByRole('textbox',{name:'To',exact:true}).fill('2026-10-31');
+ await expect(preparer.page.getByRole('row').filter({hasText:'GRT5'})).toContainText('₱100.00');
+ await expect(preparer.page.getByText('Every fact in the period is classified.')).toBeVisible();
+ for(const route of ['/institution/ownership','/institution/feeds','/institution/branches','/institution/tax']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'institution '+route);}
+ await controller.context.close();await preparer.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');

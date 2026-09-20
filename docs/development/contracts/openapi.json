@@ -55074,6 +55074,1410 @@
         },
         "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
       }
+    },
+    "/source-systems": {
+      "get": {
+        "operationId": "get_source_systems",
+        "summary": "source_system read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceSystemList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/mapping-versions": {
+      "get": {
+        "operationId": "get_mapping_versions",
+        "summary": "mapping_version read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sourceSystemId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingVersionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/mapping-versions/{id}/lines": {
+      "get": {
+        "operationId": "get_mapping_versions_id_lines",
+        "summary": "mapping_version lines and diff read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "againstId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingLinesView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/source-batches": {
+      "get": {
+        "operationId": "get_source_batches",
+        "summary": "source_batch read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sourceSystemId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "staged",
+                "validated",
+                "approved",
+                "posted",
+                "rejected",
+                "replaced"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceBatchList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/source-batches/{id}/rows": {
+      "get": {
+        "operationId": "get_source_batches_id_rows",
+        "summary": "source_batch rows read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "error"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceRowList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/expected-batches": {
+      "get": {
+        "operationId": "get_expected_batches",
+        "summary": "expected_batch read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sourceSystemId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "expected",
+                "received",
+                "missing",
+                "waived"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpectedBatchList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/feed-reconciliation": {
+      "get": {
+        "operationId": "get_feed_reconciliation",
+        "summary": "feed reconciliation read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "bookId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            },
+            "required": true
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedReconciliationView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/branch-rollup": {
+      "get": {
+        "operationId": "get_branch_rollup",
+        "summary": "branch rollup read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "source_ownership.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "bookId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            },
+            "required": true
+          },
+          {
+            "name": "periodStart",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          },
+          {
+            "name": "periodEnd",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchRollupView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/institution-tax-worksheet": {
+      "get": {
+        "operationId": "get_institution_tax_worksheet",
+        "summary": "institution tax worksheet read",
+        "tags": [
+          "P08"
+        ],
+        "x-delivery-phase": "P08",
+        "x-required-permission": "tax_rule.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "periodStart",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          },
+          {
+            "name": "periodEnd",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionTaxWorksheet"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
     }
   },
   "components": {
@@ -63628,6 +65032,1225 @@
           "transport",
           "einvoiceSchema",
           "forms"
+        ]
+      },
+      "SourceSystemResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "simulation": {
+            "type": "boolean"
+          },
+          "code": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "ownerName": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "ownerPrincipalId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "granularity": {
+            "type": "string",
+            "enum": [
+              "detail",
+              "summary"
+            ]
+          },
+          "cutoffTimezone": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "feedFormat": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "state": {
+            "$ref": "#/components/schemas/Text"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "simulation",
+          "code",
+          "name",
+          "ownerName",
+          "ownerPrincipalId",
+          "granularity",
+          "cutoffTimezone",
+          "feedFormat",
+          "state"
+        ]
+      },
+      "SourceSystemList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceSystemResource"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "MappingVersionResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "simulation": {
+            "type": "boolean"
+          },
+          "contentVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sourceSystemId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "versionLabel": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "evidenceId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "lineCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "state": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "approvedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "simulation",
+          "contentVersion",
+          "sourceSystemId",
+          "versionLabel",
+          "evidenceId",
+          "hash",
+          "lineCount",
+          "state",
+          "approvedBy"
+        ]
+      },
+      "MappingVersionList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MappingVersionResource"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "MappingLinesView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "versionLabel": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "state": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "sourceAccount": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "targetAccountId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "targetAccountCode": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "dimensions": {
+                  "type": "object"
+                },
+                "taxProfile": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "sourceAccount",
+                "targetAccountId",
+                "targetAccountCode",
+                "dimensions",
+                "taxProfile"
+              ]
+            },
+            "minItems": 0
+          },
+          "diff": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "againstId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceAccount": {
+                      "$ref": "#/components/schemas/Text"
+                    },
+                    "targetAccountId": {
+                      "$ref": "#/components/schemas/Id"
+                    },
+                    "targetAccountCode": {
+                      "$ref": "#/components/schemas/Text"
+                    },
+                    "dimensions": {
+                      "type": "object"
+                    },
+                    "taxProfile": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "sourceAccount",
+                    "targetAccountId",
+                    "targetAccountCode",
+                    "dimensions",
+                    "taxProfile"
+                  ]
+                },
+                "minItems": 0
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceAccount": {
+                      "$ref": "#/components/schemas/Text"
+                    },
+                    "targetAccountId": {
+                      "$ref": "#/components/schemas/Id"
+                    },
+                    "targetAccountCode": {
+                      "$ref": "#/components/schemas/Text"
+                    },
+                    "dimensions": {
+                      "type": "object"
+                    },
+                    "taxProfile": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "sourceAccount",
+                    "targetAccountId",
+                    "targetAccountCode",
+                    "dimensions",
+                    "taxProfile"
+                  ]
+                },
+                "minItems": 0
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceAccount": {
+                      "$ref": "#/components/schemas/Text"
+                    },
+                    "from": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "sourceAccount": {
+                          "$ref": "#/components/schemas/Text"
+                        },
+                        "targetAccountId": {
+                          "$ref": "#/components/schemas/Id"
+                        },
+                        "targetAccountCode": {
+                          "$ref": "#/components/schemas/Text"
+                        },
+                        "dimensions": {
+                          "type": "object"
+                        },
+                        "taxProfile": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "sourceAccount",
+                        "targetAccountId",
+                        "targetAccountCode",
+                        "dimensions",
+                        "taxProfile"
+                      ]
+                    },
+                    "to": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "sourceAccount": {
+                          "$ref": "#/components/schemas/Text"
+                        },
+                        "targetAccountId": {
+                          "$ref": "#/components/schemas/Id"
+                        },
+                        "targetAccountCode": {
+                          "$ref": "#/components/schemas/Text"
+                        },
+                        "dimensions": {
+                          "type": "object"
+                        },
+                        "taxProfile": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "sourceAccount",
+                        "targetAccountId",
+                        "targetAccountCode",
+                        "dimensions",
+                        "taxProfile"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "sourceAccount",
+                    "from",
+                    "to"
+                  ]
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "againstId",
+              "added",
+              "removed",
+              "changed"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "versionLabel",
+          "state",
+          "lines",
+          "diff"
+        ]
+      },
+      "SourceBatchResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "simulation": {
+            "type": "boolean"
+          },
+          "contentVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "importId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "sourceSystemId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "sourceSystemCode": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "bookId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "journal",
+              "source_balances"
+            ]
+          },
+          "externalBatchId": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "checksum": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "mappingVersionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "atomic": {
+            "type": "boolean"
+          },
+          "manifest": {
+            "type": "object"
+          },
+          "rowCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "errorCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "debitTotal": {
+            "type": "string"
+          },
+          "creditTotal": {
+            "type": "string"
+          },
+          "currencyTotals": {
+            "type": "object"
+          },
+          "duplicateCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replacesBatchId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "replacedByBatchId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postedEntryId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reversalEntryId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "$ref": "#/components/schemas/Text"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "simulation",
+          "contentVersion",
+          "importId",
+          "sourceSystemId",
+          "sourceSystemCode",
+          "bookId",
+          "kind",
+          "externalBatchId",
+          "checksum",
+          "mappingVersionId",
+          "atomic",
+          "manifest",
+          "rowCount",
+          "errorCount",
+          "debitTotal",
+          "creditTotal",
+          "currencyTotals",
+          "duplicateCount",
+          "replacesBatchId",
+          "replacedByBatchId",
+          "postedEntryId",
+          "reversalEntryId",
+          "state"
+        ]
+      },
+      "SourceBatchList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceBatchResource"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "SourceRowView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rowNo": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "externalLineId": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "accountingDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bookCode": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "accountCode": {
+            "type": "string"
+          },
+          "targetAccountId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": "string"
+          },
+          "debit": {
+            "type": "string"
+          },
+          "credit": {
+            "type": "string"
+          },
+          "sourceDocumentRef": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": "object"
+          },
+          "taxEventRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "instrumentRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "error"
+            ]
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "rowNo",
+          "externalLineId",
+          "accountingDate",
+          "bookCode",
+          "branchCode",
+          "accountCode",
+          "targetAccountId",
+          "currency",
+          "debit",
+          "credit",
+          "sourceDocumentRef",
+          "dimensions",
+          "taxEventRef",
+          "instrumentRef",
+          "status",
+          "error"
+        ]
+      },
+      "SourceRowList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRowView"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "ExpectedBatchResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "simulation": {
+            "type": "boolean"
+          },
+          "sourceSystemId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "sourceSystemCode": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "bookId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "journal",
+              "source_balances"
+            ]
+          },
+          "periodStart": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "periodEnd": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "deadlineAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "expected",
+              "received",
+              "missing",
+              "waived"
+            ]
+          },
+          "receivedBatchId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "closeTaskId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "waiverReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "simulation",
+          "sourceSystemId",
+          "sourceSystemCode",
+          "bookId",
+          "kind",
+          "periodStart",
+          "periodEnd",
+          "deadlineAt",
+          "state",
+          "receivedBatchId",
+          "closeTaskId",
+          "waiverReason"
+        ]
+      },
+      "ExpectedBatchList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpectedBatchResource"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "FeedReconciliationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bookId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "asOf": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "sourceSystems": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "latestCutoff": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "accountCode": {
+                        "$ref": "#/components/schemas/Text"
+                      },
+                      "targetAccountId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "targetAccountCode": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "branchCode": {
+                        "type": "string"
+                      },
+                      "currency": {
+                        "$ref": "#/components/schemas/Text"
+                      },
+                      "sourceBalance": {
+                        "type": "string"
+                      },
+                      "ledgerBalance": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "difference": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "cutoff": {
+                        "$ref": "#/components/schemas/Date"
+                      },
+                      "state": {
+                        "type": "string",
+                        "enum": [
+                          "ties",
+                          "differs",
+                          "unmapped"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "accountCode",
+                      "targetAccountId",
+                      "targetAccountCode",
+                      "branchCode",
+                      "currency",
+                      "sourceBalance",
+                      "ledgerBalance",
+                      "difference",
+                      "cutoff",
+                      "state"
+                    ]
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "id",
+                "code",
+                "latestCutoff",
+                "accounts"
+              ]
+            },
+            "minItems": 0
+          },
+          "expected": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpectedBatchResource"
+            },
+            "minItems": 0
+          },
+          "checksum": {
+            "$ref": "#/components/schemas/Text"
+          }
+        },
+        "required": [
+          "bookId",
+          "asOf",
+          "sourceSystems",
+          "expected",
+          "checksum"
+        ]
+      },
+      "BranchRollupView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bookId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "periodStart": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "periodEnd": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "cutoffAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "branchId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "branchCode": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "debit": {
+                  "type": "string"
+                },
+                "credit": {
+                  "type": "string"
+                },
+                "dueFrom": {
+                  "type": "string"
+                },
+                "dueTo": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "branchId",
+                "branchCode",
+                "debit",
+                "credit",
+                "dueFrom",
+                "dueTo"
+              ]
+            },
+            "minItems": 0
+          },
+          "pairs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "fromBranch": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "toBranch": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "dueFrom": {
+                  "type": "string"
+                },
+                "dueTo": {
+                  "type": "string"
+                },
+                "difference": {
+                  "type": "string"
+                },
+                "latestFromDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "latestToDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "cancels",
+                    "open"
+                  ]
+                }
+              },
+              "required": [
+                "fromBranch",
+                "toBranch",
+                "dueFrom",
+                "dueTo",
+                "difference",
+                "latestFromDate",
+                "latestToDate",
+                "state"
+              ]
+            },
+            "minItems": 0
+          },
+          "rollup": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "debit": {
+                "type": "string"
+              },
+              "credit": {
+                "type": "string"
+              },
+              "dueFrom": {
+                "type": "string"
+              },
+              "dueTo": {
+                "type": "string"
+              },
+              "eliminated": {
+                "type": "string"
+              },
+              "difference": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "debit",
+              "credit",
+              "dueFrom",
+              "dueTo",
+              "eliminated",
+              "difference"
+            ]
+          },
+          "checksum": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "rollupId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "bookId",
+          "periodStart",
+          "periodEnd",
+          "cutoffAt",
+          "branches",
+          "pairs",
+          "rollup",
+          "checksum",
+          "rollupId"
+        ]
+      },
+      "InstitutionTaxWorksheet": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "periodStart": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "periodEnd": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ruleCode": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "taxType": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "rate": {
+                  "type": "string"
+                },
+                "incomeCategory": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "facts": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "basis": {
+                  "type": "string"
+                },
+                "tax": {
+                  "type": "string"
+                },
+                "factIds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Id"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "ruleCode",
+                "taxType",
+                "rate",
+                "incomeCategory",
+                "facts",
+                "basis",
+                "tax",
+                "factIds"
+              ]
+            },
+            "minItems": 0
+          },
+          "unclassified": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "factId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "instrumentRef": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "incomeCategory": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "instrumentType": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "amount": {
+                  "type": "string"
+                },
+                "eventDate": {
+                  "$ref": "#/components/schemas/Date"
+                },
+                "maturityDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "required": [
+                "factId",
+                "instrumentRef",
+                "incomeCategory",
+                "instrumentType",
+                "amount",
+                "eventDate",
+                "maturityDate",
+                "reason"
+              ]
+            },
+            "minItems": 0
+          },
+          "totals": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "basis": {
+                "type": "string"
+              },
+              "tax": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "basis",
+              "tax"
+            ]
+          },
+          "checksum": {
+            "$ref": "#/components/schemas/Text"
+          }
+        },
+        "required": [
+          "periodStart",
+          "periodEnd",
+          "rows",
+          "unclassified",
+          "totals",
+          "checksum"
         ]
       }
     }

@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "753e15eeca1fa7f208bf888c65ba40a0dafd82bbfc276188f2a9e932b0f0a5ef",
+  "sha256": "993bbd6ab00501b5fcf77f72420f3ca97ff9b23d8ac9d548f17fcd6434e215ec",
   "operations": [
     {
       "method": "POST",
@@ -1781,6 +1781,51 @@
       "method": "GET",
       "path": "/compliance/readiness",
       "operationId": "get_compliance_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/source-systems",
+      "operationId": "get_source_systems"
+    },
+    {
+      "method": "GET",
+      "path": "/mapping-versions",
+      "operationId": "get_mapping_versions"
+    },
+    {
+      "method": "GET",
+      "path": "/mapping-versions/{id}/lines",
+      "operationId": "get_mapping_versions_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/source-batches",
+      "operationId": "get_source_batches"
+    },
+    {
+      "method": "GET",
+      "path": "/source-batches/{id}/rows",
+      "operationId": "get_source_batches_id_rows"
+    },
+    {
+      "method": "GET",
+      "path": "/expected-batches",
+      "operationId": "get_expected_batches"
+    },
+    {
+      "method": "GET",
+      "path": "/feed-reconciliation",
+      "operationId": "get_feed_reconciliation"
+    },
+    {
+      "method": "GET",
+      "path": "/branch-rollup",
+      "operationId": "get_branch_rollup"
+    },
+    {
+      "method": "GET",
+      "path": "/institution-tax-worksheet",
+      "operationId": "get_institution_tax_worksheet"
     }
   ]
 }

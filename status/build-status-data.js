@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T09:02:12+00:00",
+  "updated_at": "2026-09-20T09:39:00+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2650,15 +2650,15 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P07"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0023 (source systems, source ownership windows, mapping versions and frozen lines, source batches with manifests and staged rows, expected batches, balance snapshots, instrument facts, branch roll-ups); nine reads added to the reviewed contract (365 operations); feeds ride the reviewed import operations; scripts/test-p08-schema.mjs (7 groups) passes locally.",
+      "evidence": "Local: node scripts/test-p08-schema.mjs \u2192 P08-01 schema acceptance passed (7 groups); contracts regenerated and validate_specifications pass. CI run pending.",
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P08-02",
@@ -2687,13 +2687,13 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/fi.mjs: institution profile, source systems and approved ownership windows, mapping versions from reviewed CSV with diffs, the lara-feed-1 manifest contract through the import pipeline (duplicate rule, error workbench, one posting per batch, linked replacements, balance snapshots, instrument facts), expected batches raising close tasks on the affected period only, feed reconciliation, branch roll-up with interbranch elimination, institution tax worksheet through reviewed rule versions; scripts/test-p08-domain.mjs covers P08-T01..T05 (9 groups).",
+      "evidence": "Local: node scripts/test-p08-domain.mjs \u2192 P08-02 domain acceptance passed (9 groups). CI run pending.",
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P08-03",
@@ -2722,13 +2722,13 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "The 5 source-ownership operations plus nine reads served by apps/api/src/workspace-api.mjs; import operations carry the sourceFeed hook and period soft-close/lock carry the feeds hook; worker job feed.sweep and report types branch_rollup, institution_tax, feed_reconciliation; scripts/test-p08-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "Local: node scripts/test-p08-api.mjs \u2192 P08-03 API acceptance passed (5 groups). CI run pending.",
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P08-04",
@@ -2757,13 +2757,13 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; node scripts/test-demo-browser.mjs tests/browser/workspace.spec.mjs \u2192 11 passed (12.2m) including the institution journey with WCAG checks. CI run pending.",
+      "updated_at": "2026-09-20T09:39:00+00:00"
     },
     {
       "id": "P08-05",
@@ -2792,13 +2792,13 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written.",
+      "evidence": "Local: p08 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P08-06",
@@ -2827,13 +2827,13 @@ window.LARA_BUILD_STATUS = {
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.8.0 drafted (docs/development/releases/0.8.0-draft.md). Blocked on the 0.7.0 (P07) release, the design partner's signed entity/books/currency/tax/feed matrix and parallel month, source system owners and cutoffs, the tax advisor's GRT/DST rule versions with golden cases, contract operations for source systems, mapping versions, expected batches and the institution profile, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P09-01",
@@ -5521,48 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T00:31:43+00:00",
-      "id": "P05-03",
-      "action": "done",
-      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI."
-    },
-    {
-      "at": "2026-09-20T00:46:41+00:00",
-      "id": "P05-04",
-      "action": "in_review",
-      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
-    },
-    {
-      "at": "2026-09-20T00:46:41+00:00",
-      "id": "P05-05",
-      "action": "in_review",
-      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written."
-    },
-    {
-      "at": "2026-09-20T01:07:43+00:00",
-      "id": "P05-04",
-      "action": "in_review",
-      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
-    },
-    {
-      "at": "2026-09-20T01:08:28+00:00",
-      "id": "P05-06",
-      "action": "blocked",
-      "note": "Release 0.5.0 drafted (docs/development/releases/0.5.0-draft.md). Blocked on the 0.4.0 (P04) release, finance sign-offs on withholding timing, PO/receipt-of-service policy, manual payment responsibility and certificate obligations, contract operations for the purchasing profile, beneficiaries, receipts, advances and certificates, and the owner's tag, deployment and manifest run."
-    },
-    {
-      "at": "2026-09-20T01:14:07+00:00",
-      "id": "P05-04",
-      "action": "done",
-      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
-    },
-    {
-      "at": "2026-09-20T01:14:07+00:00",
-      "id": "P05-05",
-      "action": "done",
-      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written."
-    },
-    {
       "at": "2026-09-20T03:37:26+00:00",
       "id": "P06-01",
       "action": "in_review",
@@ -5699,6 +5657,48 @@ window.LARA_BUILD_STATUS = {
       "id": "P07-05",
       "action": "done",
       "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-01",
+      "action": "in_review",
+      "note": "Migration 0023 (source systems, source ownership windows, mapping versions and frozen lines, source batches with manifests and staged rows, expected batches, balance snapshots, instrument facts, branch roll-ups); nine reads added to the reviewed contract (365 operations); feeds ride the reviewed import operations; scripts/test-p08-schema.mjs (7 groups) passes locally."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-02",
+      "action": "in_review",
+      "note": "packages/domain/src/fi.mjs: institution profile, source systems and approved ownership windows, mapping versions from reviewed CSV with diffs, the lara-feed-1 manifest contract through the import pipeline (duplicate rule, error workbench, one posting per batch, linked replacements, balance snapshots, instrument facts), expected batches raising close tasks on the affected period only, feed reconciliation, branch roll-up with interbranch elimination, institution tax worksheet through reviewed rule versions; scripts/test-p08-domain.mjs covers P08-T01..T05 (9 groups)."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-03",
+      "action": "in_review",
+      "note": "The 5 source-ownership operations plus nine reads served by apps/api/src/workspace-api.mjs; import operations carry the sourceFeed hook and period soft-close/lock carry the feeds hook; worker job feed.sweep and report types branch_rollup, institution_tax, feed_reconciliation; scripts/test-p08-api.mjs (5 groups) runs API and worker as processes."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-05",
+      "action": "in_review",
+      "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T09:14:18+00:00",
+      "id": "P08-06",
+      "action": "blocked",
+      "note": "Release 0.8.0 drafted (docs/development/releases/0.8.0-draft.md). Blocked on the 0.7.0 (P07) release, the design partner's signed entity/books/currency/tax/feed matrix and parallel month, source system owners and cutoffs, the tax advisor's GRT/DST rule versions with golden cases, contract operations for source systems, mapping versions, expected batches and the institution profile, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T09:39:00+00:00",
+      "id": "P08-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs."
     }
   ]
 };

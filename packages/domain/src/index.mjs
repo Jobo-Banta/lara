@@ -10,3 +10,4 @@ export * as sales from './sales.mjs';
 export * as purchasing from './purchasing.mjs';
 export * as treasury from './treasury.mjs';
 export * as compliance from './compliance.mjs';
+export * as fi from './fi.mjs';

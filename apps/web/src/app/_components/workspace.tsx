@@ -11,8 +11,9 @@ import {SalesInvoices,SalesInvoiceDetail,SalesOrders,SalesCollections,SalesColle
 import {PurchasingBills,PurchasingBillDetail,PurchasingOrders,PurchasingClaims,PurchasingPayments,PurchasingPaymentDetail,PurchasingSuppliers} from './workspace-purchasing';
 import {TreasuryBankAccounts,TreasuryReconcile,TreasuryTransfers,TreasuryChecks,TreasuryCash} from './workspace-treasury';
 import {ComplianceWorkbench} from './workspace-compliance';
+import {FiOwnership,FiFeeds,FiBranches,FiTax} from './workspace-fi';
 
-const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Bank accounts','/bank/accounts'],['Reconcile','/bank/reconcile'],['Transfers','/bank/transfers'],['Checks','/bank/checks'],['Cash','/bank/cash'],['Compliance','/compliance'],['Inventory','/inventory']];
+const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Bank accounts','/bank/accounts'],['Reconcile','/bank/reconcile'],['Transfers','/bank/transfers'],['Checks','/bank/checks'],['Cash','/bank/cash'],['Compliance','/compliance'],['Source ownership','/institution/ownership'],['Feeds','/institution/feeds'],['Branches','/institution/branches'],['Institution tax','/institution/tax'],['Inventory','/inventory']];
 const roadmap:Record<string,string>={'/inventory':'Inventory costing and three-way matching arrive with P10.'};
 export default function Workspace(){
  const path=usePathname();
@@ -60,6 +61,10 @@ export default function Workspace(){
  else if(path==='/bank/checks'){title='Checks';content=<TreasuryChecks entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/bank/cash'){title='Cash sessions';content=<TreasuryCash entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/compliance'){title='Compliance';content=<ComplianceWorkbench entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/institution/ownership'){title='Source ownership';content=<FiOwnership entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/institution/feeds'){title='Feeds';content=<FiFeeds entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/institution/branches'){title='Branches';content=<FiBranches entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/institution/tax'){title='Institution tax';content=<FiTax entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/tax-rules'){title='Tax rules';content=<TaxRules entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/capabilities'){title='Capabilities';content=<Capabilities entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path.startsWith('/settings')){title='Setup checklist';content=<Setup entityId={entityId} entity={entity} me={me} can={can} tick={tick} refresh={refresh} choose={(e:string)=>{try{sessionStorage.setItem('lara-entity',e);}catch{}setEntityId(e);}}/>;}
