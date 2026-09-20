@@ -4,7 +4,7 @@
 // lara.post_journal_entry, official numbering, deliveries, receipts
 // (collections) and open-item allocations. Amounts travel as decimal strings;
 // arithmetic happens in BigInt at 1e-12 precision and rounds half up once.
-import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,expectVersion,fail,isUuid,iso,page,pageArgs,requireAnyPermission,requireEntity,requirePermission,resource} from './core.mjs';
+import {portalWhere,assertPortalParty,assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,expectVersion,fail,isUuid,iso,page,pageArgs,requireAnyPermission,requireEntity,requirePermission,resource} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 import {micros,decimal} from './ledger.mjs';
 import {checkGate} from './treasury.mjs';
@@ -440,6 +440,7 @@ export async function getDocument(tx,ctx,entityId,id,{kinds}){
  requireEntity(ctx,entityId);requirePermission(ctx,permissionFor(kinds[0],'read'));
  const row=(await tx.query('select d.* from lara.documents d where d.tenant_id=$1 and d.entity_id=$2 and d.id=$3 and not '+SUPPLIER_CREDIT,[ctx.tenantId,entityId,id])).rows[0];
  if(!row||!kinds.includes(row.kind))fail('NOT_FOUND','Document not found.');
+ assertPortalParty(ctx,row.party_id,'Document');
  requirePermission(ctx,permissionFor(row.kind,'read'));
  return documentResource(tx,ctx,row);
 }
@@ -450,6 +451,7 @@ export async function listDocuments(tx,ctx,entityId,query,{kinds}){
  let where='';
  if(query?.state)where+=' and state=$'+params.push(String(query.state));
  if(query?.partyId){if(!isUuid(query.partyId))fail('VALIDATION_FAILED','partyId must be a UUID.',{fieldErrors:[{path:'partyId',message:'UUID'}]});where+=' and party_id=$'+params.push(query.partyId);}
+ where+=portalWhere(ctx,'party_id',params);
  const rows=(await tx.query('select d.* from lara.documents d where d.tenant_id=$1 and d.entity_id=$2 and d.kind=any($3::text[]) and not '+SUPPLIER_CREDIT+where+cursorClause(after,params)+' order by created_at,id limit $4',params)).rows;
  const items=[];for(const r of rows.slice(0,limit))items.push(await documentResource(tx,ctx,r));
  return {items,nextCursor:page(rows,limit,r=>r,scope).nextCursor};
@@ -663,6 +665,7 @@ export async function listOpenItems(tx,ctx,entityId,query){
  let where='';
  if(query?.partyId){if(!isUuid(query.partyId))fail('VALIDATION_FAILED','partyId must be a UUID.',{fieldErrors:[{path:'partyId',message:'UUID'}]});where+=' and party_id=$'+params.push(query.partyId);}
  if(query?.side){if(!['AR','AP'].includes(query.side))fail('VALIDATION_FAILED','side is AR or AP.',{fieldErrors:[{path:'side',message:'AR or AP'}]});where+=' and side=$'+params.push(query.side);}
+ where+=portalWhere(ctx,'party_id',params);
  if(query?.open==='true')where+=" and status in ('open','partially_settled')";
  const rows=(await tx.query('select *,lara.open_item_allocated(tenant_id,id)::text as allocated,(original_amount-lara.open_item_allocated(tenant_id,id))::text as outstanding from lara.open_items where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
  return page(rows,limit,openItemView,scope);
@@ -673,6 +676,7 @@ export async function listOpenItems(tx,ctx,entityId,query){
 export async function agingReport(tx,ctx,entityId,{asOf,partyId=null,side='AR'}){
  requirePermission(ctx,'open_item.read');requireEntity(ctx,entityId);
  if(!['AR','AP'].includes(side))fail('VALIDATION_FAILED','side is AR or AP.');
+ if(ctx.portal)partyId=ctx.portal.partyId;
  const params=[ctx.tenantId,entityId,asOf,side];
  const partyWhere=partyId?' and i.party_id=$'+params.push(partyId):'';
  const rows=(await tx.query("select i.id,i.party_id,p.legal_name,i.document_id,d.official_number,i.currency,i.due_date,i.original_amount::text as original,coalesce((select sum(case when e.action='apply' then e.amount else -e.amount end) from lara.allocation_events e where e.tenant_id=i.tenant_id and e.open_item_id=i.id and e.created_at<=($3::date+1)::timestamptz),0)::text as allocated from lara.open_items i join lara.party p on p.tenant_id=i.tenant_id and p.id=i.party_id join lara.documents d on d.tenant_id=i.tenant_id and d.id=i.document_id where i.tenant_id=$1 and i.entity_id=$2 and i.side=$4 and i.created_at<=($3::date+1)::timestamptz"+partyWhere+' order by p.legal_name,i.due_date,i.id',params)).rows;

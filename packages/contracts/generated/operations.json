@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "f02920c99d4d2f999bf6d9677279580f26424438cb313afdd16c8f721a99d625",
+  "sha256": "031d61f99b83e7101487d70007bdb1bc551f12894981db05bef03ce3b34087a1",
   "operations": [
     {
       "method": "POST",
@@ -1926,6 +1926,91 @@
       "method": "PATCH",
       "path": "/assistant/features/{feature}",
       "operationId": "patch_assistant_features_feature"
+    },
+    {
+      "method": "GET",
+      "path": "/portal-memberships",
+      "operationId": "get_portal_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/portal/me",
+      "operationId": "get_portal_me"
+    },
+    {
+      "method": "GET",
+      "path": "/certificates",
+      "operationId": "get_certificates"
+    },
+    {
+      "method": "GET",
+      "path": "/message-requests/{id}/receipts",
+      "operationId": "get_message_requests_id_receipts"
+    },
+    {
+      "method": "GET",
+      "path": "/webhook-receipts",
+      "operationId": "get_webhook_receipts"
+    },
+    {
+      "method": "GET",
+      "path": "/verify/{token}",
+      "operationId": "get_verify_token"
+    },
+    {
+      "method": "POST",
+      "path": "/portal-invites/{id}/accept",
+      "operationId": "post_portal_invites_id_accept"
+    },
+    {
+      "method": "POST",
+      "path": "/payment-links/{id}/claim",
+      "operationId": "post_payment_links_id_claim"
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/{provider}",
+      "operationId": "post_webhooks_provider"
+    },
+    {
+      "method": "POST",
+      "path": "/firms",
+      "operationId": "post_firms"
+    },
+    {
+      "method": "GET",
+      "path": "/firms",
+      "operationId": "get_firms"
+    },
+    {
+      "method": "POST",
+      "path": "/firms/{id}/staff",
+      "operationId": "post_firms_id_staff"
+    },
+    {
+      "method": "GET",
+      "path": "/firms/{id}/staff",
+      "operationId": "get_firms_id_staff"
+    },
+    {
+      "method": "GET",
+      "path": "/firm/clients",
+      "operationId": "get_firm_clients"
+    },
+    {
+      "method": "GET",
+      "path": "/firm/rollup",
+      "operationId": "get_firm_rollup"
+    },
+    {
+      "method": "GET",
+      "path": "/firm/snapshots",
+      "operationId": "get_firm_snapshots"
+    },
+    {
+      "method": "POST",
+      "path": "/firm/bulk-reminders",
+      "operationId": "post_firm_bulk_reminders"
     }
   ]
 }

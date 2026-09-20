@@ -109,7 +109,7 @@ export async function recordScan(tx,ctx,entityId,id,scanner,store){
 export async function getEvidence(tx,ctx,entityId,id){
  requirePermission(ctx,'evidence.read');requireEntity(ctx,entityId);
  const row=(await tx.query('select * from lara.evidence where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];
- if(!row)fail('NOT_FOUND','Evidence not found.');
+ if(!row||(ctx.portal&&row.created_by!==ctx.principalId))fail('NOT_FOUND','Evidence not found.');
  return evidenceResource(row);
 }
 // Content downloads recheck membership on every request and stream through
@@ -125,6 +125,7 @@ export async function listEvidence(tx,ctx,entityId,query){
  requirePermission(ctx,'evidence.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,typeof entityId==='string'?entityId:null,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,limit+1];let where='';
  if(query?.status){params.push(String(query.status).split(','));where=' and status=any($'+params.length+'::text[])';}
+ if(ctx.portal){params.push(ctx.principalId);where+=' and created_by=$'+params.length;}
  const rows=(await tx.query('select * from lara.evidence where tenant_id=$1 and entity_id=$2'+where+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;
  return page(rows,limit,evidenceResource,scope);
 }

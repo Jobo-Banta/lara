@@ -27,7 +27,12 @@ export async function actorContext(tx,tenantId,principalId,{traceId}={}){
  for(const m of memberships.rows){for(const p of m.permissions)permissions.add(p);if(m.entity_id)entityIds.add(m.entity_id);else tenantWide=true;if(m.branch_id)branchIds.add(m.branch_id);}
  for(const d of delegations.rows)for(const p of d.permission_scope)permissions.add(p);
  if(tenantWide)for(const e of (await tx.query("select id from lara.entities where tenant_id=$1 and status<>'archived'",[tenantId])).rows)entityIds.add(e.id);
- return {tenantId,principalId,permissions,entityIds,branchIds,revocationVersion:Number(principal.revocation_version),traceId};
+ // External identities (P13): a portal membership scopes the principal to one party and entity with the portal permissions of its role; an internal membership excludes it.
+ let portal=null,firm=null;
+ if(!memberships.rows.length){const {portalScope}=await import('./portals.mjs');portal=await portalScope(tx,tenantId,principalId);if(portal){for(const p of portal.permissions)permissions.add(p);entityIds.add(portal.entityId);}}
+ // Delegated firm identities (P14): without a membership or portal scope, an active assignment under an approved mandate scopes the principal to the mandate's entities with the assigned subset; a direct member keeps its membership and is the same principal, so maker-checker holds either way.
+ if(!memberships.rows.length&&!portal){const {firmScope}=await import('./firm.mjs');firm=await firmScope(tx,tenantId,principalId);if(firm){for(const p of firm.permissions)permissions.add(p);for(const e of firm.entityIds)entityIds.add(e);}}
+ return {tenantId,principalId,permissions,entityIds,branchIds,revocationVersion:Number(principal.revocation_version),traceId,...(portal?{portal}:{}),...(firm?{firm}:{})};
 }
 
 export function sessionContext(ctx){

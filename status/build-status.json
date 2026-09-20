@@ -548,39 +548,39 @@
       "updated_at": "2026-09-20T15:57:22+00:00"
     },
     "P12-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate.",
-      "evidence": "Local: scripts/test-p12-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
-      "updated_at": "2026-09-20T17:32:29+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:05+00:00"
     },
     "P12-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider.",
-      "evidence": "Local: scripts/test-p12-domain.mjs passes (6 groups: P12-T01..T05). CI run pending.",
-      "updated_at": "2026-09-20T17:32:29+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     "P12-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only).",
-      "evidence": "Local: scripts/test-p12-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
-      "updated_at": "2026-09-20T17:32:29+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     "P12-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; the assistant journey passed in the full browser run of 2026-09-21 (13 passed, one unrelated timing flake in the institution journey on the shared dev database in later runs). CI run pending.",
-      "updated_at": "2026-09-20T19:01:16+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     "P12-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written.",
-      "evidence": "Local: p12 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T17:32:29+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     "P12-06": {
       "status": "blocked",
@@ -590,88 +590,88 @@
       "updated_at": "2026-09-20T17:32:30+00:00"
     },
     "P13-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate.",
+      "evidence": "Local: scripts/test-p13-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P13-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters.",
+      "evidence": "Local: scripts/test-p13-domain.mjs passes (5 groups: P13-T01..T05). CI run pending.",
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P13-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry.",
+      "evidence": "Local: scripts/test-p13-api.mjs passes (4 groups, API and worker as processes); P02..P07 regressions pass. CI run pending.",
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P13-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite (16 tests) run in progress. CI run pending.",
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P13-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written.",
+      "evidence": "Local: p13 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P13-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.13.0 drafted (docs/development/releases/0.13.0-draft.md). Blocked on the 0.7.0 (P07) release, a qualified messaging channel and payment provider with their adapters, the consent and notification policy, terms and support, a contract operation for the portal profile, relations and authorizer role templates, and the owner's tag, deployment and manifest run; without provider evidence the portal ships with messaging and links disabled.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P14-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas).",
+      "evidence": "Local: scripts/test-p14-schema.mjs passes (4 groups); migration applied on the dev database. CI run pending.",
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P14-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints.",
+      "evidence": "Local: scripts/test-p14-domain.mjs passes (7 groups: P14-T01..T05). CI run pending.",
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P14-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates.",
+      "evidence": "Local: scripts/test-p14-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P14-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite (17 tests) run in progress. CI run pending.",
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P14-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables.",
+      "evidence": "Local: p14 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P14-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P15-01": {
       "status": "not_started",
@@ -1243,108 +1243,6 @@
     }
   },
   "history": [
-    {
-      "at": "2026-09-18T09:06:05+00:00",
-      "id": "P00-08",
-      "action": "done",
-      "note": "Backup/restore rehearsal requires pg_dump/pg_restore availability and a confirmed local or dedicated database target."
-    },
-    {
-      "at": "2026-09-18T09:16:16+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Supabase OIDC issuer configured and server-side code flow implemented; successful user consent callback still requires an interactive account login."
-    },
-    {
-      "at": "2026-09-18T09:19:23+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Prototype shell implemented with responsive navigation, synthetic-data labels, working work/overview routes and accessible states."
-    },
-    {
-      "at": "2026-09-18T09:24:28+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
-    },
-    {
-      "at": "2026-09-18T09:24:33+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Persistent lara_demo schema, seeded synthetic run/tasks, API work/overview queries and Supabase grants implemented."
-    },
-    {
-      "at": "2026-09-18T09:35:29+00:00",
-      "id": "P01-03",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:30+00:00",
-      "id": "P01-04",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:30+00:00",
-      "id": "P01-05",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:31+00:00",
-      "id": "P01-06",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:31+00:00",
-      "id": "P01-07",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:32+00:00",
-      "id": "P01-08",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:32+00:00",
-      "id": "P01-09",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:35:33+00:00",
-      "id": "P01-10",
-      "action": "in_review",
-      "note": "P01 implementation continued through local Supabase-backed prototype."
-    },
-    {
-      "at": "2026-09-18T09:48:15+00:00",
-      "id": "P00-01",
-      "action": "in_progress",
-      "note": "Fixed deterministic branding assets and cross-platform verify/setup. Clean-clone full stack, worker and version manifest remain."
-    },
-    {
-      "at": "2026-09-18T09:48:15+00:00",
-      "id": "P00-02",
-      "action": "done",
-      "note": "Generated local session secret, removed fallback; strict runtime configuration validated at startup. Local-file baseline; external secret-manager rotation remains a deployment concern."
-    },
-    {
-      "at": "2026-09-18T09:48:16+00:00",
-      "id": "P00-03",
-      "action": "in_progress",
-      "note": "Real Supabase rollback-only clean-schema/upgrade/no-op/checksum/failure tests and runtime DDL denial pass. Scripted migrator role provisioning and independent clean-database CI rehearsal remain."
-    },
-    {
-      "at": "2026-09-18T09:48:16+00:00",
-      "id": "P00-04",
-      "action": "in_progress",
-      "note": "Fixed callback nonce and session fallback. Scoped API identity, tenant RLS and cross-tenant tests remain; role flags alone do not pass T04."
-    },
     {
       "at": "2026-09-18T09:48:17+00:00",
       "id": "P00-05",
@@ -2442,7 +2340,109 @@
       "id": "P12-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-02",
+      "action": "in_review",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-05",
+      "action": "in_review",
+      "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T19:53:47+00:00",
+      "id": "P13-06",
+      "action": "blocked",
+      "note": "Release 0.13.0 drafted (docs/development/releases/0.13.0-draft.md). Blocked on the 0.7.0 (P07) release, a qualified messaging channel and payment provider with their adapters, the consent and notification policy, terms and support, a contract operation for the portal profile, relations and authorizer role templates, and the owner's tag, deployment and manifest run; without provider evidence the portal ships with messaging and links disabled."
+    },
+    {
+      "at": "2026-09-20T19:54:05+00:00",
+      "id": "P12-01",
+      "action": "done",
+      "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate."
+    },
+    {
+      "at": "2026-09-20T19:54:06+00:00",
+      "id": "P12-02",
+      "action": "done",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider."
+    },
+    {
+      "at": "2026-09-20T19:54:06+00:00",
+      "id": "P12-03",
+      "action": "done",
+      "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only)."
+    },
+    {
+      "at": "2026-09-20T19:54:06+00:00",
+      "id": "P12-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T19:54:06+00:00",
+      "id": "P12-05",
+      "action": "done",
+      "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas)."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-02",
+      "action": "in_review",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-05",
+      "action": "in_review",
+      "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables."
+    },
+    {
+      "at": "2026-09-20T21:09:14+00:00",
+      "id": "P14-06",
+      "action": "blocked",
+      "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
     }
   ],
-  "updated_at": "2026-09-20T19:01:16+00:00"
+  "updated_at": "2026-09-20T21:09:14+00:00"
 }

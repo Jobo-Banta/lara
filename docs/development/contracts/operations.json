@@ -3463,5 +3463,158 @@
     "permission": "assistant.review",
     "input": "AiFeatureUpdate",
     "response": "AiFeatureResource"
+  },
+  {
+    "operationId": "get_portal_memberships",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal-memberships",
+    "permission": "portal_invite.read",
+    "input": null,
+    "response": "PortalMembershipList"
+  },
+  {
+    "operationId": "get_portal_me",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal/me",
+    "permission": "session.read",
+    "input": null,
+    "response": "PortalMeView"
+  },
+  {
+    "operationId": "get_certificates",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/certificates",
+    "permission": "party.read",
+    "input": null,
+    "response": "CertificateList"
+  },
+  {
+    "operationId": "get_message_requests_id_receipts",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/message-requests/{id}/receipts",
+    "permission": "message_request.read",
+    "input": null,
+    "response": "DeliveryReceiptsView"
+  },
+  {
+    "operationId": "get_webhook_receipts",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/webhook-receipts",
+    "permission": "payment_link.read",
+    "input": null,
+    "response": "WebhookReceiptList"
+  },
+  {
+    "operationId": "get_verify_token",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/verify/{token}",
+    "permission": "none",
+    "input": null,
+    "response": "VerificationView"
+  },
+  {
+    "operationId": "post_portal_invites_id_accept",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/portal-invites/{id}/accept",
+    "permission": "none",
+    "input": "InviteAccept",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payment_links_id_claim",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/payment-links/{id}/claim",
+    "permission": "payment_link.read",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_webhooks_provider",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/webhooks/{provider}",
+    "permission": "none",
+    "input": "WebhookEvent",
+    "response": "WebhookOutcome"
+  },
+  {
+    "operationId": "post_firms",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firms",
+    "permission": "firm_assignment.create",
+    "input": "FirmCreate",
+    "response": "FirmResource"
+  },
+  {
+    "operationId": "get_firms",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firms",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmList"
+  },
+  {
+    "operationId": "post_firms_id_staff",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firms/{id}/staff",
+    "permission": "firm_assignment.create",
+    "input": "FirmStaffCreate",
+    "response": "FirmStaffResource"
+  },
+  {
+    "operationId": "get_firms_id_staff",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firms/{id}/staff",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmStaffList"
+  },
+  {
+    "operationId": "get_firm_clients",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/clients",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmClientList"
+  },
+  {
+    "operationId": "get_firm_rollup",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/rollup",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmRollupView"
+  },
+  {
+    "operationId": "get_firm_snapshots",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/snapshots",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmSnapshotList"
+  },
+  {
+    "operationId": "post_firm_bulk_reminders",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm/bulk-reminders",
+    "permission": "firm_mandate.read",
+    "input": "FirmBulkAction",
+    "response": "FirmBulkOutcome"
   }
 ]

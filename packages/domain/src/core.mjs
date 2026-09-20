@@ -109,6 +109,9 @@ export function expectVersion(row,expected){
  if(Number(row.version)!==Number(expected))fail('VERSION_CONFLICT','The record changed since it was read.',{resourceVersion:Number(row.version)});
 }
 export const iso=v=>v==null?v:(v instanceof Date?v.toISOString():v);
+// Portal members (P13) see one party only: reads add the fence, by-id reads refuse another party as not found.
+export const portalWhere=(ctx,column,params)=>{if(!ctx.portal)return '';params.push(ctx.portal.partyId);return ' and '+column+'=$'+params.length;};
+export const assertPortalParty=(ctx,partyId,what='Record')=>{if(ctx.portal&&partyId!==ctx.portal.partyId)fail('NOT_FOUND',what+' not found.');};
 export function resource(row,fields){
  return {id:row.id,version:Number(row.version),contentVersion:Number(row.content_version??1),state:row.status,createdAt:iso(row.created_at),updatedAt:iso(row.updated_at),simulation:false,...fields};
 }

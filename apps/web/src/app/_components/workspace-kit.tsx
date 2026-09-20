@@ -13,6 +13,8 @@ export const select=(label:string,name:string,options:[string,string][],value=''
 export class RequestError extends Error{status:number;body:ApiError;constructor(status:number,body:ApiError){super(body.message);this.status=status;this.body=body;}}
 export async function api(method:string,path:string,{body,entityId,ifMatch,key,raw,headers={}}:{body?:unknown,entityId?:string|null,ifMatch?:number|string,key?:string,raw?:BodyInit,headers?:Record<string,string>}={}){
  const h:Record<string,string>={...headers};
+ // Explicit client context (P14): a firm delegate carries the chosen client tenant on every call; the API binds it to a committed mandate.
+ try{const tenant=sessionStorage.getItem('lara-tenant');if(tenant&&!h['x-tenant-id'])h['x-tenant-id']=tenant;}catch{}
  if(entityId)h['x-entity-id']=entityId;
  if(ifMatch!==undefined)h['if-match']='"'+ifMatch+'"';
  if(key)h['idempotency-key']=key;

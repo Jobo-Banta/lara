@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi,inventory,assets,assistant,aiProviderFromEnv} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi,inventory,assets,assistant,aiProviderFromEnv,portals,messagingProviderFromEnv} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -19,8 +19,8 @@ const log=(event,extra={})=>console.log(JSON.stringify({service:'worker',event,t
 const warn=(event,extra={})=>console.error(JSON.stringify({service:'worker',event,severity:'error',time:new Date().toISOString(),...extra}));
 let stopping=false;
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{stopping=true;});
-let store,scanner,transport,aiProvider;
-try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();transport=compliance.transportFromEnv(process.env,store);aiProvider=aiProviderFromEnv(process.env);}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
+let store,scanner,transport,aiProvider,mailProvider;
+try{store=evidenceStoreFromEnv();scanner=scannerFromEnv();transport=compliance.transportFromEnv(process.env,store);aiProvider=aiProviderFromEnv(process.env);mailProvider=messagingProviderFromEnv(process.env,store);}catch(e){warn('adapter_unavailable',{message:e.message});process.exit(1);}
 
 const client=()=>new pg.Client({...connectionOptions(url),connectionTimeoutMillis:5000,query_timeout:30000});
 
@@ -74,6 +74,8 @@ export const handlers={
  'schedule.run':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'schedule.execute');const r=await assets.executeScheduleRun(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.runId,{sales,ledger});return {resourceType:'schedule_run',resourceId:r.id,state:r.state,results:r.results.length};},
  // AI run: the requester's authority is rechecked at start and at completion; the domain gates every tool and stores minimized output.
  'assistant.run':async(tx,ctx,job)=>{const r=await assistant.executeRun(tx,{tenantId:job.tenant_id,principalId:job.requested_by,traceId:ctx.traceId},job.entity_id,job.payload_ref.runId,{provider:aiProvider,store,ledger});return {resourceType:'ai_run',resourceId:r.id,state:r.state,suggestionId:r.suggestionId};},
+ // Authorized message delivery (P13): once per send key; a relay failure records a failed receipt in its own transaction and retries with the same key.
+ 'message.send':async(tx,ctx,job)=>{const current=await identity.assertJobStillAuthorized(tx,job,'message_request.send');try{const r=await portals.deliverMessage(tx,{...current,traceId:ctx.traceId},job.entity_id,job.payload_ref.messageId,{provider:mailProvider,store});return {resourceType:'message_request',resourceId:r.id,state:r.state};}catch(e){if(e.deliveryFailure){const db=client();await db.connect();try{await inTransaction(db,{tenantId:job.tenant_id,principalId:job.requested_by,traceId:ctx.traceId},t=>portals.recordDeliveryFailure(t,{tenantId:job.tenant_id,principalId:job.requested_by,traceId:ctx.traceId},job.entity_id,job.payload_ref.messageId,e.deliveryFailure));}finally{await db.end();}}throw e;}},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){

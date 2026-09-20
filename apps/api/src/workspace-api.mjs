@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -101,6 +101,7 @@ const handlers={
   if(!staged)fail('STATE_CONFLICT','Upload the content to the upload URL before completing.');
   const r=await evidence.completeUpload(tx,ctx,entityId,params.id,staged,store,version);
   await store.dispose('staging/'+params.id);
+  if(r.outcome!=='rejected'&&ctx.portal?.role==='supplier')await portals.recordSubmission(tx,ctx,entityId,params.id,staged);
   if(r.outcome==='rejected')return {status:422,body:{code:'VALIDATION_FAILED',message:'Upload rejected: '+r.reasons.join('; ')+'.',traceId:ctx.traceId,fieldErrors:r.reasons.map(m=>({path:'content',message:m})),retryable:false}};
   return {status:202,body:r.job};},
  get_evidence:async(tx,ctx,{entityId,query})=>list(await evidence.listEvidence(tx,ctx,entityId,query)),
@@ -355,6 +356,47 @@ Object.assign(handlers,{
  post_assistant_suggestions_id_review:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await assistant.reviewSuggestion(tx,ctx,entityId,params.id,body,version)),
  get_assistant_features:async(tx,ctx,{entityId})=>list(await assistant.listFeatures(tx,ctx,entityId)),
  patch_assistant_features_feature:async(tx,ctx,{entityId,params,body,version})=>ok(await assistant.updateFeature(tx,ctx,entityId,params.feature,version,body)),
+ // P13 portals and messaging: invites, memberships, messages authorized by a named principal and sent once, payment links whose settlement comes from verified provider events.
+ post_portal_invites:async(tx,ctx,{entityId,body})=>created(await portals.createInvite(tx,ctx,entityId,body)),
+ get_portal_invites:async(tx,ctx,{entityId,query})=>list(await portals.listInvites(tx,ctx,entityId,query)),
+ get_portal_invites_id:async(tx,ctx,{entityId,params})=>ok(await portals.getInvite(tx,ctx,entityId,params.id)),
+ patch_portal_invites_id:async(tx,ctx,{entityId,params,body,version})=>ok(await portals.updateInvite(tx,ctx,entityId,params.id,version,body)),
+ post_portal_invites_id_revoke:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await portals.revokeInvite(tx,ctx,entityId,params.id,body,version)),
+ get_portal_memberships:async(tx,ctx,{entityId,query})=>list(await portals.listMemberships(tx,ctx,entityId,query)),
+ get_portal_me:async(tx,ctx,{entityId})=>({status:200,body:await portals.portalMe(tx,ctx,entityId)}),
+ get_certificates:async(tx,ctx,{entityId,query})=>list({items:await purchasing.listCertificates(tx,ctx,entityId,{partyId:isUuid(query.partyId)?query.partyId:null}),nextCursor:null}),
+ post_message_requests:async(tx,ctx,{entityId,body})=>created(await portals.createMessage(tx,ctx,entityId,body)),
+ get_message_requests:async(tx,ctx,{entityId,query})=>list(await portals.listMessages(tx,ctx,entityId,query)),
+ get_message_requests_id:async(tx,ctx,{entityId,params})=>ok(await portals.getMessage(tx,ctx,entityId,params.id)),
+ get_message_requests_id_receipts:async(tx,ctx,{entityId,params})=>({status:200,body:await portals.listReceipts(tx,ctx,entityId,params.id)}),
+ patch_message_requests_id:async(tx,ctx,{entityId,params,body,version})=>ok(await portals.updateMessage(tx,ctx,entityId,params.id,version,body)),
+ post_message_requests_id_send:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await portals.sendMessage(tx,ctx,entityId,params.id,body,version)),
+ post_payment_links:async(tx,ctx,{entityId,body,providers})=>created(await portals.createPaymentLink(tx,ctx,entityId,body,{provider:providers.pay})),
+ get_payment_links:async(tx,ctx,{entityId,query})=>list(await portals.listPaymentLinks(tx,ctx,entityId,query)),
+ get_payment_links_id:async(tx,ctx,{entityId,params})=>ok(await portals.getPaymentLink(tx,ctx,entityId,params.id)),
+ patch_payment_links_id:async(tx,ctx,{entityId,params,body,version})=>ok(await portals.updatePaymentLink(tx,ctx,entityId,params.id,version,body)),
+ post_payment_links_id_cancel:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await portals.cancelPaymentLink(tx,ctx,entityId,params.id,body,version)),
+ post_payment_links_id_claim:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await portals.claimPayment(tx,ctx,entityId,params.id,body,version)),
+ get_webhook_receipts:async(tx,ctx,{entityId,query})=>list({items:await portals.listWebhookReceipts(tx,ctx,entityId,{provider:query.provider||null}),nextCursor:null}),
+ // P14 accounting firm multi-client workspace: firm records and staff in the firm tenant; mandates and assignments in each client tenant; scopes and roll-ups through the restricted functions.
+ post_firms:async(tx,ctx,{body})=>created(await firm.createFirm(tx,ctx,body)),
+ get_firms:async(tx,ctx)=>list(await firm.listFirms(tx,ctx)),
+ post_firms_id_staff:async(tx,ctx,{params,body})=>created(await firm.addStaff(tx,ctx,params.id,body)),
+ get_firms_id_staff:async(tx,ctx,{params})=>list(await firm.listStaff(tx,ctx,params.id)),
+ get_firm_clients:async(tx,ctx)=>list(await firm.clientScopes(tx,ctx)),
+ get_firm_rollup:async(tx,ctx)=>({status:200,body:await firm.rollup(tx,ctx)}),
+ get_firm_snapshots:async(tx,ctx)=>list(await firm.listSnapshots(tx,ctx)),
+ post_firm_bulk_reminders:async(tx,ctx,{body})=>{const {firmId,...result}=await firm.bulkReminders(tx,ctx,body,{portals});return {status:200,body:result,resourceType:'firm',resourceId:firmId};},
+ post_firm_mandates:async(tx,ctx,{entityId,body})=>created(await firm.createMandate(tx,ctx,entityId,body)),
+ get_firm_mandates:async(tx,ctx,{entityId,query})=>list(await firm.listMandates(tx,ctx,entityId,query)),
+ get_firm_mandates_id:async(tx,ctx,{entityId,params})=>ok(await firm.getMandate(tx,ctx,entityId,params.id)),
+ patch_firm_mandates_id:async(tx,ctx,{entityId,params,body,version})=>ok(await firm.updateMandate(tx,ctx,entityId,params.id,version,body)),
+ post_firm_mandates_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await firm.approveMandate(tx,ctx,entityId,params.id,body,version)),
+ post_firm_mandates_id_revoke:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await firm.revokeMandate(tx,ctx,entityId,params.id,body,version)),
+ post_firm_assignments:async(tx,ctx,{entityId,body})=>created(await firm.createAssignment(tx,ctx,entityId,body)),
+ get_firm_assignments:async(tx,ctx,{entityId,query})=>list(await firm.listAssignments(tx,ctx,entityId,query)),
+ get_firm_assignments_id:async(tx,ctx,{entityId,params})=>ok(await firm.getAssignment(tx,ctx,entityId,params.id)),
+ patch_firm_assignments_id:async(tx,ctx,{entityId,params,body,version})=>ok(await firm.updateAssignment(tx,ctx,entityId,params.id,version,body)),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
@@ -398,11 +440,44 @@ Object.assign(handlers,{
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 
 export function createWorkspaceApi({pool,issuer,store,mode}){
+ const providers={mail:messagingProviderFromEnv(process.env,store),pay:paymentProviderFromEnv(process.env,store)};
  return async function handle(request,response,{identity:identity_,path,method,traceId,send}){
   const db=await pool.connect();
   try{
    const url=new URL(request.url,'http://localhost');
    const query=Object.fromEntries(url.searchParams);
+   // Public verification (P13): a non-enumerable token, minimal fields, rate limited per address.
+   const verify=/^\/verify\/([0-9a-f-]{36}\.[a-f0-9]{48})$/.exec(path);
+   if(verify&&method==='GET'){
+    rateLimit('public:'+(request.socket?.remoteAddress||'unknown'),false);
+    const tenant=portals.tenantOfToken(verify[1]);
+    const view=await inTransaction(db,{tenantId:tenant,principalId:null},tx=>portals.verifyShare(tx,tenant,verify[1]));
+    return send(response,200,view);
+   }
+   if(/^\/verify\//.test(path))return send(response,404,{code:'NOT_FOUND',message:'No such link.',traceId,fieldErrors:[],retryable:false});
+   // Signed provider webhook (P13): verified, deduplicated and reconciled server to server; the answer is always 200 so the provider stops retrying, the receipt records the verdict.
+   const hook=/^\/webhooks\/([a-z0-9-]{1,100})$/.exec(path);
+   if(hook&&method==='POST'){
+    rateLimit('public:'+(request.socket?.remoteAddress||'unknown'),true);
+    const tenantId=request.headers['x-tenant-id'];
+    if(!isUuid(tenantId))return send(response,400,{code:'VALIDATION_FAILED',message:'X-Tenant-Id header must be a UUID.',traceId,fieldErrors:[{path:'X-Tenant-Id',message:'Required UUID'}],retryable:false});
+    const rawBody=(await readBody(request)).toString('utf8');
+    const outcome=await inTransaction(db,{tenantId,principalId:null},tx=>portals.receiveWebhook(tx,{tenantId,providerName:hook[1],headers:{'x-webhook-timestamp':request.headers['x-webhook-timestamp'],'x-webhook-signature':request.headers['x-webhook-signature'],'x-trace-id':traceId},rawBody,provider:providers.pay}));
+    return send(response,200,{outcome:outcome.outcome,reason:outcome.reason||null,eventId:outcome.eventId,intentId:outcome.intentId||null,settlementId:outcome.settlementId||null});
+   }
+   if(/^\/webhooks\//.test(path))return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
+   if(!identity_)return send(response,401,{code:'UNAUTHENTICATED',message:'Authentication required.',traceId,fieldErrors:[],retryable:false});
+   // Invite acceptance (P13): the invited identity has no membership yet, so the token and the tenant header carry the proof.
+   const accept=/^\/portal-invites\/([0-9a-f-]{36})\/accept$/.exec(path);
+   if(accept&&method==='POST'){
+    rateLimit('accept:'+identity_.sub,true);
+    const tenantId=request.headers['x-tenant-id'];
+    if(!isUuid(tenantId))fail('VALIDATION_FAILED','X-Tenant-Id header must be a UUID.',{fieldErrors:[{path:'X-Tenant-Id',message:'Required UUID'}]});
+    const body=parseJson(await readBody(request));
+    const v=validateInput('post_portal_invites_id_accept',body);if(!v.ok)fail('VALIDATION_FAILED','Request does not match the reviewed contract.',{fieldErrors:v.fieldErrors});
+    const r=await inTransaction(db,{tenantId,principalId:null},tx=>portals.acceptInvite(tx,{tenantId,inviteId:accept[1],token:body.token,issuer,subject:identity_.sub,email:body.email||identity_.sub,displayName:null}));
+    return send(response,200,{resourceType:r.resourceType,resourceId:r.resourceId,version:r.version,state:r.state,journalEntryIds:[],taskIds:[],traceId,simulation:false});
+   }
    // Local-stream upload endpoint (06-api §Attachments step 2): raw bytes are
    // staged until POST /evidence/{id}/complete verifies them.
    const upload=/^\/evidence\/([0-9a-f-]{36})\/content$/.exec(path);
@@ -421,6 +496,8 @@ export function createWorkspaceApi({pool,issuer,store,mode}){
    if(!handlers[op.operationId])return send(response,409,{code:'FEATURE_NOT_ENABLED',message:'This capability is not enabled in this release.',traceId,fieldErrors:[],retryable:false});
    if(op.path.startsWith('/demo/')&&mode!=='demo')return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
    const ctx=await resolveActor(db,identity_,{issuer,tenantHeader:request.headers['x-tenant-id'],traceId});
+   // Portal members (P13) reach the portal allowlist only; every other operation is refused before any read.
+   if(ctx.portal&&!portals.PORTAL_OPERATIONS.has(op.operationId))fail('FORBIDDEN','Portal members may not perform this operation.');
    const write=op.method!=='GET';
    rateLimit(ctx.principalId,write);
    const entityId=op.requiresEntity?request.headers['x-entity-id']:null;
@@ -433,14 +510,14 @@ export function createWorkspaceApi({pool,issuer,store,mode}){
     if(op.input){const v=validateInput(op.operationId,body);if(!v.ok)fail('VALIDATION_FAILED','Request does not match the reviewed contract.',{fieldErrors:v.fieldErrors});}
     else if(body!==undefined&&Object.keys(body).length)fail('VALIDATION_FAILED','This operation takes no body.',{fieldErrors:[{path:'',message:'No body'}]});
    }
-   const parts={params,query,entityId,body,version,store};
+   const parts={params,query,entityId,body,version,store,providers};
    let out;
    if(!write)out=await inTransaction(db,ctx,tx=>handlers[op.operationId](tx,ctx,parts));
    else{
     const key=request.headers['idempotency-key'];
     if(op.requiresIdempotencyKey&&!key)fail('PRECONDITION_REQUIRED','Idempotency-Key header is required.');
     if(op.requiresIdempotencyKey){
-     const r=await command(db,ctx,{operation:op.operationId,idempotencyKey:key,entityId,body:{...(body??{}),__path:params,__version:version??null},traceId},async tx=>{const h=await handlers[op.operationId](tx,ctx,parts);return {resourceType:h.body?.resourceType||op.response||'result',resourceId:h.body?.resourceId||h.body?.id||h.body?.evidenceId||params.id||null,response:{status:h.status,body:h.body,etag:h.etag??null}};});
+     const r=await command(db,ctx,{operation:op.operationId,idempotencyKey:key,entityId,body:{...(body??{}),__path:params,__version:version??null},traceId},async tx=>{const h=await handlers[op.operationId](tx,ctx,parts);return {resourceType:h.resourceType||h.body?.resourceType||op.response||'result',resourceId:h.resourceId||h.body?.resourceId||h.body?.id||h.body?.evidenceId||params.id||null,response:{status:h.status,body:h.body,etag:h.etag??null}};});
      out=r.response;
     }else out=await inTransaction(db,ctx,tx=>handlers[op.operationId](tx,ctx,parts));
    }

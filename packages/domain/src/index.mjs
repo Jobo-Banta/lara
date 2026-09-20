@@ -16,3 +16,6 @@ export * as inventory from './inventory.mjs';
 export * as assets from './assets.mjs';
 export * as assistant from './assistant.mjs';
 export * from './ai-provider.mjs';
+export * as portals from './portals.mjs';
+export * from './portal-providers.mjs';
+export * as firm from './firm.mjs';

@@ -42,6 +42,8 @@ const server = http.createServer((request, response) => scope.run({}, async () =
     const url = new URL(request.url, "http://localhost"); const path = url.pathname; const method = request.method;
     if (path === "/health/live") return send(response, 200, { ok: true });
     if (path === "/health/ready") { const state = await ready(); return send(response, state.ok ? 200 : 503, state); }
+    // Public P13 routes: the non-enumerable verification link and the signed provider webhook carry their own proof, not a session.
+    if(path.startsWith('/v1/verify/')||path.startsWith('/v1/webhooks/'))return workspace(request,response,{identity:null,path:path.slice(3),method,traceId:trace.traceId,send:(res,status,value)=>{res.statusCode=status;res.end(typeof value==='string'?value:JSON.stringify(value));}});
     const identity=verifyIdentity((request.headers.authorization || '').replace(/^Bearer /,''),method,path,sessionKeys().verification);
     if(!identity) return send(response,401,{error:'AUTHENTICATION_REQUIRED',...(config.mode==='production'||config.mode==='staging'?{}:{reason:identityModule.lastRejection})});
     scope.getStore().sub=identity.sub;

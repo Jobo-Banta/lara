@@ -53,7 +53,7 @@ export function FiFeeds({entityId,me,can,tick,refresh}:Ctx){
  const cmd=useCommand(refresh);
  const [error,setError]=useState<ApiError|null>(null);
  const [open,setOpen]=useState<string|null>(null),[rows,setRows]=useState<Row[]|null>(null),[onlyErrors,setOnlyErrors]=useState(true);
- useEffect(()=>{if(!open){setRows(null);return;}api('GET','/source-batches/'+open+'/rows'+(onlyErrors?'?status=error':''),{entityId}).then(r=>setRows(r.data.items)).catch(e=>setError(asError(e)));},[open,onlyErrors,tick]);
+ useEffect(()=>{if(!open){setRows(null);return;}let live=true;setRows(null);api('GET','/source-batches/'+open+'/rows'+(onlyErrors?'?status=error':''),{entityId}).then(r=>{if(live)setRows(r.data.items);}).catch(e=>{if(live)setError(asError(e));});return()=>{live=false;};},[open,onlyErrors,tick]);
  const [diffFrom,setDiffFrom]=useState(''),[diffTo,setDiffTo]=useState(''),[diff,setDiff]=useState<Row|null>(null);
  useEffect(()=>{if(!diffTo){setDiff(null);return;}api('GET','/mapping-versions/'+diffTo+'/lines'+(diffFrom?'?againstId='+diffFrom:''),{entityId}).then(r=>setDiff(r.data)).catch(e=>setError(asError(e)));},[diffFrom,diffTo,tick]);
  // Pipeline actions run on the import behind the batch, with its current version.

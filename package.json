@@ -65,7 +65,13 @@
     "test:p11-api": "node scripts/test-p11-api.mjs",
     "test:p12-schema": "node scripts/test-p12-schema.mjs",
     "test:p12-domain": "node scripts/test-p12-domain.mjs",
-    "test:p12-api": "node scripts/test-p12-api.mjs"
+    "test:p12-api": "node scripts/test-p12-api.mjs",
+    "test:p13-schema": "node scripts/test-p13-schema.mjs",
+    "test:p13-domain": "node scripts/test-p13-domain.mjs",
+    "test:p13-api": "node scripts/test-p13-api.mjs",
+    "test:p14-schema": "node scripts/test-p14-schema.mjs",
+    "test:p14-domain": "node scripts/test-p14-domain.mjs",
+    "test:p14-api": "node scripts/test-p14-api.mjs"
   },
   "pnpm": {
     "overrides": {

@@ -7,7 +7,7 @@
 // derived from tax events. Documents share the P04 kernel: server-side tax
 // computation, one financial effect through lara.post_journal_entry, open
 // items whose balances derive from append-only allocation events.
-import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,iso,page,pageArgs,requirePermission,requireEntity,resource} from './core.mjs';
+import {portalWhere,assertPortalParty,assertInput,audit,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,iso,page,pageArgs,requirePermission,requireEntity,resource} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 import {encryptField} from './parties.mjs';
 import * as fx from './fx.mjs';
@@ -385,13 +385,14 @@ export async function getDocument(tx,ctx,entityId,id,{kinds}){
  requireEntity(ctx,entityId);requirePermission(ctx,permissionFor(kinds[0],'read'));
  const row=isUuid(id)?(await tx.query('select d.* from lara.documents d where d.tenant_id=$1 and d.entity_id=$2 and d.id=$3 and '+PURCHASING_DOC,[ctx.tenantId,entityId,id])).rows[0]:null;
  if(!row||!kinds.includes(row.kind))fail('NOT_FOUND','Document not found.');
+ assertPortalParty(ctx,row.party_id,'Document');
  return documentResource(tx,ctx,row);
 }
 export async function listDocuments(tx,ctx,entityId,query,{kinds}){
  requireEntity(ctx,entityId);requirePermission(ctx,permissionFor(kinds[0],'read'));
  const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);
  const params=[ctx.tenantId,entityId,kinds,limit+1];
- let where='';
+ let where=portalWhere(ctx,'d.party_id',params);
  if(query?.state)where+=' and d.state=$'+params.push(String(query.state));
  if(query?.partyId){if(!isUuid(query.partyId))fail('VALIDATION_FAILED','partyId must be a UUID.',{fieldErrors:[{path:'partyId',message:'UUID'}]});where+=' and d.party_id=$'+params.push(query.partyId);}
  if(query?.sourceDocumentId){if(!isUuid(query.sourceDocumentId))fail('VALIDATION_FAILED','sourceDocumentId must be a UUID.',{fieldErrors:[{path:'sourceDocumentId',message:'UUID'}]});where+=' and d.source_document_id=$'+params.push(query.sourceDocumentId);}
@@ -799,7 +800,7 @@ export async function issueCertificate(tx,ctx,entityId,id,{evidenceId=null}={}){
  return certificateResource(updated);
 }
 export async function listCertificates(tx,ctx,entityId,{partyId=null}={}){
- requirePermission(ctx,'bill.read');requireEntity(ctx,entityId);
+ if(ctx.portal)partyId=ctx.portal.partyId;else requirePermission(ctx,'bill.read');requireEntity(ctx,entityId);
  const params=[ctx.tenantId,entityId];const where=partyId?' and party_id=$'+params.push(partyId):'';
  return (await tx.query('select * from lara.withholding_certificates where tenant_id=$1 and entity_id=$2'+where+' order by party_id,period_key,version_number',params)).rows.map(certificateResource);
 }

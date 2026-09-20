@@ -1215,14 +1215,191 @@ test('assistant: capability activation, a capture request over a scan that absta
  await controller.page.goto('/assistant');await settled(controller.page);await noSeriousViolations(controller.page,'assistant /assistant');
  await controller.context.close();await preparer.context.close();
 });
+// The portal profile and the relations and authorizer roles have no reviewed
+// operations or seeded template yet; the journey seeds them through the
+// runtime role as an operator would. The invite, the message, the authorized
+// send, the acceptance and the member's fenced portal go through the screens;
+// the local mail adapter writes the invite into the object bucket, which the
+// journey reads as the invitee's mailbox.
+async function seedPortal(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({portal:1})])).rows[0].h;
+  const bank=(await db.query("select id from lara.bank_accounts where tenant_id=$1 and entity_id=$2 and status='approved' order by created_at limit 1",[tenantId,entity])).rows[0]?.id||null;
+  const payload={messagingProvider:'local-mail',paymentProvider:'fixture-pay',paymentBankAccountId:bank,shareDays:14,termsVersion:'portal-2026',supportEmail:'support@portal.invalid',baseUrl:BASE};
+  const ph=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'portal_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),ph,await principal('preparer'),await principal('controller')]);
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const relations=await role('relations',['portal_invite.create','portal_invite.edit','portal_invite.read','message_request.create','message_request.edit','message_request.read','payment_link.create','payment_link.edit','payment_link.read','payment_link.cancel']);
+  const authorizer=await role('message_authorizer',['message_request.send','message_request.read','portal_invite.revoke','portal_invite.read','payment_link.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),relations,await principal('security'),await principal('controller'),authorizer]);
+ }finally{await db.end();}
+}
+test('portal: capability activation, a customer invite drafted and its message authorized by another principal and delivered by the worker, acceptance of the invite link by the invited identity, the member seeing only its own invoices and statement and no internal screen, and revocation',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Customer and supplier portals and messaging'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Channel and provider qualified':'Consent and terms recorded');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedPortal();
+ // The invite and its message by the relations officer.
+ await preparer.page.goto('/portal');await settled(preparer.page);
+ const partyBox=preparer.page.getByRole('combobox',{name:'Party',exact:true});
+ await partyBox.selectOption(await partyBox.locator('option',{hasText:'Northwind'}).first().getAttribute('value'));
+ await preparer.page.getByRole('textbox',{name:'Email',exact:true}).fill('owner@northwind.invalid');
+ await preparer.page.getByRole('button',{name:'Create invite'}).click();
+ const inviteRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'o***@northwind.invalid',exact:true})});
+ await expect(inviteRow(preparer.page).getByRole('cell',{name:'pending',exact:true})).toBeVisible();
+ await inviteRow(preparer.page).getByRole('button',{name:'Draft invite message'}).click();
+ const msgRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'invite-2026',exact:true})}).last();
+ await expect(msgRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await expect(msgRow(preparer.page).getByRole('button',{name:'Authorize and send'})).toHaveCount(0);
+ // Authorized by the controller; the worker delivers into the local mailbox.
+ await controller.page.goto('/portal');await settled(controller.page);
+ await msgRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Onboarding Northwind');
+ await msgRow(controller.page).getByRole('button',{name:'Authorize and send'}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toHaveCount(0);
+ for(let i=0;i<30;i++){await controller.page.goto('/portal');await settled(controller.page);if(await msgRow(controller.page).getByRole('cell',{name:'sent',exact:true}).count())break;await controller.page.waitForTimeout(2000);}
+ await expect(msgRow(controller.page).getByRole('cell',{name:'sent',exact:true})).toBeVisible();
+ await msgRow(controller.page).getByRole('button',{name:'Receipts'}).click();
+ await expect(controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'local-mail',exact:true})}).first()).toContainText('sent');
+ const {readdir,readFile}=await import('node:fs/promises');
+ const dir=new URL('../../.local/e2e-workspace/messages/',import.meta.url);
+ const files=(await readdir(dir)).filter(f=>f.endsWith('.json'));
+ let mail=null;for(const f of files){const m=JSON.parse(await readFile(new URL(f,dir),'utf8'));if(/invite=/.test(m.link)&&(!mail||m.sentAt>mail.sentAt))mail=m;}
+ expect(mail,'the invite reached the local mailbox').toBeTruthy();
+ expect(mail.body).not.toContain('Northwind');
+ const link=new URL(mail.link);
+ // The invited identity accepts and sees only its own records.
+ const member={context:await browser.newContext({baseURL:BASE})};await member.context.addCookies([cookie('owner@northwind.invalid')]);member.page=await member.context.newPage();
+ await member.page.goto('/portal/accept'+link.search);
+ await member.page.getByRole('textbox',{name:'Email address on the invite'}).fill('owner@northwind.invalid');
+ await member.page.getByRole('button',{name:'Accept invite'}).click();
+ await expect(member.page.getByRole('heading',{name:'Welcome'})).toBeVisible({timeout:15000});
+ await member.page.goto('/portal');await settled(member.page);
+ await expect(member.page.getByRole('heading',{name:'Northwind Services'})).toBeVisible({timeout:15000});
+ await expect(member.page.getByText('Customer portal of',{exact:false})).toBeVisible();
+ await expect(member.page.getByRole('cell',{name:'INV-000001',exact:false}).first()).toBeVisible();
+ await member.page.goto('/parties');await settled(member.page);
+ await expect(member.page.getByRole('heading',{name:'Northwind Services'})).toBeVisible({timeout:15000});
+ await expect(member.page.getByRole('heading',{name:'Parties'})).toHaveCount(0);
+ await expect(member.page.getByRole('link',{name:'Journals'})).toHaveCount(0);
+ await member.page.goto('/portal');await settled(member.page);await noSeriousViolations(member.page,'portal member /portal');
+ // Revocation by the authorizer ends the member's access.
+ await controller.page.goto('/portal');await settled(controller.page);
+ await inviteRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Contact left Northwind');
+ await inviteRow(controller.page).getByRole('button',{name:'Revoke'}).click();
+ await expect(inviteRow(controller.page).getByRole('cell',{name:'revoked',exact:true})).toBeVisible();
+ await member.page.goto('/portal');await settled(member.page);
+ await expect(member.page.getByRole('heading',{name:'Set up your organization'})).toBeVisible({timeout:15000});
+ await expect(member.page.getByRole('heading',{name:'Northwind Services'})).toHaveCount(0);
+ await noSeriousViolations(controller.page,'portal admin /portal');
+ await member.context.close();await controller.context.close();await preparer.context.close();
+});
+// The firm's own organization, its partner and the client-side mandate and
+// approver roles have no reviewed operations or seeded template yet; the
+// journey seeds them through the runtime role as an operator would. The firm
+// record, the mandate, its approval, the client list, the roll-up, the
+// client context and the revocation go through the screens.
+async function seedFirm(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {organization,identity,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const clientTenant=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  const firmTenant=(await db.query('select gen_random_uuid() as id')).rows[0].id;
+  await inTransaction(db,{tenantId:firmTenant,principalId:null},async tx=>{
+   await organization.provisionTenant(tx,{id:firmTenant,slug:'api-firm-e2e-'+suffix,name:'Ledger & Co (firm)',mode:'demo'});
+   const partner=(await identity.resolvePrincipal(tx,firmTenant,{issuer:'https://identity.invalid',subject:who('partner'),displayName:'Partner'})).id;
+   const role=(await tx.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,'firm_partner','Firm partner',$2,'approved',$3,$4) returning id",[firmTenant,JSON.stringify(['firm_assignment.create','firm_assignment.read','firm_mandate.read','session.read','entity.create','entity.read','task.read']),'0'.repeat(64),partner])).rows[0].id;
+   await tx.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$2)',[firmTenant,partner,role]);
+   // The firm's own legal entity: firm records are audited against it.
+   const p={...await identity.actorContext(tx,firmTenant,partner),traceId:'seed-firm'};
+   await organization.createEntity(tx,p,{legalName:'Ledger & Co',baseCurrency:'PHP',timezone:'Asia/Manila',fiscalYearStartMonth:1});
+  });
+  await db.query("select set_config('lara.tenant_id',$1,false)",[clientTenant]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),clientTenant])).rows[0].principal_id;
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[clientTenant,code,JSON.stringify(perms),'0'.repeat(64),await principal('security')])).rows[0].id;
+  const mandates=await role('mandates',['firm_mandate.create','firm_mandate.edit','firm_mandate.read','firm_mandate.revoke','firm_assignment.read']);
+  const approver=await role('mandate_approver',['firm_mandate.approve','firm_mandate.read','firm_mandate.revoke','firm_assignment.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[clientTenant,await principal('preparer'),mandates,await principal('security'),await principal('controller'),approver]);
+ }finally{await db.end();}
+}
+test('firm: capability activation, a firm registered in its own organization, a mandate drafted by the client on the engagement evidence and approved by a second principal, the client in the partner\'s list and roll-up, the explicit client context, and revocation',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Accounting firm multi-client workspace'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Engagement signed with Ledger & Co':'Permission and expiry boundaries reviewed');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedFirm();
+ // The partner registers the firm in its own organization.
+ const partner=await as(browser,'partner');
+ await partner.page.goto('/firm');await settled(partner.page);
+ await partner.page.getByRole('textbox',{name:'Firm name',exact:true}).fill('Ledger & Co');
+ await partner.page.getByRole('button',{name:'Register firm'}).click();
+ await expect(partner.page.getByText('give this id to a client',{exact:false})).toBeVisible();
+ const firmId=(await partner.page.locator('code').first().textContent()).trim();
+ expect(firmId).toMatch(/^[0-9a-f-]{36}$/);
+ await expect(partner.page.getByText('No client has mandated you yet.')).toBeVisible();
+ // The client drafts the mandate on the engagement evidence; a second principal approves.
+ await preparer.page.goto('/firm/mandates');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Firm id',exact:true}).fill(firmId);
+ await preparer.page.getByRole('combobox',{name:'Engagement evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Draft mandate'}).click();
+ const mandateRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:firmId.slice(0,8),exact:true})});
+ await expect(mandateRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await expect(mandateRow(preparer.page).getByRole('button',{name:'Approve'})).toHaveCount(0);
+ await controller.page.goto('/firm/mandates');await settled(controller.page);
+ await mandateRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(mandateRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ // The partner sees the client, its roll-up, and opens it in an explicit context.
+ await partner.page.goto('/firm');await settled(partner.page);
+ await expect(partner.page.getByRole('cell',{name:'CI Workspace Entity',exact:true})).toBeVisible();
+ await partner.page.getByRole('button',{name:'Refresh roll-up'}).click();
+ await expect(partner.page.getByText('nothing is summed across them',{exact:false})).toBeVisible({timeout:15000});
+ await expect(partner.page.getByRole('row').filter({hasText:'CI Workspace Entity ('}).first()).toBeVisible();
+ await partner.page.getByRole('button',{name:'Open client'}).click();
+ await expect(partner.page).toHaveURL(/\/work$/);
+ await expect(partner.page.getByText('Client context:',{exact:false})).toBeVisible({timeout:15000});
+ await expect(partner.page.getByRole('heading',{level:1})).toHaveText('My work');
+ await partner.page.goto('/ledger/journals');await settled(partner.page);
+ await expect(partner.page.locator('section[role="alert"]')).toContainText('Not permitted');
+ await partner.page.getByRole('button',{name:'Leave client'}).click();
+ await expect(partner.page).toHaveURL(/\/firm$/);
+ await noSeriousViolations(partner.page,'firm /firm');
+ // Revocation ends the client at once.
+ await controller.page.goto('/firm/mandates');await settled(controller.page);
+ await mandateRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Engagement ended');
+ await mandateRow(controller.page).getByRole('button',{name:'Revoke'}).click();
+ await expect(mandateRow(controller.page).getByRole('cell',{name:'revoked',exact:true})).toBeVisible();
+ await noSeriousViolations(controller.page,'client /firm/mandates');
+ await partner.page.goto('/firm');await settled(partner.page);
+ await expect(partner.page.getByText('No client has mandated you yet.')).toBeVisible({timeout:15000});
+ await partner.context.close();await controller.context.close();await preparer.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/portal');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P13',{exact:false})).toBeVisible();
+ await clerk.page.goto('/planning');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P16',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();
