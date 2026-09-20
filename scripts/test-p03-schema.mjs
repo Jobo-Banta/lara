@@ -76,7 +76,7 @@ try{
  const dimEntry=(await post({lines:[{accountId:expense,branchId:branch,debit:'500.00',credit:'0',dimensions:{cost_center:costCenter}},{accountId:cash,branchId:branch,debit:'0',credit:'500.00',dimensions:{}}]})).rows[0].id;
  assert.ok(dimEntry);
  await rejects(post({date:'2026-12-01'}),/PERIOD_LOCKED: no open period/,'date outside any period');
- await rejects(post({currency:'USD'}),/FEATURE_NOT_ENABLED/,'foreign currency journal');
+ await rejects(post({currency:'USD'}),/never default to 1/,'foreign currency journal without an approved rate (P09)');
  await rejects(post({extra:{tenantId:randomUUID()}}),/FORBIDDEN|outside the bound tenant/,'posting for another tenant');
  await rejects(run(api,T.id,"update lara.journal_lines set func_debit=func_debit+1 where entry_id=$1",[first]),/permission denied|APPEND_ONLY/,'posted line update');
  await rejects(run(api,T.id,"delete from lara.journal_entries where id=$1",[first]),/permission denied|APPEND_ONLY/,'posted entry delete');
