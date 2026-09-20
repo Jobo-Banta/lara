@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T07:30:53+00:00",
+  "updated_at": "2026-09-20T09:02:12+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2150,15 +2150,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P06"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
-      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) passes locally on the dev database.",
-      "evidence": "Local: node scripts/test-p07-schema.mjs \u2192 P07-01 schema acceptance passed (8 groups); pnpm contracts:generate and validate_specifications pass. CI run pending.",
-      "updated_at": "2026-09-20T07:07:06+00:00"
+      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-02",
@@ -2245,13 +2245,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups).",
-      "evidence": "Local: node scripts/test-p07-domain.mjs \u2192 P07-02 domain acceptance passed (7 groups); P04/P05/P06 domain suites pass with the transmission hook. CI run pending.",
-      "updated_at": "2026-09-20T07:07:06+00:00"
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-03",
@@ -2338,13 +2338,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes.",
-      "evidence": "Local: node scripts/test-p07-api.mjs \u2192 P07-03 API acceptance passed (5 groups). CI run pending.",
-      "updated_at": "2026-09-20T07:07:06+00:00"
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-04",
@@ -2431,13 +2431,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
-      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; node scripts/test-demo-browser.mjs tests/browser/workspace.spec.mjs \u2192 10 passed (10.9m) including the compliance journey with WCAG checks. CI run pending.",
-      "updated_at": "2026-09-20T07:30:53+00:00"
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey in tests/browser/workspace.spec.mjs with WCAG checks.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-05",
@@ -2524,13 +2524,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written.",
-      "evidence": "Local: p07 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T07:07:06+00:00"
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-06",
@@ -5521,36 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T00:26:17+00:00",
-      "id": "P05-01",
-      "action": "in_review",
-      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds."
-    },
-    {
-      "at": "2026-09-20T00:26:18+00:00",
-      "id": "P05-02",
-      "action": "in_review",
-      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
-    },
-    {
-      "at": "2026-09-20T00:26:18+00:00",
-      "id": "P05-03",
-      "action": "in_review",
-      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI."
-    },
-    {
-      "at": "2026-09-20T00:31:42+00:00",
-      "id": "P05-01",
-      "action": "done",
-      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds."
-    },
-    {
-      "at": "2026-09-20T00:31:43+00:00",
-      "id": "P05-02",
-      "action": "done",
-      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
-    },
-    {
       "at": "2026-09-20T00:31:43+00:00",
       "id": "P05-03",
       "action": "done",
@@ -5699,6 +5669,36 @@ window.LARA_BUILD_STATUS = {
       "id": "P07-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T09:02:12+00:00",
+      "id": "P07-01",
+      "action": "done",
+      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) in CI."
+    },
+    {
+      "at": "2026-09-20T09:02:12+00:00",
+      "id": "P07-02",
+      "action": "done",
+      "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T09:02:12+00:00",
+      "id": "P07-03",
+      "action": "done",
+      "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes."
+    },
+    {
+      "at": "2026-09-20T09:02:12+00:00",
+      "id": "P07-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey in tests/browser/workspace.spec.mjs with WCAG checks."
+    },
+    {
+      "at": "2026-09-20T09:02:12+00:00",
+      "id": "P07-05",
+      "action": "done",
+      "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written."
     }
   ]
 };
