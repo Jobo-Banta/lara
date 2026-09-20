@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -296,6 +296,27 @@ Object.assign(handlers,{
  get_transmissions:async(tx,ctx,{entityId,query})=>list({items:await compliance.listTransmissions(tx,ctx,entityId,{state:query.state||null,documentId:isUuid(query.documentId)?query.documentId:null}),nextCursor:null}),
  get_compliance_readiness:async(tx,ctx,{entityId})=>({status:200,body:await compliance.readiness(tx,ctx,entityId,process.env)}),
  post_transmissions_id_reconcile:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestReconcile(tx,ctx,entityId,params.id,body)),
+ // P09 multiple currencies and separate books
+ post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
+ get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
+ patch_books_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateBook(tx,ctx,entityId,params.id,version,body)),
+ post_books_id_activate:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.activateBook(tx,ctx,entityId,params.id,body,version)),
+ get_books_id_combined:async(tx,ctx,{entityId,params,query})=>({status:200,body:await fx.combinedView(tx,ctx,entityId,{viewBookId:params.id,asOf:query.asOf})}),
+ get_currencies:async(tx,ctx,{entityId})=>{if(!ctx.permissions.has('book.read'))fail('FORBIDDEN','Permission book.read is required.');return {status:200,body:{items:await fx.listCurrencies(tx),nextCursor:null}};},
+ post_fx_rates:async(tx,ctx,{entityId,body})=>created(await fx.createFxRate(tx,ctx,entityId,body)),
+ get_fx_rates:async(tx,ctx,{entityId,query})=>list(await fx.listFxRates(tx,ctx,entityId,query)),
+ get_fx_rates_id:async(tx,ctx,{entityId,params})=>ok(await fx.getFxRate(tx,ctx,entityId,params.id)),
+ patch_fx_rates_id:async(tx,ctx,{entityId,params,body,version})=>ok(await fx.updateFxRate(tx,ctx,entityId,params.id,version,body)),
+ post_fx_rates_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await fx.approveFxRate(tx,ctx,entityId,params.id,body,version)),
+ get_fx_layers:async(tx,ctx,{entityId,query})=>({status:200,body:await fx.listLayers(tx,ctx,entityId,{openItemId:query.openItemId||null,partyId:query.partyId||null})}),
+ post_revaluations:async(tx,ctx,{entityId,body})=>created(await fx.createRevaluation(tx,ctx,entityId,body)),
+ get_revaluations:async(tx,ctx,{entityId,query})=>list(await fx.listRevaluations(tx,ctx,entityId,query)),
+ get_revaluations_id:async(tx,ctx,{entityId,params})=>ok(await fx.getRevaluation(tx,ctx,entityId,params.id)),
+ get_revaluations_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await fx.revaluationPreview(tx,ctx,entityId,params.id)}),
+ patch_revaluations_id:async(tx,ctx,{entityId,params,body,version})=>ok(await fx.updateRevaluation(tx,ctx,entityId,params.id,version,body)),
+ post_revaluations_id_preview:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await fx.previewRevaluation(tx,ctx,entityId,params.id,body,version)),
+ post_revaluations_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await fx.approveRevaluation(tx,ctx,entityId,params.id,body,version)),
+ post_revaluations_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await fx.postRevaluation(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
  // P08 financial institution coexistence
  post_source_ownership:async(tx,ctx,{entityId,body})=>created(await fi.createSourceOwnership(tx,ctx,entityId,body)),
  get_source_ownership:async(tx,ctx,{entityId,query})=>list(await fi.listSourceOwnership(tx,ctx,entityId,query)),

@@ -56478,6 +56478,576 @@
         },
         "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
       }
+    },
+    "/currencies": {
+      "get": {
+        "operationId": "get_currencies",
+        "summary": "currency metadata read",
+        "tags": [
+          "P09"
+        ],
+        "x-delivery-phase": "P09",
+        "x-required-permission": "book.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/fx-layers": {
+      "get": {
+        "operationId": "get_fx_layers",
+        "summary": "open item FX layers read",
+        "tags": [
+          "P09"
+        ],
+        "x-delivery-phase": "P09",
+        "x-required-permission": "open_item.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "openItemId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "partyId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FxLayerList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/revaluations/{id}/lines": {
+      "get": {
+        "operationId": "get_revaluations_id_lines",
+        "summary": "revaluation preview read",
+        "tags": [
+          "P09"
+        ],
+        "x-delivery-phase": "P09",
+        "x-required-permission": "revaluation.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevaluationPreviewView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/books/{id}/combined": {
+      "get": {
+        "operationId": "get_books_id_combined",
+        "summary": "combined management view read",
+        "tags": [
+          "P09"
+        ],
+        "x-delivery-phase": "P09",
+        "x-required-permission": "book.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CombinedBookView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
     }
   },
   "components": {
@@ -66250,6 +66820,466 @@
           "rows",
           "unclassified",
           "totals",
+          "checksum"
+        ]
+      },
+      "CurrencyList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "name": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "minorUnits": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "code",
+                "name",
+                "minorUnits"
+              ]
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "FxLayerList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "openItemId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "documentId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "officialNumber": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "partyId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "side": {
+                  "type": "string",
+                  "enum": [
+                    "AR",
+                    "AP"
+                  ]
+                },
+                "currency": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "seq": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "event": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "settle",
+                    "reverse",
+                    "revalue"
+                  ]
+                },
+                "settlementId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "revaluationId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "txnConsumed": {
+                  "type": "string"
+                },
+                "funcConsumed": {
+                  "type": "string"
+                },
+                "realizedFx": {
+                  "type": "string"
+                },
+                "txnRemaining": {
+                  "type": "string"
+                },
+                "funcCarrying": {
+                  "type": "string"
+                },
+                "rate": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "$ref": "#/components/schemas/Timestamp"
+                }
+              },
+              "required": [
+                "id",
+                "openItemId",
+                "documentId",
+                "officialNumber",
+                "partyId",
+                "side",
+                "currency",
+                "seq",
+                "event",
+                "settlementId",
+                "revaluationId",
+                "txnConsumed",
+                "funcConsumed",
+                "realizedFx",
+                "txnRemaining",
+                "funcCarrying",
+                "rate",
+                "createdAt"
+              ]
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "RevaluationPreviewView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "rate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rateDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "periodEnd": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "accountId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "accountCode": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "accountName": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "txnBalance": {
+                  "type": "string"
+                },
+                "carrying": {
+                  "type": "string"
+                },
+                "revalued": {
+                  "type": "string"
+                },
+                "difference": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "accountId",
+                "accountCode",
+                "accountName",
+                "txnBalance",
+                "carrying",
+                "revalued",
+                "difference"
+              ]
+            },
+            "minItems": 0
+          },
+          "totalDifference": {
+            "type": "string"
+          },
+          "adjustsRunId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entryId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reversalEntryId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "checksum": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "currency",
+          "rate",
+          "rateDate",
+          "periodEnd",
+          "lines",
+          "totalDifference",
+          "adjustsRunId",
+          "entryId",
+          "reversalEntryId",
+          "checksum"
+        ]
+      },
+      "CombinedBookView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "viewBookId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "viewCode": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "asOf": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "basis": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "bookId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "kind": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "functionalCurrency": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "policy": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "rate": {
+                  "type": "string"
+                },
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "code": {
+                        "$ref": "#/components/schemas/Text"
+                      },
+                      "name": {
+                        "$ref": "#/components/schemas/Text"
+                      },
+                      "category": {
+                        "$ref": "#/components/schemas/Text"
+                      },
+                      "nativeBalance": {
+                        "type": "string"
+                      },
+                      "translated": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "name",
+                      "category",
+                      "nativeBalance",
+                      "translated"
+                    ]
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "bookId",
+                "code",
+                "kind",
+                "functionalCurrency",
+                "policy",
+                "rate",
+                "accounts"
+              ]
+            },
+            "minItems": 0
+          },
+          "combined": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "name": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "category": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "balance": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "name",
+                "category",
+                "balance"
+              ]
+            },
+            "minItems": 0
+          },
+          "excluded": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "bookId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "kind": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "reason": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "required": [
+                "bookId",
+                "code",
+                "kind",
+                "reason"
+              ]
+            },
+            "minItems": 0
+          },
+          "blocked": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "bookId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "code": {
+                  "$ref": "#/components/schemas/Text"
+                },
+                "reason": {
+                  "$ref": "#/components/schemas/Text"
+                }
+              },
+              "required": [
+                "bookId",
+                "code",
+                "reason"
+              ]
+            },
+            "minItems": 0
+          },
+          "checksum": {
+            "$ref": "#/components/schemas/Text"
+          }
+        },
+        "required": [
+          "viewBookId",
+          "viewCode",
+          "currency",
+          "asOf",
+          "basis",
+          "books",
+          "combined",
+          "excluded",
+          "blocked",
           "checksum"
         ]
       }

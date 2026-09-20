@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T10:54:21+00:00",
+  "updated_at": "2026-09-20T12:12:10+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2849,15 +2849,15 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P08"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally.",
+      "evidence": "Local: node scripts/test-p09-schema.mjs \u2192 P09-01 schema acceptance passed (5 groups); contracts regenerated and validate_specifications pass. CI run pending.",
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P09-02",
@@ -2875,13 +2875,13 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/fx.mjs with hooks in ledger, sales and purchasing: FX profile, rate review with the inverted-pair guard, documents posting both amounts at the document-date rate with open-item layers, settlements consuming layers proportionally with the final allocation absorbing rounding and realized FX as a functional adjustment (AC-10 exact), reversals at the original rate, revaluation of classified monetary accounts posting once per rate set with linked later sets, partitions with access grants and the combined management view; scripts/test-p09-domain.mjs covers P09-T01..T05 (7 groups).",
+      "evidence": "Local: node scripts/test-p09-domain.mjs \u2192 P09-02 domain acceptance passed (7 groups). CI run pending.",
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P09-03",
@@ -2899,13 +2899,13 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 17 P09 operations plus the four reads served by apps/api/src/workspace-api.mjs (books create/edit/activate/combined, rates, revaluation preview/approve/post with If-Match); scripts/test-p09-api.mjs (5 groups) runs the API as a process with AC-10 over HTTP.",
+      "evidence": "Local: node scripts/test-p09-api.mjs \u2192 P09-03 API acceptance passed (5 groups). CI run pending.",
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P09-04",
@@ -2923,13 +2923,13 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; node scripts/test-demo-browser.mjs tests/browser/workspace.spec.mjs \u2192 12 passed (14.9m) including the multi-currency journey with WCAG checks. CI run pending.",
+      "updated_at": "2026-09-20T12:12:10+00:00"
     },
     {
       "id": "P09-05",
@@ -2947,13 +2947,13 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written.",
+      "evidence": "Local: p09 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P09-06",
@@ -2971,13 +2971,13 @@ window.LARA_BUILD_STATUS = {
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.9.0 drafted (docs/development/releases/0.9.0-draft.md). Blocked on the 0.8.0 (P08) release, the controller's approval of the monetary classification, FX sources, functional currencies and book boundaries, tested separate-book reports, contract operations for the FX profile, book access grants, book links and currency metadata, FX desk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P10-01",
@@ -5521,48 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T06:02:37+00:00",
-      "id": "P06-06",
-      "action": "blocked",
-      "note": "Release 0.6.0 drafted (docs/development/releases/0.6.0-draft.md). Blocked on the 0.5.0 (P05) release, pilot bank format acceptance by bank and customer, signer matrix and outbound custody controls, contract operations for the treasury profile, statement batches, bank file runs and cash counts, and the owner's tag, deployment and manifest run."
-    },
-    {
-      "at": "2026-09-20T06:10:34+00:00",
-      "id": "P06-01",
-      "action": "done",
-      "note": "Migration 0021 (bank accounts, statement batches and lines, reconciliation matches and guarded allocations, checks, transfers, cash sessions with counts and handovers, bank file runs); GET /bank-statement-lines and GET /bank-reconciliation added to the reviewed contract (353 operations); scripts/test-p06-schema.mjs (9 groups) in CI."
-    },
-    {
-      "at": "2026-09-20T06:10:34+00:00",
-      "id": "P06-02",
-      "action": "done",
-      "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups)."
-    },
-    {
-      "at": "2026-09-20T06:10:34+00:00",
-      "id": "P06-03",
-      "action": "done",
-      "note": "36 P06 operations served by apps/api/src/workspace-api.mjs (imports carry the treasury hooks, payments carry the bank-file generator, dishonor carries the settlement reversal); worker bank.propose_matches job and bank_reconciliation report; scripts/test-p06-api.mjs (8 groups) in CI."
-    },
-    {
-      "at": "2026-09-20T06:10:34+00:00",
-      "id": "P06-04",
-      "action": "done",
-      "note": "workspace-treasury.tsx: bank accounts, reconciliation workbench (difference breakdown, statement lines, counterparts, journal allocations, proposals with confirm/reject/reverse), transfers, check register with release calendar, cashier sessions with denomination counts and handover; imports screen offers bank statements; routes /bank/*; browser treasury journey."
-    },
-    {
-      "at": "2026-09-20T06:10:34+00:00",
-      "id": "P06-05",
-      "action": "done",
-      "note": "P06-T01..T05 in scripts/test-p06-domain.mjs and test-p06-api.mjs; docs/development/P06-REVIEW.md, P06-RUNBOOK.md and releases/0.6.0-draft.md written; later-phase probes moved to P07 operations."
-    },
-    {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-01",
-      "action": "in_review",
-      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) passes locally on the dev database."
-    },
-    {
       "at": "2026-09-20T07:07:06+00:00",
       "id": "P07-02",
       "action": "in_review",
@@ -5699,6 +5657,48 @@ window.LARA_BUILD_STATUS = {
       "id": "P08-05",
       "action": "done",
       "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-01",
+      "action": "in_review",
+      "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-02",
+      "action": "in_review",
+      "note": "packages/domain/src/fx.mjs with hooks in ledger, sales and purchasing: FX profile, rate review with the inverted-pair guard, documents posting both amounts at the document-date rate with open-item layers, settlements consuming layers proportionally with the final allocation absorbing rounding and realized FX as a functional adjustment (AC-10 exact), reversals at the original rate, revaluation of classified monetary accounts posting once per rate set with linked later sets, partitions with access grants and the combined management view; scripts/test-p09-domain.mjs covers P09-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-03",
+      "action": "in_review",
+      "note": "All 17 P09 operations plus the four reads served by apps/api/src/workspace-api.mjs (books create/edit/activate/combined, rates, revaluation preview/approve/post with If-Match); scripts/test-p09-api.mjs (5 groups) runs the API as a process with AC-10 over HTTP."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-05",
+      "action": "in_review",
+      "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T11:17:04+00:00",
+      "id": "P09-06",
+      "action": "blocked",
+      "note": "Release 0.9.0 drafted (docs/development/releases/0.9.0-draft.md). Blocked on the 0.8.0 (P08) release, the controller's approval of the monetary classification, FX sources, functional currencies and book boundaries, tested separate-book reports, contract operations for the FX profile, book access grants, book links and currency metadata, FX desk and approver role templates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T12:12:10+00:00",
+      "id": "P09-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs."
     }
   ]
 };

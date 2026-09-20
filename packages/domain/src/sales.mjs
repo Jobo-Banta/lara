@@ -9,6 +9,7 @@ import {linkEvidence} from './evidence.mjs';
 import {micros,decimal} from './ledger.mjs';
 import {checkGate} from './treasury.mjs';
 import {queueTransmission} from './compliance.mjs';
+import * as fx from './fx.mjs';
 
 const PICO=10n**12n;
 const MICRO=10n**6n;
@@ -79,7 +80,9 @@ export async function salesProfile(tx,ctx,entityId){
 export async function bookFor(tx,ctx,entityId,bookId){
  if(!isUuid(bookId))fail('VALIDATION_FAILED','bookId must be a UUID.',{fieldErrors:[{path:'bookId',message:'UUID'}]});
  const book=(await tx.query("select * from lara.books where tenant_id=$1 and entity_id=$2 and id=$3 and status='active'",[ctx.tenantId,entityId,bookId])).rows[0];
- if(!book)fail('NOT_FOUND','Book not found.');return book;
+ if(!book)fail('NOT_FOUND','Book not found.');
+ if(book.kind==='management')fail('STATE_CONFLICT','A management view never posts; it combines its source books.');
+ return book;
 }
 async function customerFor(tx,ctx,entityId,partyId){
  if(!isUuid(partyId))fail('VALIDATION_FAILED','partyId must be a UUID.',{fieldErrors:[{path:'partyId',message:'UUID'}]});
@@ -189,7 +192,8 @@ export async function documentResource(tx,ctx,d){
 // Validates references, resolves rules and computes the server-side totals.
 async function prepareDocument(tx,ctx,entityId,input,profile){
  const book=await bookFor(tx,ctx,entityId,input.bookId);
- if(input.currency!==book.functional_currency)fail('FEATURE_NOT_ENABLED','Foreign-currency documents arrive with P09.');
+ if(input.currency!==book.functional_currency&&!(await fx.isFxActive(tx,ctx,entityId)))fail('FEATURE_NOT_ENABLED','Foreign-currency documents need the multi-currency capability (P09).');
+ await fx.requireBookAccess(tx,ctx,book,'post');
  await branchFor(tx,ctx,entityId,input.branchId);
  await customerFor(tx,ctx,entityId,input.partyId);
  if(input.accountingDate<input.documentDate)fail('VALIDATION_FAILED','The accounting date cannot precede the document date.',{fieldErrors:[{path:'accountingDate',message:'Before document date'}]});
@@ -330,7 +334,12 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  const {seriesId,officialNumber}=await allocateNumber(tx,ctx,entityId,row);
  const snapshot={legalName:party.legal_name,identityStatus:party.identity_status,address:party.address_json,officialNumber,documentDate:iso(row.document_date)};
  await tx.query('insert into lara.party_snapshots(document_id,tenant_id,entity_id,immutable_json,snapshot_hash) values($1,$2,$3,$4,$5)',[id,ctx.tenantId,entityId,JSON.stringify(snapshot),contentHash(snapshot)]);
- const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'document',sourceId:id,sourceVersion:Number(row.approved_version),purpose:'posting',accountingDate:iso(row.accounting_date),documentDate:iso(row.document_date),description:(row.kind==='credit_note'?'Credit note ':'Invoice ')+officialNumber+' '+party.legal_name,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,lines:documentJournalLines(row,lines,profile)})])).rows[0].id;
+ // A foreign-currency document posts both amounts at the approved rate of its document date (P09); the control line carries the residual.
+ const book=(await tx.query('select * from lara.books where tenant_id=$1 and id=$2',[ctx.tenantId,row.book_id])).rows[0];
+ const fxRate=row.currency!==book.functional_currency?await fx.rateFor(tx,ctx,entityId,{base:row.currency,quote:book.functional_currency,onDate:iso(row.document_date)}):null;
+ let journalLines=documentJournalLines(row,lines,profile);
+ if(fxRate)journalLines=fx.translateLines(journalLines,fxRate.rate,{controlAccountId:profile.arAccountId});
+ const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'document',sourceId:id,sourceVersion:Number(row.approved_version),purpose:'posting',accountingDate:iso(row.accounting_date),documentDate:iso(row.document_date),description:(row.kind==='credit_note'?'Credit note ':'Invoice ')+officialNumber+' '+party.legal_name,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,...(fxRate?fx.postingFx(fxRate):{}),lines:journalLines})])).rows[0].id;
  for(const l of lines)if(l.tax_rule_version_id&&micros(String(l.tax))>0n){
   const rule=(await tx.query('select recognition from lara.tax_rule_versions where tenant_id=$1 and id=$2',[ctx.tenantId,l.tax_rule_version_id])).rows[0];
   if(['issue','accrual'].includes(rule.recognition))await tx.query("insert into lara.tax_events(tenant_id,entity_id,document_id,line_id,tax_rule_version_id,tax_point,recognition,basis,amount,recognition_entry_id) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",[ctx.tenantId,entityId,id,l.id,l.tax_rule_version_id,rule.recognition==='issue'?iso(row.document_date):iso(row.accounting_date),rule.recognition,l.net,l.tax,entryId]);
@@ -338,14 +347,16 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  const updated=(await tx.query("update lara.documents set state='posted',posted_entry_id=$3,posted_by=$4,posted_at=now(),series_id=$5,official_number=$6,tax_date=document_date where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,entryId,ctx.principalId,seriesId,officialNumber])).rows[0];
  const journalEntryIds=[entryId];
  if(row.kind==='invoice'){
-  await tx.query("insert into lara.open_items(tenant_id,entity_id,document_id,side,party_id,original_amount,currency,due_date) values($1,$2,$3,'AR',$4,$5,$6,$7)",[ctx.tenantId,entityId,id,row.party_id,row.gross,row.currency,row.due_schedule[0]?.dueDate||iso(row.document_date)]);
+  const item=(await tx.query("insert into lara.open_items(tenant_id,entity_id,document_id,side,party_id,original_amount,currency,due_date) values($1,$2,$3,'AR',$4,$5,$6,$7) returning id",[ctx.tenantId,entityId,id,row.party_id,row.gross,row.currency,row.due_schedule[0]?.dueDate||iso(row.document_date)])).rows[0];
+  if(fxRate)await fx.openLayer(tx,ctx,entityId,{openItemId:item.id,txn:micros(String(row.gross)),func:fx.controlFunc(journalLines,profile.arAccountId),rate:fxRate});
  }else{
   // Apply the credit to the original invoice's open item up to its outstanding.
   const relation=(await tx.query("select target_id from lara.document_relations where tenant_id=$1 and source_id=$2 and relation in ('credit','reversal') limit 1",[ctx.tenantId,id])).rows[0];
   if(relation){
    const item=(await tx.query('select id,(original_amount-lara.open_item_allocated(tenant_id,id))::text as outstanding from lara.open_items where tenant_id=$1 and document_id=$2',[ctx.tenantId,relation.target_id])).rows[0];
    if(item){const outstanding=micros(item.outstanding.replace(/^-/,''));const apply=outstanding<micros(String(row.gross))?outstanding:micros(String(row.gross));
-    if(apply>0n){await tx.query("insert into lara.allocation_events(tenant_id,entity_id,credit_document_id,open_item_id,amount,action,command_id,created_by) values($1,$2,$3,$4,$5,'apply',$6,$7)",[ctx.tenantId,entityId,id,item.id,decimal(apply,6),commandId,ctx.principalId]);await refreshSettlementState(tx,ctx,relation.target_id);}
+    if(apply>0n){await tx.query("insert into lara.allocation_events(tenant_id,entity_id,credit_document_id,open_item_id,amount,action,command_id,created_by) values($1,$2,$3,$4,$5,'apply',$6,$7)",[ctx.tenantId,entityId,id,item.id,decimal(apply,6),commandId,ctx.principalId]);await refreshSettlementState(tx,ctx,relation.target_id);
+     if(fxRate){const s=await fx.settleLayers(tx,ctx,entityId,{settlementId:null,allocations:[{openItemId:item.id,amount:decimal(apply)}],rate:fxRate,side:'AR'});const fxEntry=await fx.postRealized(tx,ctx,entityId,{bookId:row.book_id,sourceType:'document_fx',sourceId:id,sourceVersion:Number(row.approved_version),accountingDate:iso(row.accounting_date),description:'Credit note '+officialNumber,controlAccountId:profile.arAccountId,branchId:row.branch_id,side:'AR',cashFunc:s.cashFunc,consumed:s.consumed,commandId});if(fxEntry)journalEntryIds.push(fxEntry);}}
     await tx.query('update lara.documents set settlement_state=$3 where tenant_id=$1 and id=$2',[ctx.tenantId,id,apply<micros(String(row.gross))?'credit_balance':'paid']);}
   }else await tx.query("update lara.documents set settlement_state='credit_balance' where tenant_id=$1 and id=$2",[ctx.tenantId,id]);
  }
@@ -566,17 +577,28 @@ export async function postCollection(tx,ctx,entityId,id,input,expectedVersion,{c
  const party=(await tx.query('select legal_name from lara.party where tenant_id=$1 and id=$2',[ctx.tenantId,row.party_id])).rows[0];
  const advance=await advanceReturn(tx,ctx,entityId,row.party_id);
  const creditAccountId=advance?await recordAdvanceReturn(tx,ctx,entityId,row,{commandId}):profile.arAccountId;
- const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement',sourceId:id,sourceVersion:Number(row.content_version),purpose:'posting',accountingDate:iso(row.value_date),documentDate:iso(row.value_date),description:(advance?'Advance returned by ':'Receipt from ')+party.legal_name,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,lines:settlementJournalLines({...row,branch_id:branch.id},profile,{creditAccountId})})])).rows[0].id;
+ // A foreign-currency receipt settles at the approved rate of its value date: the
+ // transaction entry moves cash and the control at that rate, the layers give the
+ // consumed carrying value and the realized difference posts as a functional adjustment (P09).
+ const book=(await tx.query('select * from lara.books where tenant_id=$1 and id=$2',[ctx.tenantId,row.book_id])).rows[0];
+ const fxRate=row.currency!==book.functional_currency?await fx.rateFor(tx,ctx,entityId,{base:row.currency,quote:book.functional_currency,onDate:iso(row.value_date)}):null;
+ const intents=row.allocation_intents||[];
+ if(fxRate){if(advance)fail('FEATURE_NOT_ENABLED','Foreign-currency advance returns are not supported.');if(micros(String(row.withholding_amount))>0n)fail('FEATURE_NOT_ENABLED','Withholding on foreign-currency receipts is not supported.');const allocated=intents.reduce((t,a)=>t+micros(String(a.amount)),0n);if(allocated!==micros(String(row.gross_amount)))fail('STATE_CONFLICT','A foreign-currency receipt allocates its full amount at posting so the realized FX is known.');}
+ let journalLines=settlementJournalLines({...row,branch_id:branch.id},profile,{creditAccountId});
+ if(fxRate)journalLines=fx.translateLines(journalLines,fxRate.rate,{controlAccountId:creditAccountId});
+ const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement',sourceId:id,sourceVersion:Number(row.content_version),purpose:'posting',accountingDate:iso(row.value_date),documentDate:iso(row.value_date),description:(advance?'Advance returned by ':'Receipt from ')+party.legal_name,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,...(fxRate?fx.postingFx(fxRate):{}),lines:journalLines})])).rows[0].id;
  const updated=(await tx.query("update lara.settlements set state='posted',posted_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,entryId])).rows[0];
- await applyAllocations(tx,ctx,entityId,id,row.allocation_intents||[],{commandId});
+ await applyAllocations(tx,ctx,entityId,id,intents,{commandId});
+ const journalEntryIds=[entryId];
+ if(fxRate){const s=await fx.settleLayers(tx,ctx,entityId,{settlementId:id,allocations:intents,rate:fxRate,side:'AR'});const fxEntry=await fx.postRealized(tx,ctx,entityId,{bookId:row.book_id,sourceType:'settlement_fx',sourceId:id,sourceVersion:Number(row.content_version),accountingDate:iso(row.value_date),description:'Receipt from '+party.legal_name,controlAccountId:profile.arAccountId,branchId:branch.id,side:'AR',cashFunc:fx.controlFunc(journalLines,profile.arAccountId),consumed:s.consumed,commandId});if(fxEntry)journalEntryIds.push(fxEntry);}
  await audit(tx,ctx,{entityId,action:'collection.post',resourceType:'collection',resourceId:id,resourceVersion:Number(updated.version),afterRef:entryId});
- return sresult(updated,{journalEntryIds:[entryId]});
+ return sresult(updated,{journalEntryIds});
 }
 export async function allocateCollection(tx,ctx,entityId,id,input,expectedVersion,{commandId=null}={}){
  requirePermission(ctx,'collection.allocate');requireEntity(ctx,entityId);assertInput('ApplyAllocations',input);
  const row=await loadSettlement(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.state!=='posted')fail('STATE_CONFLICT','Only posted collections allocate.');
- for(const [i,a] of input.allocations.entries()){const item=(await tx.query('select * from lara.open_items where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,a.openItemId])).rows[0];if(!item)fail('NOT_FOUND','Open item not found.');if(micros(a.amount)<=0n)fail('VALIDATION_FAILED','Allocations are positive.',{fieldErrors:[{path:'allocations.'+i+'.amount',message:'Positive'}]});}
+ for(const [i,a] of input.allocations.entries()){const item=(await tx.query('select * from lara.open_items where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,a.openItemId])).rows[0];if(!item)fail('NOT_FOUND','Open item not found.');if(micros(a.amount)<=0n)fail('VALIDATION_FAILED','Allocations are positive.',{fieldErrors:[{path:'allocations.'+i+'.amount',message:'Positive'}]});if(await fx.layerState(tx,ctx,item.id))fail('STATE_CONFLICT','Foreign-currency open items are allocated when the receipt posts, at its approved rate.');}
  const ids=await applyAllocations(tx,ctx,entityId,id,input.allocations,{commandId,reason:input.reason||null});
  const updated=(await tx.query('update lara.settlements set content_version=content_version where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id])).rows[0];
  await audit(tx,ctx,{entityId,action:'collection.allocate',resourceType:'collection',resourceId:id,resourceVersion:Number(updated.version),afterRef:ids.join(',')});
@@ -609,7 +631,12 @@ export async function reverseSettlementEffect(tx,ctx,entityId,row,input,{command
  if(row.state!=='posted')fail('STATE_CONFLICT','Only posted settlements are reversed.');
  const entry=(await tx.query('select * from lara.journal_entries where tenant_id=$1 and id=$2',[ctx.tenantId,row.posted_entry_id])).rows[0];
  const lines=(await tx.query('select * from lara.journal_lines where tenant_id=$1 and entry_id=$2 order by line_no',[ctx.tenantId,row.posted_entry_id])).rows;
- const reversalId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement',sourceId:id,sourceVersion:Number(row.content_version),purpose:'reversal',accountingDate:input.accountingDate,documentDate:input.accountingDate,description:'Reversal: '+entry.description+' — '+input.reason,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,reversalOf:row.posted_entry_id,lines:lines.map(l=>({accountId:l.account_id,branchId:l.branch_id,dimensions:l.dimensions_json||{},debit:String(l.txn_credit),credit:String(l.txn_debit)}))})])).rows[0].id;
+ const fxEntry=entry.transaction_currency!==entry.functional_currency;
+ const reversalId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement',sourceId:id,sourceVersion:Number(row.content_version),purpose:'reversal',accountingDate:input.accountingDate,documentDate:input.accountingDate,description:'Reversal: '+entry.description+' — '+input.reason,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,reversalOf:row.posted_entry_id,...(fxEntry?{rate:String(entry.fx_rate),rateId:entry.fx_rate_id}:{}),lines:lines.map(l=>({accountId:l.account_id,branchId:l.branch_id,dimensions:l.dimensions_json||{},debit:String(l.txn_credit),credit:String(l.txn_debit),...(fxEntry?{funcDebit:String(l.func_credit),funcCredit:String(l.func_debit)}:{})}))})])).rows[0].id;
+ // The realized FX of the settlement reverses at its original amounts, never at today's rate.
+ const fxAdjust=fxEntry?(await tx.query("select * from lara.journal_entries where tenant_id=$1 and source_type='settlement_fx' and source_id=$2 and purpose='adjustment' and reversal_of is null",[ctx.tenantId,id])).rows[0]:null;
+ if(fxAdjust){const al=(await tx.query('select * from lara.journal_lines where tenant_id=$1 and entry_id=$2 order by line_no',[ctx.tenantId,fxAdjust.id])).rows;await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement_fx',sourceId:id,sourceVersion:Number(row.content_version),purpose:'reversal',reversalOf:fxAdjust.id,accountingDate:input.accountingDate,documentDate:input.accountingDate,description:'Reversal: '+fxAdjust.description,currency:entry.functional_currency,manual:false,postingActor:ctx.principalId,commandId,lines:al.map(l=>({accountId:l.account_id,branchId:l.branch_id,dimensions:l.dimensions_json||{},debit:String(l.func_credit),credit:String(l.func_debit)}))})]);}
+ if(fxEntry)await fx.reverseLayers(tx,ctx,entityId,{settlementId:id});
  const applies=(await tx.query("select a.* from lara.allocation_events a where a.tenant_id=$1 and a.settlement_id=$2 and a.action='apply' and not exists (select 1 from lara.allocation_events r where r.tenant_id=a.tenant_id and r.reverses_id=a.id)",[ctx.tenantId,id])).rows;
  for(const a of applies){await tx.query("insert into lara.allocation_events(tenant_id,entity_id,settlement_id,open_item_id,amount,action,reverses_id,reason,created_by) values($1,$2,$3,$4,$5,'reverse',$6,$7,$8)",[ctx.tenantId,entityId,id,a.open_item_id,a.amount,a.id,'Receipt reversed: '+input.reason,ctx.principalId]);const item=(await tx.query('select document_id from lara.open_items where tenant_id=$1 and id=$2',[ctx.tenantId,a.open_item_id])).rows[0];await refreshSettlementState(tx,ctx,item.document_id);}
  const updated=(await tx.query("update lara.settlements set state='reversed',reversal_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,reversalId])).rows[0];

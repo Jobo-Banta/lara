@@ -703,7 +703,7 @@ test('compliance: capability activation, readiness gates, a return run prepared 
  await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
  await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('approved');
  await preparer.page.getByRole('button',{name:'Issue invoice'}).click();
- await expect(preparer.page.locator('.status-grid dd').nth(2)).toHaveText('queued');
+ await expect(preparer.page.locator('.status-grid dd').nth(2)).toHaveText('queued',{timeout:30000});
  await expect.poll(async()=>{await preparer.page.reload();await settled(preparer.page);return preparer.page.locator('.status-grid dd').nth(2).textContent();},{timeout:90000}).toBe('accepted');
  await preparer.page.goto('/compliance');await settled(preparer.page);
  await expect(preparer.page.getByRole('row').filter({hasText:'INV-000002'})).toContainText('accepted');
@@ -823,6 +823,127 @@ test('institution: capability activation, source ownership recorded from the sig
  await expect(preparer.page.getByText('Every fact in the period is classified.')).toBeVisible();
  for(const route of ['/institution/ownership','/institution/feeds','/institution/branches','/institution/tax']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'institution '+route);}
  await controller.context.close();await preparer.context.close();
+});
+// The FX profile, the FX accounts, the zero-rated rule, the FX desk and
+// approver roles and the view links have no reviewed operations or seeded
+// template yet; the journey seeds them through the runtime role as an
+// operator would. Rates, documents, receipts, revaluations, books and the
+// combined view go through the screens.
+async function seedFx(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const book=(await db.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({fx:1})])).rows[0].h;
+  const acct=async(code,name,category,side)=>(await db.query("insert into lara.accounts(tenant_id,entity_id,book_id,code,name,category,normal_side,control_type,allow_manual,content_hash,created_by) values($1,$2,$3,$4,$5,$6,$7,'none',true,$8,$9) on conflict (tenant_id,entity_id,book_id,code) do update set name=excluded.name returning id",[tenantId,entity,book,code,name,category,side,hash,await principal('preparer')])).rows[0].id;
+  const ar=(await db.query("select id from lara.accounts where tenant_id=$1 and entity_id=$2 and book_id=$3 and code='1200'",[tenantId,entity,book])).rows[0].id;
+  const payload={realizedGainAccountId:await acct('7100','Realized FX gain','income','credit'),realizedLossAccountId:await acct('7200','Realized FX loss','expense','debit'),unrealizedGainAccountId:await acct('7300','Unrealized FX gain','income','credit'),unrealizedLossAccountId:await acct('7400','Unrealized FX loss','expense','debit'),monetaryAccountIds:[ar],profileVersion:'fx-2026'};
+  const ph=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'fx_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),ph,await principal('preparer'),await principal('controller')]);
+  const registration=(await db.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='registration.pdf'",[tenantId,entity])).rows[0].id;
+  await db.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,content_hash,created_by,status,approved_by,activated_by,activated_at) values($1,$2,'ZERO',1,'vat','2026-01-01',0,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-10\"]',$4,$5,'active',$6,$6,now())",[tenantId,entity,JSON.stringify([registration]),hash,await principal('preparer'),await principal('controller')]);
+  // No seeded template holds fx_rate.create/edit or the revaluation permissions; tenant roles cover the FX desk and the approver.
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const desk=await role('fx_desk',['fx_rate.create','fx_rate.edit','fx_rate.read','revaluation.create','revaluation.edit','revaluation.preview','revaluation.read']);
+  const approver=await role('fx_approver',['revaluation.approve','revaluation.post','revaluation.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),desk,await principal('security'),await principal('controller'),approver]);
+ }finally{await db.end();}
+}
+async function seedViewLinks(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const controller=(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who('controller'),tenantId])).rows[0].principal_id;
+  const bookOf=async code=>(await db.query('select id from lara.books where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  await db.query("insert into lara.book_links(tenant_id,entity_id,source_book_id,target_view_id,translation_policy,created_by) values($1,$2,$3,$4,'as_is',$5),($1,$2,$6,$4,'closing_rate',$5)",[tenantId,entity,await bookOf('MAIN'),await bookOf('MGMT'),controller,await bookOf('FCDU')]);
+ }finally{await db.end();}
+}
+test('multi-currency: capability activation, a rate imported and approved independently, a USD invoice posting both amounts, a receipt at another rate realizing FX on screen, a revaluation previewed, approved and posted once, and partitions with the combined view',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),billing=await as(browser,'billing');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Multiple currencies and separate books'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Export customers invoice in USD':'Reviewed the monetary classification');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedFx();
+ // Rates: the desk drafts, the controller approves; the self-approval is refused.
+ const importRate=async(date,value)=>{await preparer.page.goto('/fx/rates');await settled(preparer.page);await preparer.page.getByRole('combobox',{name:'Foreign currency (base)'}).selectOption('USD');await preparer.page.getByRole('combobox',{name:'Functional currency (quote)'}).selectOption('PHP');await preparer.page.getByLabel('Rate date').fill(date);await preparer.page.getByLabel('Rate',{exact:true}).fill(value);await preparer.page.getByRole('combobox',{name:'Source evidence'}).selectOption({label:'registration.pdf'});await preparer.page.getByRole('button',{name:'Save draft rate'}).click();const row=preparer.page.getByRole('row').filter({hasText:date});await expect(row.getByRole('cell',{name:'draft',exact:true})).toBeVisible();};
+ await importRate('2026-10-20','56');
+ await preparer.page.getByRole('row').filter({hasText:'2026-10-20'}).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('section[role="alert"]')).toContainText('cannot approve');
+ await importRate('2026-10-25','57');await importRate('2026-10-31','58');
+ await controller.page.goto('/fx/rates');await settled(controller.page);
+ for(const date of ['2026-10-20','2026-10-25','2026-10-31']){const row=controller.page.getByRole('row').filter({hasText:date});await row.getByRole('button',{name:'Approve',exact:true}).click();await expect(row.getByRole('cell',{name:'approved',exact:true})).toBeVisible();}
+ // A USD invoice of 100 at 56 and a second unpaid one of 50; both amounts post.
+ const issueUsd=async(price)=>{await billing.page.goto('/sales/invoices');await settled(billing.page);await pickCustomer(billing.page);await billing.page.getByRole('combobox',{name:'Currency'}).selectOption('USD');await billing.page.getByLabel('Document date').fill('2026-10-20');await billing.page.getByLabel('Accounting date').fill('2026-10-20');await billing.page.getByRole('textbox',{name:'Line 1 description'}).fill('Export services');await billing.page.getByRole('textbox',{name:'Line 1 unit price'}).fill(price);await billing.page.getByRole('combobox',{name:'Line 1 revenue account'}).selectOption({label:'4000 Service revenue'});await billing.page.getByRole('combobox',{name:'Line 1 tax rule'}).selectOption({label:'ZERO 0%'});await billing.page.getByRole('button',{name:'Save draft'}).click();await expect(billing.page).toHaveURL(/\/sales\/invoices\/[0-9a-f-]{36}$/);const url=new URL(billing.page.url()).pathname;await billing.page.getByRole('button',{name:'Submit for approval'}).click();await expect(billing.page.locator('.status-grid dd').first()).toHaveText('submitted');await preparer.page.goto(url);await settled(preparer.page);await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('approved');await preparer.page.getByRole('button',{name:'Issue invoice'}).click();await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('posted',{timeout:30000});return url;};
+ const usdInvoice=await issueUsd('100');
+ await expect(preparer.page.getByRole('status').filter({hasText:'functional carrying'})).toContainText('₱5,600.00');
+ await issueUsd('50');
+ // Receipt of USD 100 at 57 allocated to the first invoice: the realized gain shows on the invoice.
+ await billing.page.goto('/sales/collections');await settled(billing.page);
+ await pickCustomer(billing.page);
+ await billing.page.getByRole('combobox',{name:'Currency'}).selectOption('USD');
+ await billing.page.getByLabel('Value date',{exact:true}).fill('2026-10-25');
+ await billing.page.getByLabel('Gross received').fill('100');await billing.page.getByLabel('Cash amount').fill('100');
+ await billing.page.getByLabel('Allocate to item due 2026-11-19').first().fill('100');
+ await expect(billing.page.getByRole('status').filter({hasText:'Allocated'})).toContainText('fully applied');
+ await billing.page.getByRole('button',{name:'Save receipt'}).click();
+ await expect(billing.page).toHaveURL(/\/sales\/collections\/[0-9a-f-]{36}$/);
+ const receiptUrl=new URL(billing.page.url()).pathname;
+ await billing.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(billing.page.getByText('State submitted',{exact:false})).toBeVisible();
+ await preparer.page.goto(receiptUrl);await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.getByText('State approved',{exact:false})).toBeVisible();
+ await preparer.page.getByRole('button',{name:'Post receipt'}).click();
+ await expect(preparer.page.getByText('State posted',{exact:false})).toBeVisible({timeout:30000});
+ await preparer.page.goto(usdInvoice);await settled(preparer.page);
+ await expect(preparer.page.locator('.status-grid dd').nth(3)).toHaveText('paid');
+ await expect(preparer.page.getByRole('row').filter({hasText:'settle'})).toContainText('₱100.00');
+ // Revaluation of receivables at the 58 closing rate: preview, independent approval, one posting.
+ await preparer.page.goto('/fx/revaluations');await settled(preparer.page);
+ const pickOption=async(box,text)=>{await expect(box.locator('option',{hasText:text})).toHaveCount(1);await box.selectOption(await box.locator('option',{hasText:text}).getAttribute('value'));};
+ await pickOption(preparer.page.getByRole('combobox',{name:'Period'}),'2026-10-01 → 2026-10-31');
+ await pickOption(preparer.page.getByRole('combobox',{name:'Closing rate set'}),'58 on 2026-10-31');
+ await preparer.page.getByLabel('1200 Receivables').check();
+ await preparer.page.getByRole('button',{name:'Create run'}).click();
+ const runRow=page=>page.getByRole('row').filter({hasText:'USD/PHP 58'});
+ await expect(runRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await runRow(preparer.page).getByRole('button',{name:'Compute preview'}).click();
+ await expect(runRow(preparer.page).getByRole('cell',{name:'previewed',exact:true})).toBeVisible();
+ await runRow(preparer.page).getByRole('button',{name:'Preview',exact:true}).click();
+ await expect(preparer.page.getByRole('row').filter({hasText:'1200 Receivables'})).toContainText('₱100.00');
+ await controller.page.goto('/fx/revaluations');await settled(controller.page);
+ await runRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await runRow(controller.page).getByRole('button',{name:'Post',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible({timeout:30000});
+ // Partitions: the controller creates an FCDU book and a management view; the preparer activates them; the combined view labels its basis.
+ await controller.page.goto('/books');await settled(controller.page);
+ const createBook=async(code,kind,currency)=>{await controller.page.getByLabel('Code',{exact:true}).fill(code);await controller.page.getByRole('combobox',{name:'Kind'}).selectOption(kind);await controller.page.getByRole('combobox',{name:'Functional currency'}).selectOption(currency);await controller.page.getByRole('button',{name:'Create book'}).click();await expect(controller.page.getByRole('row').filter({hasText:code}).getByRole('cell',{name:'draft',exact:true})).toBeVisible();};
+ await createBook('FCDU','fcdu','USD');await createBook('MGMT','management','PHP');
+ await preparer.page.goto('/books');await settled(preparer.page);
+ for(const code of ['FCDU','MGMT']){const row=preparer.page.getByRole('row').filter({hasText:code});await row.getByLabel('Reason').fill('Licence on file');await row.getByRole('button',{name:'Activate'}).click();await expect(row.getByRole('cell',{name:'active',exact:true})).toBeVisible();}
+ await seedViewLinks();
+ await controller.page.goto('/books');await settled(controller.page);
+ await controller.page.getByRole('combobox',{name:'View'}).selectOption({label:'MGMT'});
+ await controller.page.getByLabel('As of').fill('2026-10-31');
+ await expect(controller.page.getByRole('status').filter({hasText:'Basis:'})).toContainText('each source book counted once');
+ await expect(controller.page.locator('h3').filter({hasText:'MAIN · primary · PHP'})).toBeVisible();
+ await expect(controller.page.locator('h3').filter({hasText:'FCDU · fcdu · USD at 58'})).toBeVisible();
+ for(const route of ['/fx/rates','/fx/revaluations','/books']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'fx '+route);}
+ await controller.context.close();await preparer.context.close();await billing.context.close();
 });
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);

@@ -21,6 +21,9 @@ async function bookFor(tx,ctx,entityId,bookId){
  if(!isUuid(bookId))fail('VALIDATION_FAILED','bookId must be a UUID.',{fieldErrors:[{path:'bookId',message:'UUID'}]});
  const book=(await tx.query('select * from lara.books where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,bookId])).rows[0];
  if(!book)fail('NOT_FOUND','Book not found.');
+ if(book.kind==='management')fail('STATE_CONFLICT','A management view never posts or reports on its own; it combines its source books.');
+ // A partition with access grants is closed to everyone else (P09); the primary book stays open.
+ if(['rbu','fcdu','trust'].includes(book.kind)){const grants=(await tx.query('select principal_id from lara.book_access where tenant_id=$1 and book_id=$2',[ctx.tenantId,book.id])).rows;if(grants.length&&!grants.some(g=>g.principal_id===ctx.principalId))fail('FORBIDDEN','No access to book '+book.code+'.');}
  return book;
 }
 // The ledger capability must be active on the entity before any book work.
@@ -35,10 +38,35 @@ async function requireLedger(tx,ctx,entityId){
 export const bookResource=b=>resource(b,{code:b.code,kind:b.kind,functionalCurrency:b.functional_currency,sourceOwner:b.source_owner});
 export async function createBook(tx,ctx,entityId,input){
  requirePermission(ctx,'book.create');requireEntity(ctx,entityId);assertInput('BookCreate',input);
- if(input.functionalCurrency!=='PHP')fail('FEATURE_NOT_ENABLED','Books in other currencies arrive with P09.');
- const row=(await tx.query("insert into lara.books(tenant_id,entity_id,code,kind,functional_currency,source_owner,status,created_by) values($1,$2,$3,$4,$5,$6,'active',$7) returning *",[ctx.tenantId,entityId,input.code.trim().toUpperCase(),input.kind,input.functionalCurrency,input.sourceOwner.trim(),ctx.principalId])).rows[0];
+ // Separate books and other functional currencies arrive with the multi-currency capability (P09); the primary book is active at once.
+ const fxActive=(await tx.query("select 1 from lara.capability_activations where tenant_id=$1 and entity_id=$2 and capability='multi_currency' and status='active'",[ctx.tenantId,entityId])).rowCount>0;
+ if(input.functionalCurrency!=='PHP'&&!fxActive)fail('FEATURE_NOT_ENABLED','Books in other currencies need the multi-currency capability (P09).');
+ if(input.kind!=='primary'&&!fxActive)fail('FEATURE_NOT_ENABLED','Separate books need the multi-currency capability (P09).');
+ if(input.kind!=='primary'&&!(await tx.query('select 1 from lara.currency_metadata where code=$1',[input.functionalCurrency])).rowCount)fail('VALIDATION_FAILED','Currency '+input.functionalCurrency+' is not in the currency metadata.',{fieldErrors:[{path:'functionalCurrency',message:'Unknown currency'}]});
+ const row=(await tx.query("insert into lara.books(tenant_id,entity_id,code,kind,functional_currency,source_owner,status,created_by) values($1,$2,$3,$4,$5,$6,$7,$8) returning *",[ctx.tenantId,entityId,input.code.trim().toUpperCase(),input.kind,input.functionalCurrency,input.sourceOwner.trim(),input.kind==='primary'?'active':'draft',ctx.principalId])).rows[0];
  await audit(tx,ctx,{entityId,action:'book.create',resourceType:'book',resourceId:row.id,resourceVersion:1});
  return bookResource(row);
+}
+export async function getBook(tx,ctx,entityId,id){requirePermission(ctx,'book.read');requireEntity(ctx,entityId);if(!isUuid(id))fail('NOT_FOUND','Book not found.');const row=(await tx.query('select * from lara.books where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Book not found.');return bookResource(row);}
+export async function updateBook(tx,ctx,entityId,id,expectedVersion,input){
+ requirePermission(ctx,'book.edit');requireEntity(ctx,entityId);assertInput('BookCreate',input);if(!isUuid(id))fail('NOT_FOUND','Book not found.');
+ const row=(await tx.query('select * from lara.books where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Book not found.');expectVersion(row,expectedVersion);
+ if(row.status!=='draft')fail('STATE_CONFLICT','Only draft books change; a functional-currency change of an active book is a reviewed migration, not an edit.');
+ if(input.kind==='primary'&&row.kind!=='primary')fail('STATE_CONFLICT','A separate book does not become the primary book.');
+ const updated=(await tx.query('update lara.books set code=$3,kind=$4,functional_currency=$5,source_owner=$6 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,input.code.trim().toUpperCase(),input.kind,input.functionalCurrency,input.sourceOwner.trim()])).rows[0];
+ await audit(tx,ctx,{entityId,action:'book.edit',resourceType:'book',resourceId:id,resourceVersion:Number(updated.version)});
+ return bookResource(updated);
+}
+// Activation by a principal other than the creator; the book then accepts periods and postings.
+export async function activateBook(tx,ctx,entityId,id,input,expectedVersion){
+ requirePermission(ctx,'book.activate');requireEntity(ctx,entityId);assertInput('ReasonAction',input);if(!isUuid(id))fail('NOT_FOUND','Book not found.');
+ const row=(await tx.query('select * from lara.books where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Book not found.');if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
+ if(row.status==='active')return {resourceType:'book',resourceId:id,version:Number(row.version),state:'active'};
+ if(row.status!=='draft')fail('STATE_CONFLICT','Book is '+row.status+'.');
+ if(row.created_by===ctx.principalId)fail('SELF_APPROVAL','The book creator cannot activate it.');
+ const updated=(await tx.query("update lara.books set status='active' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id])).rows[0];
+ await audit(tx,ctx,{entityId,action:'book.activate',resourceType:'book',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});
+ return {resourceType:'book',resourceId:id,version:Number(updated.version),state:'active'};
 }
 export async function listBooks(tx,ctx,entityId,query){requirePermission(ctx,'book.read');requireEntity(ctx,entityId);const scope=cursorScope(ctx,entityId,query||{});const {limit,after}=pageArgs(query,scope);const params=[ctx.tenantId,entityId,limit+1];const rows=(await tx.query('select * from lara.books where tenant_id=$1 and entity_id=$2'+cursorClause(after,params)+' order by created_at,id limit $3',params)).rows;return page(rows,limit,bookResource,scope);}
 
@@ -195,7 +223,7 @@ function validateLines(lines){
 export async function createJournal(tx,ctx,entityId,input,{reversalOf=null}={}){
  requirePermission(ctx,'journal.prepare');requireEntity(ctx,entityId);assertInput('JournalCreate',input);await requireLedger(tx,ctx,entityId);
  const book=await bookFor(tx,ctx,entityId,input.bookId);
- if(input.currency!==book.functional_currency)fail('FEATURE_NOT_ENABLED','Foreign-currency journals arrive with separate books (P09).');
+ if(input.currency!==book.functional_currency){const fxActive=(await tx.query("select 1 from lara.capability_activations where tenant_id=$1 and entity_id=$2 and capability='multi_currency' and status='active'",[ctx.tenantId,entityId])).rowCount>0;if(!fxActive)fail('FEATURE_NOT_ENABLED','Foreign-currency journals need the multi-currency capability (P09).');}
  validateLines(input.lines);
  const m=journalMaterial(input),hash=contentHash(m);
  const row=(await tx.query('insert into lara.journal_drafts(tenant_id,entity_id,book_id,accounting_date,document_date,currency,description,lines,evidence_ids,content_hash,reversal_of,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) returning *',[ctx.tenantId,entityId,input.bookId,input.accountingDate,input.documentDate,input.currency,m.description,JSON.stringify(m.lines),JSON.stringify(m.evidenceIds),hash,reversalOf,ctx.principalId])).rows[0];
@@ -246,7 +274,15 @@ export async function postJournal(tx,ctx,entityId,id,input,expectedVersion,{comm
  const row=await loadJournal(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.status!=='approved')fail('STATE_CONFLICT','Approval is required before posting.');
  if(row.approved_by===ctx.principalId&&row.created_by===ctx.principalId)fail('SELF_APPROVAL','The preparer cannot both approve and post.');
- const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'journal_draft',sourceId:row.id,sourceVersion:Number(row.content_version),purpose:row.reversal_of?'reversal':'posting',accountingDate:iso(row.accounting_date),documentDate:iso(row.document_date),description:row.description,currency:row.currency,manual:true,postingActor:ctx.principalId,commandId,reversalOf:row.reversal_of,lines:row.lines})])).rows[0].id;
+ // A foreign-currency journal posts both amounts at the approved rate of its accounting date (P09); a reversal keeps the original entry's rate and functional amounts.
+ const book=(await tx.query('select * from lara.books where tenant_id=$1 and id=$2',[ctx.tenantId,row.book_id])).rows[0];
+ let lines=row.lines,fxExtra={};
+ if(row.currency!==book.functional_currency){
+  const fx=await import('./fx.mjs');
+  if(row.reversal_of){const original=(await tx.query('select * from lara.journal_entries where tenant_id=$1 and id=$2',[ctx.tenantId,row.reversal_of])).rows[0];const ol=(await tx.query('select * from lara.journal_lines where tenant_id=$1 and entry_id=$2 order by line_no',[ctx.tenantId,row.reversal_of])).rows;fxExtra={rate:String(original.fx_rate),rateId:original.fx_rate_id};lines=row.lines.map((l,i)=>({...l,funcDebit:String(ol[i]?.func_credit??0),funcCredit:String(ol[i]?.func_debit??0)}));}
+  else{const rate=await fx.rateFor(tx,ctx,entityId,{base:row.currency,quote:book.functional_currency,onDate:iso(row.accounting_date)});fxExtra=fx.postingFx(rate);lines=fx.translateLines(row.lines,rate.rate);}
+ }
+ const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'journal_draft',sourceId:row.id,sourceVersion:Number(row.content_version),purpose:row.reversal_of?'reversal':'posting',accountingDate:iso(row.accounting_date),documentDate:iso(row.document_date),description:row.description,currency:row.currency,manual:true,postingActor:ctx.principalId,commandId,reversalOf:row.reversal_of,...fxExtra,lines})])).rows[0].id;
  const updated=(await tx.query("update lara.journal_drafts set status='posted',posted_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,entryId])).rows[0];
  await audit(tx,ctx,{entityId,action:'journal.post',resourceType:'journal',resourceId:id,resourceVersion:Number(updated.version),afterRef:entryId});
  await emit(tx,ctx,{entityId,aggregateType:'journal',aggregateId:id,aggregateVersion:Number(updated.version),eventType:'document.posted.v1',payload:{journalId:id,entryId,bookId:row.book_id,accountingDate:iso(row.accounting_date)}});

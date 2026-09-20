@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "993bbd6ab00501b5fcf77f72420f3ca97ff9b23d8ac9d548f17fcd6434e215ec",
+  "sha256": "e4ffca3b0459acf4155318ba29b92863d2d7b0d95de917cbc3343a5f6c611279",
   "operations": [
     {
       "method": "POST",
@@ -1826,6 +1826,26 @@
       "method": "GET",
       "path": "/institution-tax-worksheet",
       "operationId": "get_institution_tax_worksheet"
+    },
+    {
+      "method": "GET",
+      "path": "/currencies",
+      "operationId": "get_currencies"
+    },
+    {
+      "method": "GET",
+      "path": "/fx-layers",
+      "operationId": "get_fx_layers"
+    },
+    {
+      "method": "GET",
+      "path": "/revaluations/{id}/lines",
+      "operationId": "get_revaluations_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/books/{id}/combined",
+      "operationId": "get_books_id_combined"
     }
   ]
 }

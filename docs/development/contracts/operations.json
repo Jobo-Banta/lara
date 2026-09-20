@@ -3283,5 +3283,41 @@
     "permission": "tax_rule.read",
     "input": null,
     "response": "InstitutionTaxWorksheet"
+  },
+  {
+    "operationId": "get_currencies",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/currencies",
+    "permission": "book.read",
+    "input": null,
+    "response": "CurrencyList"
+  },
+  {
+    "operationId": "get_fx_layers",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/fx-layers",
+    "permission": "open_item.read",
+    "input": null,
+    "response": "FxLayerList"
+  },
+  {
+    "operationId": "get_revaluations_id_lines",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/revaluations/{id}/lines",
+    "permission": "revaluation.read",
+    "input": null,
+    "response": "RevaluationPreviewView"
+  },
+  {
+    "operationId": "get_books_id_combined",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/books/{id}/combined",
+    "permission": "book.read",
+    "input": null,
+    "response": "CombinedBookView"
   }
 ]
