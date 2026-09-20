@@ -275,25 +275,25 @@
       "updated_at": "2026-09-20T00:31:43+00:00"
     },
     "P05-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury.",
-      "evidence": "Local: tsc, pnpm build and the full browser suite (25 tests) pass against Supabase; CI run pending",
-      "updated_at": "2026-09-20T01:07:43+00:00"
+      "evidence": "GitHub Actions CI run 35480573825 (push, 2f4b59c) and 35480575787 (pull request) succeeded: verify + images; fresh database runs the browser suite with the purchasing journey and the load profile with the bill and duplicate-race checks; upgrade path runs the P05 suites",
+      "updated_at": "2026-09-20T01:14:07+00:00"
     },
     "P05-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written.",
-      "evidence": "Local: load profile passed (REPORT mode against Supabase); CI run pending",
-      "updated_at": "2026-09-20T00:46:41+00:00"
+      "evidence": "GitHub Actions CI run 35480573825 (push, 2f4b59c) and 35480575787 (pull request) succeeded: verify + images; fresh database runs the browser suite with the purchasing journey and the load profile with the bill and duplicate-race checks; upgrade path runs the P05 suites",
+      "updated_at": "2026-09-20T01:14:07+00:00"
     },
     "P05-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.5.0 drafted (docs/development/releases/0.5.0-draft.md). Blocked on the 0.4.0 (P04) release, finance sign-offs on withholding timing, PO/receipt-of-service policy, manual payment responsibility and certificate obligations, contract operations for the purchasing profile, beneficiaries, receipts, advances and certificates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T01:08:28+00:00"
     },
     "P06-01": {
       "status": "not_started",
@@ -2016,7 +2016,25 @@
       "id": "P05-04",
       "action": "in_review",
       "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
+    },
+    {
+      "at": "2026-09-20T01:08:28+00:00",
+      "id": "P05-06",
+      "action": "blocked",
+      "note": "Release 0.5.0 drafted (docs/development/releases/0.5.0-draft.md). Blocked on the 0.4.0 (P04) release, finance sign-offs on withholding timing, PO/receipt-of-service policy, manual payment responsibility and certificate obligations, contract operations for the purchasing profile, beneficiaries, receipts, advances and certificates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T01:14:07+00:00",
+      "id": "P05-04",
+      "action": "done",
+      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
+    },
+    {
+      "at": "2026-09-20T01:14:07+00:00",
+      "id": "P05-05",
+      "action": "done",
+      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written."
     }
   ],
-  "updated_at": "2026-09-20T01:07:43+00:00"
+  "updated_at": "2026-09-20T01:14:07+00:00"
 }
