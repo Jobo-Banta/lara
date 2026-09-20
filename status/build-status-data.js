@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T14:12:53+00:00",
+  "updated_at": "2026-09-20T15:47:12+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2999,15 +2999,15 @@ window.LARA_BUILD_STATUS = {
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P06"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Migration 0025 (warehouses, items with fixed cost method, stock movements and frozen lines, non-negative balances, valuation layers, append-only allocations, lot and serial tracking, count sessions and lines, landed cost runs and allocations); six reads added to the reviewed contract (375 operations); scripts/test-p10-schema.mjs (5 groups) passes locally.",
-      "evidence": "Local: node scripts/test-p10-schema.mjs \u2192 P10-01 schema acceptance passed (5 groups); contracts regenerated and validate_specifications pass. CI run pending.",
-      "updated_at": "2026-09-20T13:33:27+00:00"
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-02",
@@ -3031,13 +3031,13 @@ window.LARA_BUILD_STATUS = {
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/inventory.mjs with the three-way hook in purchasing: inventory profile, items and warehouses, movements posted once with FIFO or moving-average costing (AC-09), sorted balance locks refusing negative stock, serials in one warehouse, transfers conserving value, deterministic recost for backdated receipts as a linked adjustment, counts with frozen expected quantities, landed cost by value or quantity with the sold portion to cost of sales, valuation versus ledger, and the three-way match mandating the goods receipt; scripts/test-p10-domain.mjs covers P10-T01..T05 (7 groups).",
-      "evidence": "Local: node scripts/test-p10-domain.mjs \u2192 P10-02 domain acceptance passed (7 groups). CI run pending.",
-      "updated_at": "2026-09-20T13:33:27+00:00"
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-03",
@@ -3061,13 +3061,13 @@ window.LARA_BUILD_STATUS = {
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "All 24 P10 operations plus the six reads served by apps/api/src/workspace-api.mjs; the worker renders inventory_valuation reports; scripts/test-p10-api.mjs (5 groups) runs API and worker as processes.",
-      "evidence": "Local: node scripts/test-p10-api.mjs \u2192 P10-03 API acceptance passed (5 groups). CI run pending.",
-      "updated_at": "2026-09-20T13:33:27+00:00"
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-04",
@@ -3091,13 +3091,13 @@ window.LARA_BUILD_STATUS = {
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite 13/13 passed (16.4m) including the inventory journey. CI run pending.",
-      "updated_at": "2026-09-20T14:12:53+00:00"
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-05",
@@ -3121,13 +3121,13 @@ window.LARA_BUILD_STATUS = {
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written.",
-      "evidence": "Local: p10 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T13:33:27+00:00"
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-06",
@@ -5521,36 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T09:14:18+00:00",
-      "id": "P08-02",
-      "action": "in_review",
-      "note": "packages/domain/src/fi.mjs: institution profile, source systems and approved ownership windows, mapping versions from reviewed CSV with diffs, the lara-feed-1 manifest contract through the import pipeline (duplicate rule, error workbench, one posting per batch, linked replacements, balance snapshots, instrument facts), expected batches raising close tasks on the affected period only, feed reconciliation, branch roll-up with interbranch elimination, institution tax worksheet through reviewed rule versions; scripts/test-p08-domain.mjs covers P08-T01..T05 (9 groups)."
-    },
-    {
-      "at": "2026-09-20T09:14:18+00:00",
-      "id": "P08-03",
-      "action": "in_review",
-      "note": "The 5 source-ownership operations plus nine reads served by apps/api/src/workspace-api.mjs; import operations carry the sourceFeed hook and period soft-close/lock carry the feeds hook; worker job feed.sweep and report types branch_rollup, institution_tax, feed_reconciliation; scripts/test-p08-api.mjs (5 groups) runs API and worker as processes."
-    },
-    {
-      "at": "2026-09-20T09:14:18+00:00",
-      "id": "P08-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T09:14:18+00:00",
-      "id": "P08-05",
-      "action": "in_review",
-      "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written."
-    },
-    {
-      "at": "2026-09-20T09:14:18+00:00",
-      "id": "P08-06",
-      "action": "blocked",
-      "note": "Release 0.8.0 drafted (docs/development/releases/0.8.0-draft.md). Blocked on the 0.7.0 (P07) release, the design partner's signed entity/books/currency/tax/feed matrix and parallel month, source system owners and cutoffs, the tax advisor's GRT/DST rule versions with golden cases, contract operations for source systems, mapping versions, expected batches and the institution profile, and the owner's tag, deployment and manifest run."
-    },
-    {
       "at": "2026-09-20T09:39:00+00:00",
       "id": "P08-04",
       "action": "in_review",
@@ -5699,6 +5669,36 @@ window.LARA_BUILD_STATUS = {
       "id": "P10-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T15:47:12+00:00",
+      "id": "P10-01",
+      "action": "done",
+      "note": "Migration 0025 (warehouses, items with fixed cost method, stock movements and frozen lines, non-negative balances, valuation layers, append-only allocations, lot and serial tracking, count sessions and lines, landed cost runs and allocations); six reads added to the reviewed contract (375 operations); scripts/test-p10-schema.mjs (5 groups) passes locally."
+    },
+    {
+      "at": "2026-09-20T15:47:12+00:00",
+      "id": "P10-02",
+      "action": "done",
+      "note": "packages/domain/src/inventory.mjs with the three-way hook in purchasing: inventory profile, items and warehouses, movements posted once with FIFO or moving-average costing (AC-09), sorted balance locks refusing negative stock, serials in one warehouse, transfers conserving value, deterministic recost for backdated receipts as a linked adjustment, counts with frozen expected quantities, landed cost by value or quantity with the sold portion to cost of sales, valuation versus ledger, and the three-way match mandating the goods receipt; scripts/test-p10-domain.mjs covers P10-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T15:47:12+00:00",
+      "id": "P10-03",
+      "action": "done",
+      "note": "All 24 P10 operations plus the six reads served by apps/api/src/workspace-api.mjs; the worker renders inventory_valuation reports; scripts/test-p10-api.mjs (5 groups) runs API and worker as processes."
+    },
+    {
+      "at": "2026-09-20T15:47:12+00:00",
+      "id": "P10-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T15:47:12+00:00",
+      "id": "P10-05",
+      "action": "done",
+      "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written."
     }
   ]
 };
