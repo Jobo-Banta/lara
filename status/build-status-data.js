@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T00:26:18+00:00",
+  "updated_at": "2026-09-20T01:07:43+00:00",
   "releases": [
     {
       "id": "P00",
@@ -1665,15 +1665,15 @@ window.LARA_BUILD_STATUS = {
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P04"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds.",
-      "evidence": "Local: scripts/test-p05-schema.mjs passed against Supabase; CI run pending",
-      "updated_at": "2026-09-20T00:26:17+00:00"
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
+      "updated_at": "2026-09-20T00:31:42+00:00"
     },
     {
       "id": "P05-02",
@@ -1701,13 +1701,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups).",
-      "evidence": "Local: scripts/test-p05-domain.mjs and P04 regression passed; CI run pending",
-      "updated_at": "2026-09-20T00:26:18+00:00"
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
+      "updated_at": "2026-09-20T00:31:43+00:00"
     },
     {
       "id": "P05-03",
@@ -1735,13 +1735,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI.",
-      "evidence": "Local: scripts/test-p05-api.mjs passed; CI run pending",
-      "updated_at": "2026-09-20T00:26:18+00:00"
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
+      "updated_at": "2026-09-20T00:31:43+00:00"
     },
     {
       "id": "P05-04",
@@ -1769,13 +1769,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury.",
+      "evidence": "Local: tsc, pnpm build and the full browser suite (25 tests) pass against Supabase; CI run pending",
+      "updated_at": "2026-09-20T01:07:43+00:00"
     },
     {
       "id": "P05-05",
@@ -1803,13 +1803,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written.",
+      "evidence": "Local: load profile passed (REPORT mode against Supabase); CI run pending",
+      "updated_at": "2026-09-20T00:46:41+00:00"
     },
     {
       "id": "P05-06",
@@ -5521,42 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-18T20:19:21+00:00",
-      "id": "P03-01",
-      "action": "in_progress",
-      "note": "Designing ledger schema: accounts (cycle prevention, control types, dimension rules), dimensions, periods (non-overlap, open/soft_closed/locked), append-only journal entries/lines inserted only through a granted posting function enforcing balance and account/period rules, opening batches and staged rows, control balances, report snapshots, close tasks, substantiations, statement mappings and journal templates."
-    },
-    {
-      "at": "2026-09-18T20:19:44+00:00",
-      "id": "P02-05",
-      "action": "done",
-      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases."
-    },
-    {
-      "at": "2026-09-18T20:25:59+00:00",
-      "id": "P03-01",
-      "action": "in_review",
-      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
-    },
-    {
-      "at": "2026-09-18T20:27:23+00:00",
-      "id": "P03-02",
-      "action": "in_progress",
-      "note": "Implementing the ledger domain: chart and dimension rules, periods (soft close, lock with close-task gate, reopen), journal drafts with independent approval and posting through the database function, reversals as linked drafts, opening imports (validate, tie control accounts, approve, commit), trial balance and statements with snapshots, retained-earnings close once per fiscal year."
-    },
-    {
-      "at": "2026-09-18T20:31:20+00:00",
-      "id": "P03-01",
-      "action": "done",
-      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts."
-    },
-    {
-      "at": "2026-09-18T20:56:03+00:00",
-      "id": "P03-02",
-      "action": "in_review",
-      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
-    },
-    {
       "at": "2026-09-18T21:00:24+00:00",
       "id": "P03-02",
       "action": "done",
@@ -5699,6 +5663,42 @@ window.LARA_BUILD_STATUS = {
       "id": "P05-03",
       "action": "in_review",
       "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI."
+    },
+    {
+      "at": "2026-09-20T00:31:42+00:00",
+      "id": "P05-01",
+      "action": "done",
+      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds."
+    },
+    {
+      "at": "2026-09-20T00:31:43+00:00",
+      "id": "P05-02",
+      "action": "done",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
+    },
+    {
+      "at": "2026-09-20T00:31:43+00:00",
+      "id": "P05-03",
+      "action": "done",
+      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI."
+    },
+    {
+      "at": "2026-09-20T00:46:41+00:00",
+      "id": "P05-04",
+      "action": "in_review",
+      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
+    },
+    {
+      "at": "2026-09-20T00:46:41+00:00",
+      "id": "P05-05",
+      "action": "in_review",
+      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T01:07:43+00:00",
+      "id": "P05-04",
+      "action": "in_review",
+      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury."
     }
   ]
 };

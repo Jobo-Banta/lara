@@ -352,14 +352,154 @@ test('sales: capability activation, control accounts, tax rule approval, invoice
  await controller.context.close();await preparer.context.close();await billing.context.close();
 });
 
+// The purchasing profile, bill numbering series, the purchaser role and the
+// reviewed beneficiary have no reviewed operations yet, so the journey seeds
+// them through the runtime role as an operator would; everything else goes
+// through the screens.
+async function seedPurchasing(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const branch=(await db.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and code='HQ'",[tenantId,entity])).rows[0].id;
+  const acct=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const payload={apAccountId:await acct('2100'),inputTaxAccountId:await acct('1300'),cashAccountId:await acct('1010'),advanceAccountId:await acct('1400'),withholdingRecognition:'accrual',scale:2,dueDays:30};
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'purchasing_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),hash,await principal('preparer'),await principal('controller')]);
+  await db.query("insert into lara.document_series(tenant_id,entity_id,branch_id,kind,prefix,profile_version,created_by) values($1,$2,$3,'bill','BILL','numbering-2026',$4)",[tenantId,entity,branch,await principal('controller')]);
+  // No seeded template holds purchase_order.create; the clerk gets a tenant role for orders.
+  const role=(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,'purchaser','Purchaser','[\"purchase_order.create\",\"purchase_order.edit\",\"purchase_order.read\",\"purchase_order.submit\",\"purchase_order.cancel\"]','approved',$2,$3) returning id",[tenantId,hash,await principal('security')])).rows[0].id;
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,await principal('clerk'),role,await principal('security')]);
+  const supplier=(await db.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name='Supplies Inc'",[tenantId,entity])).rows[0].id;
+  const ben=(await db.query("insert into lara.beneficiary_versions(tenant_id,entity_id,party_id,version_number,bank_name,account_name,account_number_encrypted,account_number_last4,content_hash,created_by,status,reviewed_by) values($1,$2,$3,1,'BDO','Supplies Inc','v1:seeded','7890',$4,$5,'approved',$6) returning id",[tenantId,entity,supplier,hash,await principal('preparer'),await principal('controller')])).rows[0].id;
+  return {beneficiaryId:ben};
+ }finally{await db.end();}
+}
+test('purchasing: capability activation, supplier and control accounts, purchase order approval, bill with server totals through review and posting, payment proposal through authority, manual release and settlement, supplier aging',async({browser})=>{
+ test.setTimeout(420000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),clerk=await as(browser,'clerk'),treasury=await as(browser,'treasury');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Purchasing payables and expenses'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Purchasing go-live requested':'Reviewed purchasing activation evidence');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ // Supplier by the clerk; payables, input tax, advances and an expense account by the preparer.
+ await clerk.page.goto('/parties');await settled(clerk.page);
+ const form=clerk.page.locator('form').filter({has:clerk.page.getByRole('button',{name:'Create party'})});
+ await form.getByLabel('Legal name').fill('Supplies Inc');
+ await form.getByRole('combobox',{name:'Role',exact:true}).selectOption('supplier');
+ await form.getByRole('combobox',{name:'Identity',exact:true}).selectOption('unknown');
+ await form.getByLabel('Address',{exact:true}).fill('Mandaue City');
+ await form.getByRole('button',{name:'Create party'}).click();
+ await expect(clerk.page).toHaveURL(/\/parties\/[0-9a-f-]{36}$/);
+ await preparer.page.goto('/ledger/accounts');await settled(preparer.page);
+ const acct=async(code,name,category,control)=>{const f=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Create account'})});await f.getByLabel('Code',{exact:true}).fill(code);await f.getByLabel('Name',{exact:true}).fill(name);await f.getByRole('combobox',{name:'Category'}).selectOption(category);await f.getByRole('combobox',{name:'Control type'}).selectOption(control);await f.getByRole('button',{name:'Create account'}).click();await expect(preparer.page.getByRole('cell',{name:code,exact:true})).toBeVisible();};
+ await acct('2100','Payables','liability','ap');await acct('1300','Input tax','asset','input_tax');await acct('1400','Employee advances','asset','none');await acct('5000','Professional fees','expense','none');
+ const {beneficiaryId}=await seedPurchasing();
+ // Purchase order by the clerk (purchaser role), approved by the controller.
+ await clerk.page.goto('/purchases/orders');await settled(clerk.page);
+ await expect(clerk.page.getByText('No purchase orders yet.')).toBeVisible();
+ await clerk.page.getByRole('combobox',{name:'Supplier'}).selectOption({label:'Supplies Inc'});
+ await clerk.page.getByLabel('Document date').fill('2026-10-07');await clerk.page.getByLabel('Accounting date').fill('2026-10-07');
+ await clerk.page.getByRole('textbox',{name:'Line 1 description'}).fill('Cleaning services Q4');
+ await clerk.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('20000');
+ await clerk.page.getByRole('combobox',{name:'Line 1 expense account'}).selectOption({label:'5000 Professional fees'});
+ await clerk.page.getByRole('button',{name:'Save draft'}).click();
+ const orderRow=page=>page.getByRole('row').filter({hasText:'Supplies Inc'}).filter({hasText:'₱20,000.00'});
+ await expect(orderRow(clerk.page)).toBeVisible();
+ await orderRow(clerk.page).getByRole('button',{name:'Submit'}).click();
+ await expect(orderRow(clerk.page).getByRole('cell',{name:'submitted',exact:true})).toBeVisible();
+ await controller.page.goto('/purchases/orders');await settled(controller.page);
+ await orderRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(orderRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ // Bill against the order with the scanned invoice as evidence; server totals; preparer approves and posts.
+ await clerk.page.goto('/purchases/bills');await settled(clerk.page);
+ await expect(clerk.page.getByText('No bills yet.')).toBeVisible();
+ await clerk.page.getByRole('combobox',{name:'Supplier'}).selectOption({label:'Supplies Inc'});
+ await clerk.page.getByLabel('Document date').fill('2026-10-08');await clerk.page.getByLabel('Accounting date').fill('2026-10-08');
+ await clerk.page.getByLabel('Supplier invoice reference').fill('SI-2026-001');
+ const poBox=clerk.page.getByRole('combobox',{name:'Purchase order (optional)'});
+ await poBox.selectOption(await poBox.locator('option',{hasText:'Supplies Inc'}).getAttribute('value'));
+ await clerk.page.getByRole('combobox',{name:'Source evidence'}).selectOption({label:'registration.pdf'});
+ await clerk.page.getByRole('textbox',{name:'Line 1 description'}).fill('Cleaning services October');
+ await clerk.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('10000');
+ await clerk.page.getByRole('combobox',{name:'Line 1 expense account'}).selectOption({label:'5000 Professional fees'});
+ await clerk.page.getByRole('combobox',{name:'Line 1 tax rule'}).selectOption({label:'VAT12 12%'});
+ await expect(clerk.page.getByRole('status').filter({hasText:'Preview'})).toContainText('gross ₱11,200.00');
+ await clerk.page.getByRole('button',{name:'Save draft'}).click();
+ await expect(clerk.page).toHaveURL(/\/purchases\/bills\/[0-9a-f-]{36}$/);
+ const billUrl=new URL(clerk.page.url()).pathname;
+ await expect(clerk.page.getByText('Gross ₱11,200.00',{exact:true})).toBeVisible();
+ await expect(clerk.page.getByRole('button',{name:'Approve',exact:true})).toHaveCount(0);
+ await clerk.page.getByRole('button',{name:'Submit for approval'}).click();
+ await expect(clerk.page.locator('.status-grid dd').first()).toHaveText('submitted');
+ await preparer.page.goto(billUrl);await settled(preparer.page);
+ await preparer.page.getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(preparer.page.locator('.status-grid dd').first()).toHaveText('approved');
+ await preparer.page.getByRole('button',{name:'Post bill'}).click();
+ await expect(preparer.page.locator('.status-grid dd')).toHaveText(['posted','not requested','not applicable','unpaid']);
+ await expect(preparer.page.getByText('BILL-000001',{exact:false}).first()).toBeVisible();
+ await expect(preparer.page.getByText('Posted documents are immutable; corrections are new linked documents.')).toBeVisible();
+ await clerk.page.goto('/purchases/orders');await settled(clerk.page);
+ await expect(orderRow(clerk.page)).toContainText('₱10,000.00');
+ // Payment: treasury proposes and submits, creates the order against the reviewed beneficiary, the controller authorizes, treasury records the manual release and the bank settlement.
+ await treasury.page.goto('/payments');await settled(treasury.page);
+ await treasury.page.getByRole('combobox',{name:'Payee'}).selectOption({label:'Supplies Inc'});
+ await treasury.page.getByLabel('Value date',{exact:true}).fill('2026-10-09');
+ await treasury.page.getByLabel('Gross payment').fill('11200');await treasury.page.getByLabel('Cash amount').fill('11200');
+ await treasury.page.getByRole('button',{name:'Full'}).click();
+ await expect(treasury.page.getByRole('status').filter({hasText:'Allocated'})).toContainText('ready');
+ await treasury.page.getByRole('button',{name:'Save proposal'}).click();
+ await expect(treasury.page).toHaveURL(/\/payments\/[0-9a-f-]{36}$/);
+ const paymentUrl=new URL(treasury.page.url()).pathname;
+ await treasury.page.getByRole('button',{name:'Submit proposal'}).click();
+ await expect(treasury.page.getByText('State submitted',{exact:false})).toBeVisible();
+ await treasury.page.getByLabel('Approved beneficiary version id').fill(beneficiaryId);
+ await treasury.page.getByRole('button',{name:'Create payment order'}).click();
+ await expect(treasury.page.getByText('Payment draft',{exact:false})).toBeVisible();
+ await treasury.page.getByRole('button',{name:'Submit for authority'}).click();
+ await expect(treasury.page.getByText('Payment submitted',{exact:false})).toBeVisible();
+ await expect(treasury.page.getByRole('button',{name:'Authorize payment'})).toHaveCount(0);
+ await controller.page.goto(paymentUrl);await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Authorize payment'}).click();
+ await expect(controller.page.getByText('Payment authorized',{exact:false})).toBeVisible();
+ await treasury.page.goto(paymentUrl);await settled(treasury.page);
+ await treasury.page.getByLabel('Bank transaction reference').fill('TXN-2026-77');
+ await treasury.page.getByRole('combobox',{name:'Evidence'}).selectOption({label:'registration.pdf'});
+ await treasury.page.getByRole('button',{name:'Record manual release'}).click();
+ await expect(treasury.page.getByText('Payment released',{exact:false})).toBeVisible();
+ await treasury.page.getByLabel('Bank settlement reference').fill('BANK-2026-77');
+ await treasury.page.getByLabel('Value date',{exact:true}).fill('2026-10-09');
+ await treasury.page.getByRole('combobox',{name:'Evidence'}).selectOption({label:'registration.pdf'});
+ await treasury.page.getByRole('button',{name:'Record settlement'}).click();
+ await expect(treasury.page.getByText('Payment settled',{exact:false})).toBeVisible();
+ await expect(treasury.page.getByText('State posted',{exact:false})).toBeVisible();
+ await preparer.page.goto(billUrl);await settled(preparer.page);
+ await expect(preparer.page.locator('.status-grid dd').nth(3)).toHaveText('paid');
+ // Supplier statement: nothing outstanding; the aging job renders from its snapshot.
+ await controller.page.goto('/purchases/suppliers');await settled(controller.page);
+ await expect(controller.page.getByText('No payables.')).toBeVisible();
+ await controller.page.getByRole('button',{name:'Generate supplier aging'}).click();
+ await expect(controller.page.getByRole('status').filter({hasText:'Supplier aging job'})).toContainText('succeeded',{timeout:60000});
+ await expect(controller.page.getByText(/Nothing payable as of/)).toBeVisible();
+ for(const route of ['/purchases/bills','/purchases/orders','/purchases/claims','/payments','/purchases/suppliers',billUrl,paymentUrl]){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'purchasing '+route);}
+ await controller.context.close();await preparer.context.close();await clerk.context.close();await treasury.context.close();
+});
+
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/purchases/bills');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P05',{exact:false})).toBeVisible();
+ await clerk.page.goto('/compliance');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P07',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

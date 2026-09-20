@@ -55,7 +55,20 @@ try{
   const rule=(await tx.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,status,approved_by,activated_by,activated_at,content_hash,created_by) values($1,$2,'VAT12',1,'vat','2026-01-01',0.12,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-01\"]','active',$4,$4,now(),$5,$6) returning id",[tenantId,entityId,JSON.stringify([randomUUID()]),p.id,'4'.repeat(64),a.id])).rows[0].id;
   const customer=(await tx.query("insert into lara.party(tenant_id,entity_id,legal_name,identity_status,status,content_hash,created_by) values($1,$2,'Load customer','unknown','active',$3,$4) returning id",[tenantId,entityId,'5'.repeat(64),p.id])).rows[0].id;
   await tx.query("insert into lara.party_roles(tenant_id,entity_id,party_id,role,created_by) values($1,$2,$3,'customer',$4)",[tenantId,entityId,customer,p.id]);
-  Object.assign(fixture,{bookId:book,branchId:branch.id,cash:cash.id,revenue:rev.id,rule,customer});
+  // Purchasing bill profile: the clerk prepares and submits, the accountant approves and posts; the supplier reference guard and numbering serialize per supplier and series.
+  const c=await identity.resolvePrincipal(tx,tenantId,{issuer:process.env.OIDC_ISSUER,subject:'load-clerk-'+suffix,displayName:'clerk'});
+  const crole=(await tx.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) select $1,'clerk','Clerk',permissions,'approved',$2,$3 from lara.role_templates where code='clerk' returning id",[tenantId,'6'.repeat(64),p.id])).rows[0].id;
+  await tx.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,c.id,crole,p.id]);
+  await tx.query("insert into lara.capability_activations(tenant_id,entity_id,capability,status,profile_version,approved_by,activated_at,created_by) values($1,$2,'purchasing','active','p05.1',$3,now(),$4)",[tenantId,entityId,p.id,a.id]);
+  const ap=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'2100',name:'Payables',category:'liability',controlType:'ap',requiredDimensions:[]});
+  const itax=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'1300',name:'Input tax',category:'asset',controlType:'input_tax',requiredDimensions:[]});
+  const exp=await ledger.createAccount(tx,actx,entityId,{bookId:book,code:'5000',name:'Fees',category:'expense',controlType:'none',requiredDimensions:[]});
+  await tx.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'purchasing_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entityId,JSON.stringify({apAccountId:ap.id,inputTaxAccountId:itax.id,cashAccountId:cash.id,scale:2,dueDays:30}),'7'.repeat(64),a.id,p.id]);
+  await tx.query("insert into lara.document_series(tenant_id,entity_id,branch_id,kind,prefix,profile_version,created_by) values($1,$2,$3,'bill','BILL','numbering-2026',$4)",[tenantId,entityId,branch.id,p.id]);
+  const supplier=(await tx.query("insert into lara.party(tenant_id,entity_id,legal_name,identity_status,status,content_hash,created_by) values($1,$2,'Load supplier','unknown','active',$3,$4) returning id",[tenantId,entityId,'8'.repeat(64),p.id])).rows[0].id;
+  await tx.query("insert into lara.party_roles(tenant_id,entity_id,party_id,role,created_by) values($1,$2,$3,'supplier',$4)",[tenantId,entityId,supplier,p.id]);
+  const invoice=(await tx.query("insert into lara.evidence(tenant_id,entity_id,object_key,filename,sha256,mime,byte_count,status,classification,created_by) values($1,$2,$3,'si.pdf',$4,'application/pdf',10,'available','internal',$5) returning id",[tenantId,entityId,'load-'+suffix,'9'.repeat(64),p.id])).rows[0].id;
+  Object.assign(fixture,{bookId:book,branchId:branch.id,cash:cash.id,revenue:rev.id,rule,customer,supplier,expense:exp.id,invoice});
  });
  child=spawn(process.execPath,['apps/api/src/server.mjs'],{env:{...process.env,API_PORT:String(PORT),API_BIND_HOST:'127.0.0.1',RATE_LIMIT_WRITES_PER_MINUTE:'100000',RATE_LIMIT_READS_PER_MINUTE:'100000',OBJECT_ADAPTER:'filesystem',OBJECT_BUCKET:'.local/load-'+suffix,FIELD_ENCRYPTION_KEY:process.env.FIELD_ENCRYPTION_KEY||randomBytes(32).toString('hex')},stdio:['ignore','ignore','pipe']});
  let stderr='';child.stderr.on('data',b=>stderr+=b);
@@ -66,6 +79,7 @@ try{
   await Promise.all(Array.from({length:concurrency},async()=>{while(next<requests){const i=next++;results.push(await fn(i));}}));
   const ms=results.map(r=>r.ms).sort((a,b)=>a-b),p=q=>Math.round(ms[Math.min(ms.length-1,Math.floor(ms.length*q))]);
   const errors=results.filter(r=>r.status>=400).length;
+  if(errors&&process.env.LARA_LOAD_DEBUG)console.error(results.find(r=>r.status>=400).body.slice(0,400));
   const statuses={};for(const r of results)statuses[r.status]=(statuses[r.status]||0)+1;
   const summary={label,requests,concurrency,p50:p(0.5),p95:p(0.95),max:Math.round(ms.at(-1)),errors,statuses,throughputPerSec:Math.round(requests/(results.reduce((s,r)=>s+r.ms,0)/concurrency/1000)*10)/10};
   console.log(JSON.stringify(summary));return summary;
@@ -91,9 +105,23 @@ try{
  });
  const numbers=JSON.parse((await call('GET','/invoices?state=posted&limit=200',undefined,bill)).body).items.map(d=>d.officialNumber);
  assert.equal(new Set(numbers).size,numbers.length,'official numbers must be unique under concurrent issuance');
- assert.equal(reads.errors+writes.errors+mixed.errors+postings.errors+issuance.errors,0,'no request may fail under load: '+stderr.slice(-500));
+ // Bill profile (P05-T03 under concurrency): distinct supplier references post with single-use numbers; the same reference submitted concurrently records exactly one bill.
+ const clerk='load-clerk-'+suffix;
+ const bills=await run('bill post (after prepare, submit, approve)',async i=>{
+  const d=JSON.parse((await call('POST','/bills',{kind:'bill',branchId:fixture.branchId,bookId:fixture.bookId,partyId:fixture.supplier,documentDate:'2026-06-15',accountingDate:'2026-06-15',currency:'PHP',ruleProfileVersion:'load',externalReference:'LOAD-'+i,lines:[{description:'Load bill '+i,quantity:'1',unitPrice:'1000',discount:'0',priceBasis:'exclusive',accountId:fixture.expense,taxCodeId:fixture.rule,dimensions:{}}],evidenceIds:[fixture.invoice]},clerk)).body);
+  const s=JSON.parse((await call('POST','/bills/'+d.id+'/submit',{},clerk,{'if-match':'"'+d.version+'"'})).body);
+  // Equal amounts on one date flag every later bill as a possible duplicate; the approval records the disposition.
+  const a=JSON.parse((await call('POST','/bills/'+d.id+'/approve',{decision:'approve',contentVersion:1,reason:'Load run: distinct supplier invoices checked'},acct,{'if-match':'"'+s.version+'"'})).body);
+  return call('POST','/bills/'+d.id+'/post',{},acct,{'if-match':'"'+a.version+'"'});
+ });
+ const billNumbers=JSON.parse((await call('GET','/bills?state=posted&limit=200',undefined,clerk)).body).items.map(d=>d.officialNumber);
+ assert.equal(new Set(billNumbers).size,billNumbers.length,'bill numbers must be unique under concurrent posting');
+ const duplicates=await Promise.all(Array.from({length:concurrency},()=>call('POST','/bills',{kind:'bill',branchId:fixture.branchId,bookId:fixture.bookId,partyId:fixture.supplier,documentDate:'2026-06-16',accountingDate:'2026-06-16',currency:'PHP',ruleProfileVersion:'load',externalReference:'DUP-001',lines:[{description:'Duplicate race',quantity:'1',unitPrice:'50',discount:'0',priceBasis:'exclusive',accountId:fixture.expense,dimensions:{}}],evidenceIds:[fixture.invoice]},clerk)));
+ assert.equal(duplicates.filter(r=>r.status===201).length,1,'exactly one bill per supplier reference under a concurrent race: '+JSON.stringify(duplicates.map(r=>r.status)));
+ assert.ok(duplicates.filter(r=>r.status===409).every(r=>JSON.parse(r.body).code==='DUPLICATE_SOURCE'),'the losers answer DUPLICATE_SOURCE');
+ assert.equal(reads.errors+writes.errors+mixed.errors+postings.errors+issuance.errors+bills.errors,0,'no request may fail under load: '+stderr.slice(-500));
  if(process.env.LARA_LOAD_ASSERT==='1'){
-  for(const s of [reads,writes,mixed,postings,issuance])assert.ok(s.p95<2000,s.label+' p95 '+s.p95+'ms exceeds the 2 s profile');
+  for(const s of [reads,writes,mixed,postings,issuance,bills])assert.ok(s.p95<2000,s.label+' p95 '+s.p95+'ms exceeds the 2 s profile');
   assert.ok(writes.p95<1000&&postings.p95<1000,'local command/post p95 exceeds the 1 s profile: '+writes.p95+'/'+postings.p95);
   console.log('PASS P02 load profile asserted on the local database');
  }else console.log('REPORT P02 load measured against a remote database; thresholds not asserted (set LARA_LOAD_ASSERT=1 on the benchmark environment)');

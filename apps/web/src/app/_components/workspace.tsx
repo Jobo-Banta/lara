@@ -8,9 +8,10 @@ import {usePathname} from 'next/navigation';
 import {api,asError,useCommand,ErrorPanel,Editor,table,link,useList,Loading,input,select,when,uuid,RequestError,type Row,type ApiError} from './workspace-kit';
 import {LedgerAccounts,LedgerJournals,LedgerJournalDetail,LedgerImports,LedgerPeriods,LedgerReports,Capabilities} from './workspace-ledger';
 import {SalesInvoices,SalesInvoiceDetail,SalesOrders,SalesCollections,SalesCollectionDetail,SalesCustomers,TaxRules} from './workspace-sales';
+import {PurchasingBills,PurchasingBillDetail,PurchasingOrders,PurchasingClaims,PurchasingPayments,PurchasingPaymentDetail,PurchasingSuppliers} from './workspace-purchasing';
 
-const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Money out','/purchases/bills'],['Compliance','/compliance']];
-const roadmap:Record<string,string>={'/purchases/bills':'Purchasing and payables arrive with P05.','/compliance':'Compliance and e-invoicing arrive with P07.','/payments':'Payments arrive with treasury (P06).','/bank/reconcile':'Bank reconciliation arrives with treasury (P06).'};
+const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Compliance','/compliance']];
+const roadmap:Record<string,string>={'/compliance':'Compliance and e-invoicing arrive with P07.','/bank/reconcile':'Bank reconciliation arrives with treasury (P06).'};
 export default function Workspace(){
  const path=usePathname();
  const [me,setMe]=useState<Row|null>(null),[meError,setMeError]=useState<ApiError|null>(null),[entityId,setEntityId]=useState<string|null>(null),[entity,setEntity]=useState<Row|null>(null),[tick,setTick]=useState(0);
@@ -44,6 +45,13 @@ export default function Workspace(){
  else if(path==='/sales/collections'){title='Receipts';content=<SalesCollections entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path.startsWith('/sales/collections/')){title='Receipt';content=<SalesCollectionDetail entityId={entityId!} id={id} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/sales/customers'){title='Customers';content=<SalesCustomers entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/purchases/bills'){title='Bills';content=<PurchasingBills entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path.startsWith('/purchases/bills/')){title='Bill';content=<PurchasingBillDetail entityId={entityId!} id={id} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/purchases/orders'){title='Purchase orders';content=<PurchasingOrders entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/purchases/claims'){title='Expense claims';content=<PurchasingClaims entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/purchases/suppliers'){title='Suppliers';content=<PurchasingSuppliers entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/payments'){title='Payments';content=<PurchasingPayments entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path.startsWith('/payments/')){title='Payment';content=<PurchasingPaymentDetail entityId={entityId!} id={id} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/tax-rules'){title='Tax rules';content=<TaxRules entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/capabilities'){title='Capabilities';content=<Capabilities entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path.startsWith('/settings')){title='Setup checklist';content=<Setup entityId={entityId} entity={entity} me={me} can={can} tick={tick} refresh={refresh} choose={(e:string)=>{try{sessionStorage.setItem('lara-entity',e);}catch{}setEntityId(e);}}/>;}
