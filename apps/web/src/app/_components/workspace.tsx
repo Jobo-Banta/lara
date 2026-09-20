@@ -13,9 +13,10 @@ import {TreasuryBankAccounts,TreasuryReconcile,TreasuryTransfers,TreasuryChecks,
 import {ComplianceWorkbench} from './workspace-compliance';
 import {FiOwnership,FiFeeds,FiBranches,FiTax} from './workspace-fi';
 import {FxRates,FxRevaluations,Books} from './workspace-fx';
+import {InventoryItems,InventoryMovements,InventoryCounts,InventoryLandedCosts} from './workspace-inventory';
 
-const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Bank accounts','/bank/accounts'],['Reconcile','/bank/reconcile'],['Transfers','/bank/transfers'],['Checks','/bank/checks'],['Cash','/bank/cash'],['Compliance','/compliance'],['Source ownership','/institution/ownership'],['Feeds','/institution/feeds'],['Branches','/institution/branches'],['Institution tax','/institution/tax'],['Books','/books'],['FX rates','/fx/rates'],['Revaluations','/fx/revaluations'],['Inventory','/inventory']];
-const roadmap:Record<string,string>={'/inventory':'Inventory costing and three-way matching arrive with P10.'};
+const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Bank accounts','/bank/accounts'],['Reconcile','/bank/reconcile'],['Transfers','/bank/transfers'],['Checks','/bank/checks'],['Cash','/bank/cash'],['Compliance','/compliance'],['Source ownership','/institution/ownership'],['Feeds','/institution/feeds'],['Branches','/institution/branches'],['Institution tax','/institution/tax'],['Books','/books'],['FX rates','/fx/rates'],['Revaluations','/fx/revaluations'],['Inventory','/inventory'],['Stock movements','/inventory/movements'],['Counts','/inventory/counts'],['Landed costs','/inventory/landed-costs'],['Assets','/assets']];
+const roadmap:Record<string,string>={'/assets':'Assets, recurring work and recognition schedules arrive with P11.'};
 export default function Workspace(){
  const path=usePathname();
  const [me,setMe]=useState<Row|null>(null),[meError,setMeError]=useState<ApiError|null>(null),[entityId,setEntityId]=useState<string|null>(null),[entity,setEntity]=useState<Row|null>(null),[tick,setTick]=useState(0);
@@ -67,6 +68,10 @@ export default function Workspace(){
  else if(path==='/institution/branches'){title='Branches';content=<FiBranches entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/institution/tax'){title='Institution tax';content=<FiTax entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/books'){title='Books';content=<Books entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/inventory'){title='Inventory';content=<InventoryItems entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/inventory/movements'){title='Stock movements';content=<InventoryMovements entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/inventory/counts'){title='Stock counts';content=<InventoryCounts entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/inventory/landed-costs'){title='Landed costs';content=<InventoryLandedCosts entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/fx/rates'){title='FX rates';content=<FxRates entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/fx/revaluations'){title='Revaluations';content=<FxRevaluations entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/tax-rules'){title='Tax rules';content=<TaxRules entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}

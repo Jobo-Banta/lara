@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "e4ffca3b0459acf4155318ba29b92863d2d7b0d95de917cbc3343a5f6c611279",
+  "sha256": "a93063b977580672f33bb2874524088b8449f114447cd05721f8656b04fbcb0e",
   "operations": [
     {
       "method": "POST",
@@ -1846,6 +1846,36 @@
       "method": "GET",
       "path": "/books/{id}/combined",
       "operationId": "get_books_id_combined"
+    },
+    {
+      "method": "GET",
+      "path": "/warehouses",
+      "operationId": "get_warehouses"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-card",
+      "operationId": "get_stock_card"
+    },
+    {
+      "method": "GET",
+      "path": "/inventory-valuation",
+      "operationId": "get_inventory_valuation"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-movements/{id}/recost",
+      "operationId": "get_stock_movements_id_recost"
+    },
+    {
+      "method": "GET",
+      "path": "/stock-counts/{id}/lines",
+      "operationId": "get_stock_counts_id_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/landed-costs/{id}/lines",
+      "operationId": "get_landed_costs_id_lines"
     }
   ]
 }

@@ -464,46 +464,46 @@
       "updated_at": "2026-09-20T11:17:04+00:00"
     },
     "P10-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "Migration 0025 (warehouses, items with fixed cost method, stock movements and frozen lines, non-negative balances, valuation layers, append-only allocations, lot and serial tracking, count sessions and lines, landed cost runs and allocations); six reads added to the reviewed contract (375 operations); scripts/test-p10-schema.mjs (5 groups) passes locally.",
+      "evidence": "Local: node scripts/test-p10-schema.mjs \u2192 P10-01 schema acceptance passed (5 groups); contracts regenerated and validate_specifications pass. CI run pending.",
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P10-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/inventory.mjs with the three-way hook in purchasing: inventory profile, items and warehouses, movements posted once with FIFO or moving-average costing (AC-09), sorted balance locks refusing negative stock, serials in one warehouse, transfers conserving value, deterministic recost for backdated receipts as a linked adjustment, counts with frozen expected quantities, landed cost by value or quantity with the sold portion to cost of sales, valuation versus ledger, and the three-way match mandating the goods receipt; scripts/test-p10-domain.mjs covers P10-T01..T05 (7 groups).",
+      "evidence": "Local: node scripts/test-p10-domain.mjs \u2192 P10-02 domain acceptance passed (7 groups). CI run pending.",
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P10-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "All 24 P10 operations plus the six reads served by apps/api/src/workspace-api.mjs; the worker renders inventory_valuation reports; scripts/test-p10-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "Local: node scripts/test-p10-api.mjs \u2192 P10-03 API acceptance passed (5 groups). CI run pending.",
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P10-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite 13/13 passed (16.4m) including the inventory journey. CI run pending.",
+      "updated_at": "2026-09-20T14:12:53+00:00"
     },
     "P10-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written.",
+      "evidence": "Local: p10 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P10-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.10.0 drafted (docs/development/releases/0.10.0-draft.md). Blocked on the 0.6.0 (P06) release, the controller's signed costing method, unit conversions, cutoff, negative-stock policy and opening count, the stock/GL/AR/AP and inventory outputs on a parallel month, contract operations for warehouses, the inventory profile and the opening stock import, stock clerk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     "P11-01": {
       "status": "not_started",
@@ -2316,7 +2316,49 @@
       "id": "P09-05",
       "action": "done",
       "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-01",
+      "action": "in_review",
+      "note": "Migration 0025 (warehouses, items with fixed cost method, stock movements and frozen lines, non-negative balances, valuation layers, append-only allocations, lot and serial tracking, count sessions and lines, landed cost runs and allocations); six reads added to the reviewed contract (375 operations); scripts/test-p10-schema.mjs (5 groups) passes locally."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-02",
+      "action": "in_review",
+      "note": "packages/domain/src/inventory.mjs with the three-way hook in purchasing: inventory profile, items and warehouses, movements posted once with FIFO or moving-average costing (AC-09), sorted balance locks refusing negative stock, serials in one warehouse, transfers conserving value, deterministic recost for backdated receipts as a linked adjustment, counts with frozen expected quantities, landed cost by value or quantity with the sold portion to cost of sales, valuation versus ledger, and the three-way match mandating the goods receipt; scripts/test-p10-domain.mjs covers P10-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-03",
+      "action": "in_review",
+      "note": "All 24 P10 operations plus the six reads served by apps/api/src/workspace-api.mjs; the worker renders inventory_valuation reports; scripts/test-p10-api.mjs (5 groups) runs API and worker as processes."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-05",
+      "action": "in_review",
+      "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written."
+    },
+    {
+      "at": "2026-09-20T13:33:27+00:00",
+      "id": "P10-06",
+      "action": "blocked",
+      "note": "Release 0.10.0 drafted (docs/development/releases/0.10.0-draft.md). Blocked on the 0.6.0 (P06) release, the controller's signed costing method, unit conversions, cutoff, negative-stock policy and opening count, the stock/GL/AR/AP and inventory outputs on a parallel month, contract operations for warehouses, the inventory profile and the opening stock import, stock clerk and approver role templates, and the owner's tag, deployment and manifest run."
+    },
+    {
+      "at": "2026-09-20T14:12:53+00:00",
+      "id": "P10-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs."
     }
   ],
-  "updated_at": "2026-09-20T13:13:18+00:00"
+  "updated_at": "2026-09-20T14:12:53+00:00"
 }

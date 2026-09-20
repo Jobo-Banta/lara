@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury,compliance,fi,inventory} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -35,7 +35,7 @@ export const handlers={
  'report.generate':async(tx,ctx,job)=>{
   const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
   const actor={...current,traceId:ctx.traceId};
-  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'}),bank_reconciliation:(t,c,e,input)=>treasury.reconciliationReport(t,c,e,{bankAccountId:input.dimensions?.bankAccountId,asOf:input.periodEnd}),...fi.reportBuilders}});
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'}),bank_reconciliation:(t,c,e,input)=>treasury.reconciliationReport(t,c,e,{bankAccountId:input.dimensions?.bankAccountId,asOf:input.periodEnd}),...fi.reportBuilders,...inventory.reportBuilders}});
   const format=job.payload_ref.format||'json';
   let content,mime;
   if(format==='csv'){const rows=snap.payload.lines||snap.payload.parties.flatMap(p=>p.items.map(i=>({party:p.legalName,...i})));const cols=snap.payload.lines?['code','name','category','debit','credit','balance']:['party','officialNumber','dueDate','daysPastDue','outstanding'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...rows.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}

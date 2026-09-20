@@ -3319,5 +3319,59 @@
     "permission": "book.read",
     "input": null,
     "response": "CombinedBookView"
+  },
+  {
+    "operationId": "get_warehouses",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/warehouses",
+    "permission": "item.read",
+    "input": null,
+    "response": "WarehouseList"
+  },
+  {
+    "operationId": "get_stock_card",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-card",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "StockCardView"
+  },
+  {
+    "operationId": "get_inventory_valuation",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/inventory-valuation",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "InventoryValuationView"
+  },
+  {
+    "operationId": "get_stock_movements_id_recost",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-movements/{id}/recost",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "RecostPreviewView"
+  },
+  {
+    "operationId": "get_stock_counts_id_lines",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-counts/{id}/lines",
+    "permission": "stock_count.read",
+    "input": null,
+    "response": "CountLinesView"
+  },
+  {
+    "operationId": "get_landed_costs_id_lines",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/landed-costs/{id}/lines",
+    "permission": "landed_cost.read",
+    "input": null,
+    "response": "LandedCostPreviewView"
   }
 ]

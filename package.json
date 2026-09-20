@@ -56,7 +56,10 @@
     "test:p08-api": "node scripts/test-p08-api.mjs",
     "test:p09-schema": "node scripts/test-p09-schema.mjs",
     "test:p09-domain": "node scripts/test-p09-domain.mjs",
-    "test:p09-api": "node scripts/test-p09-api.mjs"
+    "test:p09-api": "node scripts/test-p09-api.mjs",
+    "test:p10-schema": "node scripts/test-p10-schema.mjs",
+    "test:p10-domain": "node scripts/test-p10-domain.mjs",
+    "test:p10-api": "node scripts/test-p10-api.mjs"
   },
   "pnpm": {
     "overrides": {

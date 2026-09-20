@@ -945,14 +945,113 @@ test('multi-currency: capability activation, a rate imported and approved indepe
  for(const route of ['/fx/rates','/fx/revaluations','/books']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'fx '+route);}
  await controller.context.close();await preparer.context.close();await billing.context.close();
 });
+// The inventory profile, the stock accounts, the warehouse and the stock
+// clerk and approver roles have no reviewed operations or seeded template
+// yet; the journey seeds them through the runtime role as an operator would.
+// Items, movements, the stock card, the count and the reconciliation go
+// through the screens.
+async function seedInventory(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const book=(await db.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+  const branch=(await db.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and code='HQ'",[tenantId,entity])).rows[0].id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify({inv:1})])).rows[0].h;
+  const acct=async(code,name,category,side)=>(await db.query("insert into lara.accounts(tenant_id,entity_id,book_id,code,name,category,normal_side,control_type,allow_manual,content_hash,created_by) values($1,$2,$3,$4,$5,$6,$7,'none',true,$8,$9) on conflict (tenant_id,entity_id,book_id,code) do update set name=excluded.name returning id",[tenantId,entity,book,code,name,category,side,hash,await principal('preparer')])).rows[0].id;
+  await acct('1500','Inventory','asset','debit');await acct('5100','Cost of sales','expense','debit');
+  const payload={grniAccountId:await acct('2150','Goods received not invoiced','liability','credit'),stockGainAccountId:await acct('4200','Stock gain','income','credit'),stockLossAccountId:await acct('5200','Stock loss','expense','debit'),landedCostClearingAccountId:await acct('5300','Freight in','expense','debit'),threeWayTolerancePercent:'2',profileVersion:'inventory-2026'};
+  const ph=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'inventory_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),ph,await principal('preparer'),await principal('controller')]);
+  await db.query("insert into lara.warehouses(tenant_id,entity_id,branch_id,code,name,created_by) values($1,$2,$3,'WH1','Main warehouse',$4)",[tenantId,entity,branch,await principal('controller')]);
+  // No seeded template holds the inventory permissions; tenant roles cover the stock clerk and the approver.
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const clerkRole=await role('stock_clerk',['item.create','item.edit','item.read','stock_movement.create','stock_movement.edit','stock_movement.submit','stock_movement.read','stock_count.create','stock_count.edit','stock_count.read','landed_cost.create','landed_cost.edit','landed_cost.preview','landed_cost.read']);
+  const approverRole=await role('inventory_approver',['stock_movement.approve','stock_movement.post','stock_movement.read','stock_count.approve','stock_count.post','stock_count.read','landed_cost.approve','landed_cost.post','landed_cost.read','item.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),clerkRole,await principal('security'),await principal('controller'),approverRole]);
+ }finally{await db.end();}
+}
+test('inventory: capability activation, an item with its cost method, a goods receipt and a FIFO issue through submission, independent approval and posting, the stock card and the stock-to-ledger tie, and a count with its variance posted',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Inventory costing and three-way matching'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Trading goods from October':'Reviewed the costing method and cutoff');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedInventory();
+ // The item.
+ await preparer.page.goto('/inventory');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'SKU',exact:true}).fill('WIDGET');await preparer.page.getByRole('textbox',{name:'Description',exact:true}).fill('Widget');
+ await preparer.page.getByRole('combobox',{name:'Cost method'}).selectOption('fifo');
+ await preparer.page.getByRole('combobox',{name:'Stock account'}).selectOption({label:'1500 Inventory'});
+ await preparer.page.getByRole('combobox',{name:'Cost of sales account'}).selectOption({label:'5100 Cost of sales'});
+ await preparer.page.getByRole('button',{name:'Create item'}).click();
+ await expect(preparer.page.getByRole('cell',{name:'WIDGET',exact:true})).toBeVisible();
+ // A receipt of 10 at 30 and an issue of 4: the clerk drafts and submits, the controller approves and posts.
+ const movement=async(kind,quantity,unitCost)=>{
+  await preparer.page.goto('/inventory/movements');await settled(preparer.page);
+  await preparer.page.getByRole('combobox',{name:'Kind'}).selectOption(kind);
+  await preparer.page.getByRole('combobox',{name:'Warehouse'}).selectOption({label:'WH1 Main warehouse'});
+  await preparer.page.getByRole('textbox',{name:'Accounting date',exact:true}).fill('2026-10-20');
+  await preparer.page.getByRole('combobox',{name:'Line 1 item'}).selectOption({label:'WIDGET Widget'});
+  await preparer.page.getByRole('textbox',{name:'Line 1 quantity'}).fill(quantity);
+  if(unitCost)await preparer.page.getByRole('textbox',{name:'Line 1 unit cost'}).fill(unitCost);
+  await preparer.page.getByRole('button',{name:'Save draft'}).click();
+  const row=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:kind==='receipt'?'receipt':'issue',exact:true})}).last();
+  await expect(row(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+  await row(preparer.page).getByRole('button',{name:'Submit'}).click();
+  await expect(row(preparer.page).getByRole('cell',{name:'submitted',exact:true})).toBeVisible();
+  await controller.page.goto('/inventory/movements');await settled(controller.page);
+  await row(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+  await expect(row(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+  await row(controller.page).getByRole('button',{name:'Post',exact:true}).click();
+  await expect(row(controller.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible({timeout:30000});
+ };
+ await movement('receipt','10','30');
+ await movement('issue','4',null);
+ // The stock card and the tie to the ledger.
+ await controller.page.goto('/inventory');await settled(controller.page);
+ await controller.page.getByRole('row').filter({hasText:'WIDGET'}).getByRole('button',{name:'Open'}).click();
+ await expect(controller.page.getByRole('row').filter({has:controller.page.getByRole('cell',{name:'WH1',exact:true})}).first()).toContainText('₱180.00');
+ await controller.page.getByRole('textbox',{name:'As of',exact:true}).fill('2026-10-31');
+ await expect(controller.page.getByRole('row').filter({hasText:'1500'}).first()).toContainText('ties');
+ // A count observing 5 against the expected 6 posts the loss after approval.
+ await preparer.page.goto('/inventory/counts');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Warehouse'}).selectOption({label:'WH1 Main warehouse'});
+ await preparer.page.getByRole('textbox',{name:'Cutoff date',exact:true}).fill('2026-10-25');
+ await preparer.page.getByRole('combobox',{name:'Count line 1 item'}).selectOption({label:'WIDGET'});
+ await preparer.page.getByRole('textbox',{name:'Count line 1 observed quantity'}).fill('5');
+ await preparer.page.getByRole('button',{name:'Save count'}).click();
+ const countRow=page=>page.getByRole('row').filter({hasText:'WH1'}).last();
+ await expect(countRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await countRow(preparer.page).getByRole('button',{name:'Lines'}).click();
+ await expect(preparer.page.getByRole('row').filter({has:preparer.page.getByRole('cell',{name:'WIDGET',exact:true})})).toContainText('-1');
+ await controller.page.goto('/inventory/counts');await settled(controller.page);
+ await countRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(countRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await countRow(controller.page).getByRole('button',{name:'Post variances'}).click();
+ await expect(countRow(controller.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible({timeout:30000});
+ await controller.page.goto('/inventory');await settled(controller.page);
+ await controller.page.getByRole('textbox',{name:'As of',exact:true}).fill('2026-10-31');
+ await expect(controller.page.getByRole('row').filter({hasText:'1500'}).first()).toContainText('₱150.00');
+ for(const route of ['/inventory','/inventory/movements','/inventory/counts','/inventory/landed-costs']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'inventory '+route);}
+ await controller.context.close();await preparer.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/inventory');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P10',{exact:false})).toBeVisible();
+ await clerk.page.goto('/assets');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P11',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

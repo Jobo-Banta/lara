@@ -11,6 +11,7 @@ import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,expectVersio
 import {linkEvidence} from './evidence.mjs';
 import {encryptField} from './parties.mjs';
 import * as fx from './fx.mjs';
+import * as inventory from './inventory.mjs';
 import {micros,decimal} from './ledger.mjs';
 import {money,bookFor,branchFor,resolveRules,computeLines,totals,rateScaled,documentMaterial,lineResource,lineRows,writeLines,allocateNumber,refreshSettlementState,settlementMaterial,settlementResource,applyAllocations,loadDocument,dueSchedule,documentResource,SUPPLIER_CREDIT} from './sales.mjs';
 
@@ -81,12 +82,15 @@ async function prepare(tx,ctx,entityId,input,profile,{kind=input.kind,source=nul
  await partyWithRole(tx,ctx,entityId,input.partyId,family==='expense_claim'?'employee':'supplier');
  if(input.accountingDate<input.documentDate)fail('VALIDATION_FAILED','The accounting date cannot precede the document date.',{fieldErrors:[{path:'accountingDate',message:'Before document date'}]});
  if(family==='bill'&&kind==='bill'&&!input.externalReference?.trim())fail('VALIDATION_FAILED','A bill records the supplier invoice reference.',{fieldErrors:[{path:'externalReference',message:'Required for bills'}]});
+ // With inventory active (P10) a goods line names its item and posts to the goods-received clearing account of the inventory profile.
+ const invActive=await inventory.isInventoryActive(tx,ctx,entityId);
+ const grni=invActive?(await inventory.inventoryProfile(tx,ctx,entityId).catch(()=>null))?.grniAccountId||null:null;
  for(const [i,l] of input.lines.entries()){
   const acct=(await tx.query('select * from lara.accounts where tenant_id=$1 and entity_id=$2 and book_id=$3 and id=$4',[ctx.tenantId,entityId,input.bookId,l.accountId])).rows[0];
   if(!acct)fail('NOT_FOUND','Line '+(i+1)+' account not found in this book.');
   if(acct.status!=='active')fail('STATE_CONFLICT','Line '+(i+1)+' account is '+acct.status+'.');
-  if(acct.control_type!=='none'||!['expense','asset'].includes(acct.category))fail('VALIDATION_FAILED','Line '+(i+1)+' must post to an expense or asset account, not a control or revenue account.',{fieldErrors:[{path:'lines.'+i+'.accountId',message:'Expense or asset account'}]});
-  if(l.itemId)fail('FEATURE_NOT_ENABLED','Items and three-way matching arrive with inventory (P10).');
+  if(acct.id!==grni&&(acct.control_type!=='none'||!['expense','asset'].includes(acct.category)))fail('VALIDATION_FAILED','Line '+(i+1)+' must post to an expense or asset account, not a control or revenue account.',{fieldErrors:[{path:'lines.'+i+'.accountId',message:'Expense or asset account'}]});
+  if(l.itemId){if(!invActive)fail('FEATURE_NOT_ENABLED','Items and three-way matching need the inventory capability (P10).');const item=(await tx.query("select id from lara.items where tenant_id=$1 and entity_id=$2 and id=$3 and status='active'",[ctx.tenantId,entityId,l.itemId])).rows[0];if(!item)fail('NOT_FOUND','Line '+(i+1)+' item not found.');}
  }
  const rules=await resolveRules(tx,ctx,entityId,input.lines,input.documentDate);
  const computed=computeLines(input.lines,rules,{scale:profile.scale});
@@ -219,6 +223,8 @@ export async function approveDocument(tx,ctx,entityId,id,input,expectedVersion){
  if(Number(row.content_version)!==input.contentVersion)fail('VERSION_CONFLICT','The document changed since review.',{resourceVersion:Number(row.version)});
  if(input.decision==='reject'&&!input.reason)fail('VALIDATION_FAILED','Rejection requires a reason.',{fieldErrors:[{path:'reason',message:'Required'}]});
  if(input.decision==='approve'&&row.kind==='bill'){
+  // Three-way match (P10): a variance beyond the tolerance needs the approver's recorded disposition.
+  await inventory.threeWayCheck(tx,ctx,entityId,row,{stage:'approve',reason:input.reason||null});
   // A possible-duplicate task is the reviewer's disposition; approving resolves it with the stated reason.
   const open=(await tx.query("select id from lara.tasks where tenant_id=$1 and entity_id=$2 and source_type='document' and source_id=$3 and kind='duplicate_review' and status not in ('resolved','cancelled')",[ctx.tenantId,entityId,id])).rows;
   if(open.length&&!input.reason)fail('VALIDATION_FAILED','This bill is flagged as a possible duplicate; approval needs a reason recording the disposition.',{fieldErrors:[{path:'reason',message:'Disposition required'}]});
@@ -275,7 +281,7 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  if(row.kind==='expense_claim')return postClaim(tx,ctx,entityId,row,{commandId});
  const profile=await purchasingProfile(tx,ctx,entityId);
  const lines=await lineRows(tx,ctx,id);
- if(row.kind==='bill'&&row.source_document_id){const order=(await tx.query('select * from lara.documents where tenant_id=$1 and id=$2 for update',[ctx.tenantId,row.source_document_id])).rows[0];await matchOrder(tx,ctx,entityId,order,{partyId:row.party_id},{net:micros(String(row.net))},profile,{excludeId:id});}
+ if(row.kind==='bill'&&row.source_document_id){const order=(await tx.query('select * from lara.documents where tenant_id=$1 and id=$2 for update',[ctx.tenantId,row.source_document_id])).rows[0];await matchOrder(tx,ctx,entityId,order,{partyId:row.party_id},{net:micros(String(row.net))},profile,{excludeId:id});await inventory.threeWayCheck(tx,ctx,entityId,row,{stage:'post'});}
  const accrual=micros(String(row.withholding))>0n&&(row.kind==='credit_note'||profile.withholdingRecognition==='accrual');
  const recognition=micros(String(row.withholding))>0n?(accrual?'accrual':'payment'):null;
  const {seriesId,officialNumber}=await optionalNumber(tx,ctx,entityId,row);

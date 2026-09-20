@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -164,7 +164,7 @@ Object.assign(handlers,{
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation','branch_rollup','institution_tax','feed_reconciliation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation','branch_rollup','institution_tax','feed_reconciliation','inventory_valuation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
  // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
@@ -296,6 +296,37 @@ Object.assign(handlers,{
  get_transmissions:async(tx,ctx,{entityId,query})=>list({items:await compliance.listTransmissions(tx,ctx,entityId,{state:query.state||null,documentId:isUuid(query.documentId)?query.documentId:null}),nextCursor:null}),
  get_compliance_readiness:async(tx,ctx,{entityId})=>({status:200,body:await compliance.readiness(tx,ctx,entityId,process.env)}),
  post_transmissions_id_reconcile:async(tx,ctx,{entityId,params,body})=>jobBody(ctx,await compliance.requestReconcile(tx,ctx,entityId,params.id,body)),
+ // P10 inventory costing and three-way matching
+ get_warehouses:async(tx,ctx,{entityId,query})=>list(await inventory.listWarehouses(tx,ctx,entityId,query)),
+ post_items:async(tx,ctx,{entityId,body})=>created(await inventory.createItem(tx,ctx,entityId,body)),
+ get_items:async(tx,ctx,{entityId,query})=>list(await inventory.listItems(tx,ctx,entityId,query)),
+ get_items_id:async(tx,ctx,{entityId,params})=>ok(await inventory.getItem(tx,ctx,entityId,params.id)),
+ patch_items_id:async(tx,ctx,{entityId,params,body,version})=>ok(await inventory.updateItem(tx,ctx,entityId,params.id,version,body)),
+ post_stock_movements:async(tx,ctx,{entityId,body})=>created(await inventory.createMovement(tx,ctx,entityId,body)),
+ get_stock_movements:async(tx,ctx,{entityId,query})=>list(await inventory.listMovements(tx,ctx,entityId,query)),
+ get_stock_movements_id:async(tx,ctx,{entityId,params})=>ok(await inventory.getMovement(tx,ctx,entityId,params.id)),
+ get_stock_movements_id_recost:async(tx,ctx,{entityId,params})=>({status:200,body:await inventory.recostPreview(tx,ctx,entityId,params.id)}),
+ patch_stock_movements_id:async(tx,ctx,{entityId,params,body,version})=>ok(await inventory.updateMovement(tx,ctx,entityId,params.id,version,body)),
+ post_stock_movements_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.submitMovement(tx,ctx,entityId,params.id,body,version)),
+ post_stock_movements_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.approveMovement(tx,ctx,entityId,params.id,body,version)),
+ post_stock_movements_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await inventory.postMovement(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ get_stock_card:async(tx,ctx,{entityId,query})=>({status:200,body:await inventory.stockCard(tx,ctx,entityId,{itemId:query.itemId,warehouseId:query.warehouseId||null})}),
+ get_inventory_valuation:async(tx,ctx,{entityId,query})=>({status:200,body:await inventory.inventoryValuation(tx,ctx,entityId,{bookId:query.bookId,asOf:query.asOf})}),
+ post_stock_counts:async(tx,ctx,{entityId,body})=>created(await inventory.createCount(tx,ctx,entityId,body)),
+ get_stock_counts:async(tx,ctx,{entityId,query})=>list(await inventory.listCounts(tx,ctx,entityId,query)),
+ get_stock_counts_id:async(tx,ctx,{entityId,params})=>ok(await inventory.getCount(tx,ctx,entityId,params.id)),
+ get_stock_counts_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await inventory.countLines(tx,ctx,entityId,params.id)}),
+ patch_stock_counts_id:async(tx,ctx,{entityId,params,body,version})=>ok(await inventory.updateCount(tx,ctx,entityId,params.id,version,body)),
+ post_stock_counts_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.approveCount(tx,ctx,entityId,params.id,body,version)),
+ post_stock_counts_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await inventory.postCount(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ post_landed_costs:async(tx,ctx,{entityId,body})=>created(await inventory.createLandedCost(tx,ctx,entityId,body)),
+ get_landed_costs:async(tx,ctx,{entityId,query})=>list(await inventory.listLandedCosts(tx,ctx,entityId,query)),
+ get_landed_costs_id:async(tx,ctx,{entityId,params})=>ok(await inventory.getLandedCost(tx,ctx,entityId,params.id)),
+ get_landed_costs_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await inventory.landedCostPreview(tx,ctx,entityId,params.id)}),
+ patch_landed_costs_id:async(tx,ctx,{entityId,params,body,version})=>ok(await inventory.updateLandedCost(tx,ctx,entityId,params.id,version,body)),
+ post_landed_costs_id_preview:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.previewLandedCost(tx,ctx,entityId,params.id,body,version)),
+ post_landed_costs_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await inventory.approveLandedCost(tx,ctx,entityId,params.id,body,version)),
+ post_landed_costs_id_post:async(tx,ctx,{entityId,params,body,version})=>{const r=await inventory.postLandedCost(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
