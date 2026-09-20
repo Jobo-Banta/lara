@@ -29,6 +29,8 @@ test.afterAll(async()=>{if(worker&&worker.exitCode===null&&!worker.signalCode){c
 
 async function as(browser,role){const context=await browser.newContext({baseURL:BASE});await context.addCookies([cookie(who(role))]);const page=await context.newPage();return {context,page};}
 const settled=async page=>{await expect(page.getByRole('status').filter({hasText:/Loading/})).toHaveCount(0);};
+// Selects the first option whose text matches; selectOption takes no regular expression.
+const pickOption=async(box,re)=>box.selectOption(await box.locator('option',{hasText:re}).first().getAttribute('value'));
 async function noSeriousViolations(page,label){const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();const serious=results.violations.filter(v=>['serious','critical'].includes(v.impact));expect(serious,label+' '+JSON.stringify(serious.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})))).toEqual([]);}
 const pdf=Buffer.from('%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n');
 
@@ -1392,14 +1394,196 @@ test('firm: capability activation, a firm registered in its own organization, a 
  await expect(partner.page.getByText('No client has mandated you yet.')).toBeVisible({timeout:15000});
  await partner.context.close();await controller.context.close();await preparer.context.close();
 });
+// The group accountant and reviewer roles have no reviewed template yet; a
+// wholly-owned subsidiary with its own books, an approved invoice from the
+// workspace entity to it and the frozen closes are seeded through the domain
+// so the journey stays on the group screens.
+async function seedGroup(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {organization,identity,ledger,parties,sales,evidence,inTransaction,FilesystemEvidenceStore}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",['group'])).rows[0].h;
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const accountant=await role('group_accountant',['group.create','group.edit','group.read','intercompany_pair.create','intercompany_pair.edit','intercompany_pair.read','intercompany_pair.accept','intercompany_pair.post','consolidation.create','consolidation.edit','consolidation.read','consolidation.preview']);
+  const reviewer=await role('group_reviewer',['group.read','group.activate','intercompany_pair.read','consolidation.read','consolidation.approve','consolidation.publish']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),accountant,await principal('security'),await principal('controller'),reviewer]);
+  const parent=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const ctrlId=await principal('controller'),prepId=await principal('preparer'),billId=await principal('billing'),clerkId=await principal('clerk');
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-group'});
+   let ctrl=await ctxOf(ctrlId);
+   const sub=(await organization.createEntity(tx,ctrl,{legalName:'CI Subsidiary',baseCurrency:'PHP',timezone:'Asia/Manila',fiscalYearStartMonth:1})).id;
+   ctrl=await ctxOf(ctrlId);const prep=await ctxOf(prepId),bill=await ctxOf(billId),clerk=await ctxOf(clerkId);
+   const branch=await organization.createBranch(tx,ctrl,sub,{code:'HQ',name:'Head office',address:'Cebu'});
+   for(const cap of ['workspace','general_ledger','sales','purchasing','treasury','compliance','fi_coexistence','multi_currency','inventory','assets'])await tx.query("insert into lara.capability_activations(tenant_id,entity_id,capability,status,profile_version,approved_by,activated_at,created_by) values($1,$2,$3,'active','p.1',$4,now(),$5)",[tenantId,sub,cap,prepId,ctrlId]);
+   const book=await ledger.createBook(tx,ctrl,sub,{code:'php-main',kind:'primary',functionalCurrency:'PHP',sourceOwner:'lara'});
+   const mk=(code,name,category,extra={})=>ledger.createAccount(tx,prep,sub,{bookId:book.id,code,name,category,controlType:'none',requiredDimensions:[],...extra});
+   const cash=await mk('1010','Cash','asset'),ar=await mk('1200','Receivables','asset',{controlType:'ar'}),inTax=await mk('1300','Input tax','asset',{controlType:'input_tax'}),adv=await mk('1400','Advances','asset'),ap=await mk('2100','Payables','liability',{controlType:'ap'}),outTax=await mk('2200','Output tax','liability',{controlType:'output_tax'}),whtPay=await mk('2300','Withholding payable','liability'),equity=await mk('3000','Share capital','equity');await mk('4000','Service revenue','income');await mk('5000','Professional fees','expense');await mk('5100','Intercompany services','expense');
+   await ledger.createPeriod(tx,ctrl,sub,{bookId:book.id,startsOn:'2026-10-01',endsOn:'2026-10-31'});
+   const settle=async(kind,payload)=>{const s=await organization.saveSettings(tx,ctrl,sub,kind,payload);await organization.approveSettings(tx,{...prep,permissions:new Set([...prep.permissions,'entity.activate'])},sub,s.id,{payloadHash:s.payloadHash});};
+   await settle('sales_profile',{arAccountId:ar.id,outputTaxAccountId:outTax.id,cashAccountId:cash.id,scale:2,dueDays:30});
+   await settle('purchasing_profile',{apAccountId:ap.id,inputTaxAccountId:inTax.id,cashAccountId:cash.id,withholdingPayableAccountId:whtPay.id,advanceAccountId:adv.id,withholdingRecognition:'accrual',scale:2,dueDays:30,requirePurchaseOrder:false,requireReceiptOfService:false,nonPoAccountIds:[],duplicateWindowDays:7,expensePolicyVersion:'expense-2026',supplierWithholding:{}});
+   await tx.query("insert into lara.document_series(tenant_id,entity_id,branch_id,kind,prefix,profile_version,created_by) values($1,$2,$3,'bill','BILL','numbering-2026',$4)",[tenantId,sub,branch.id,ctrlId]);
+   const j=await ledger.createJournal(tx,prep,sub,{bookId:book.id,accountingDate:'2026-10-01',documentDate:'2026-10-01',currency:'PHP',description:'Share capital',lines:[{accountId:cash.id,branchId:branch.id,debit:'50000.00',credit:'0',dimensions:{}},{accountId:equity.id,branchId:branch.id,debit:'0',credit:'50000.00',dimensions:{}}],evidenceIds:[]});
+   await ledger.submitJournal(tx,prep,sub,j.id,{});await ledger.approveJournal(tx,ctrl,sub,j.id,{decision:'approve',contentVersion:1});await ledger.postJournal(tx,ctrl,sub,j.id,{});
+   const env={FIELD_ENCRYPTION_KEY:process.env.FIELD_ENCRYPTION_KEY};
+   await parties.createParty(tx,clerk,sub,{legalName:'CI Workspace Entity',roles:['supplier'],identityStatus:'unknown',address:'Makati'},env);
+   const store=new FilesystemEvidenceStore('.local/e2e-workspace');const copy=Buffer.from('%PDF-1.4 intercompany invoice copy'+String.fromCharCode(10));
+   const reg=await evidence.registerUpload(tx,clerk,sub,{filename:'intercompany-invoice.pdf',mime:'application/pdf',byteCount:copy.length,sha256:createHash('sha256').update(copy).digest('hex'),classification:'internal'});
+   await evidence.completeUpload(tx,clerk,sub,reg.evidenceId,copy,store);await evidence.recordScan(tx,{tenantId,principalId:null},sub,reg.evidenceId,new evidence.FixtureScanner(),store);
+   const customer=await parties.createParty(tx,clerk,parent,{legalName:'CI Subsidiary',roles:['customer'],identityStatus:'unknown',address:'Cebu'},env);
+   const pb=(await tx.query("select b.id as book_id,(select id from lara.branches where tenant_id=b.tenant_id and entity_id=b.entity_id and code='HQ') as branch_id,(select id from lara.accounts a where a.tenant_id=b.tenant_id and a.entity_id=b.entity_id and a.code='4000') as revenue from lara.books b where b.tenant_id=$1 and b.entity_id=$2 and b.kind='primary'",[tenantId,parent])).rows[0];
+   const inv=await sales.createDocument(tx,bill,parent,{kind:'invoice',branchId:pb.branch_id,bookId:pb.book_id,partyId:customer.id,documentDate:'2026-10-12',accountingDate:'2026-10-12',currency:'PHP',ruleProfileVersion:'ph-2026',lines:[{description:'Management services',quantity:'1',unitPrice:'12000',discount:'0',priceBasis:'exclusive',accountId:pb.revenue,dimensions:{}}],evidenceIds:[]});
+   await sales.submitDocument(tx,bill,parent,inv.id,{});await sales.approveDocument(tx,prep,parent,inv.id,{decision:'approve',contentVersion:1});
+   return sub;
+  });
+  return (await db.query("select id from lara.entities where tenant_id=$1 and legal_name='CI Subsidiary'",[tenantId])).rows[0].id;
+ }finally{await db.end();}
+}
+// The subsidiary approves the accepted bill under its own maker-checker, and both closes are frozen with statements snapshots for the run.
+async function approveSubBillAndFreeze(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,ledger,purchasing,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const ctrlId=await principal('controller'),clerkId=await principal('clerk');
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-group'});
+   const ctrl=await ctxOf(ctrlId),clerk=await ctxOf(clerkId);
+   const sub=(await tx.query("select id from lara.entities where tenant_id=$1 and legal_name='CI Subsidiary'",[tenantId])).rows[0].id;
+   const bill=(await tx.query("select id,content_version from lara.documents where tenant_id=$1 and entity_id=$2 and kind='bill' and state='draft'",[tenantId,sub])).rows[0];
+   await purchasing.submitDocument(tx,clerk,sub,bill.id,{});await purchasing.approveDocument(tx,ctrl,sub,bill.id,{decision:'approve',contentVersion:Number(bill.content_version)});
+  });
+ }finally{await db.end();}
+}
+async function freezeCloses(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,ledger,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const ctrlId=(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who('controller'),tenantId])).rows[0].principal_id;
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctrl={...await identity.actorContext(tx,tenantId,ctrlId),traceId:'seed-group'};
+   for(const e of (await tx.query("select e.id,b.id as book_id,p.id as period_id,p.status from lara.entities e join lara.books b on b.tenant_id=e.tenant_id and b.entity_id=e.id and b.kind='primary' and b.status<>'archived' join lara.periods p on p.tenant_id=e.tenant_id and p.book_id=b.id and p.starts_on='2026-10-01' where e.tenant_id=$1",[tenantId])).rows){
+    if(e.status==='open')await ledger.softClosePeriod(tx,ctrl,e.id,e.period_id,{reason:'Month end for the group'});
+    await ledger.snapshotReport(tx,ctrl,e.id,{reportType:'statements',bookId:e.book_id,periodStart:'2026-10-01',periodEnd:'2026-10-31',asOf:new Date().toISOString(),format:'json'});
+   }
+  });
+ }finally{await db.end();}
+}
+test('group: capability activation, a group defined with a wholly-owned subsidiary and mapped from the member charts, the mapping approved and the group activated by the reviewer, a rate set, an intercompany pair raised, accepted in the subsidiary, an exception on the unapproved side, both sides posted, readiness, a run previewed into the worksheet, approved and published',async({browser})=>{
+ test.setTimeout(600000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Intercompany and consolidation'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Group reporting approved by the board':'Ownership, method and mapping basis reviewed');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ const subId=await seedGroup();
+ const inEntity=async(who,id)=>{await who.page.evaluate(e=>sessionStorage.setItem('lara-entity',e),id);};
+ // The group, its members and the mapping drafted from the member charts.
+ await preparer.page.goto('/group');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Group name'}).fill('CI Holdings group');
+ await preparer.page.getByRole('checkbox',{name:'CI Subsidiary'}).check();
+ await preparer.page.getByRole('button',{name:'Define group'}).click();
+ await expect(preparer.page.getByRole('cell',{name:'CI Subsidiary',exact:true})).toBeVisible({timeout:15000});
+ await preparer.page.getByRole('textbox',{name:'Mapping version'}).fill('2026.1');
+ await preparer.page.getByRole('button',{name:'Draft mapping from member charts'}).click();
+ const mappingRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'2026.1',exact:true})});
+ await expect(mappingRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:20000});
+ await expect(preparer.page.getByRole('button',{name:'Approve mapping'})).toHaveCount(0);
+ await controller.page.goto('/group');await settled(controller.page);
+ await mappingRow(controller.page).getByRole('button',{name:'Approve mapping'}).click();
+ await expect(mappingRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.getByRole('textbox',{name:'Reason'}).first().fill('Ownership and mapping reviewed');
+ await controller.page.getByRole('button',{name:'Activate group'}).click();
+ await expect(controller.page.getByText('state active',{exact:false})).toBeVisible({timeout:15000});
+ // A rate set from the source publication, approved by the reviewer.
+ await preparer.page.goto('/group');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Code',exact:true}).fill('2026-10');
+ await preparer.page.getByRole('textbox',{name:'Period end'}).fill('2026-10-31');
+ await preparer.page.getByRole('combobox',{name:'Source evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Save rate set'}).click();
+ const rateRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'2026-10',exact:true})});
+ await expect(rateRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.goto('/group');await settled(controller.page);
+ await rateRow(controller.page).getByRole('button',{name:'Approve rate set'}).click();
+ await expect(rateRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await noSeriousViolations(controller.page,'group /group');
+ // The pair: raised in the workspace entity against the approved invoice, accepted in the subsidiary.
+ await preparer.page.goto('/group/pairs');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Target entity'}).selectOption({label:'CI Subsidiary'});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Source invoice'}),/12000\.00 · approved/);
+ await preparer.page.getByRole('combobox',{name:/Supplier party in/}).selectOption({label:'CI Workspace Entity'});
+ await preparer.page.getByRole('combobox',{name:'Expense account in the target'}).selectOption({label:'5100 Intercompany services'});
+ await preparer.page.getByRole('combobox',{name:/Evidence in the target/}).selectOption({label:'intercompany-invoice.pdf'});
+ await preparer.page.getByRole('button',{name:'Raise pair'}).click();
+ const pairRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'ICP-000001',exact:true})});
+ await expect(pairRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await expect(preparer.page.getByRole('button',{name:'Accept into our books'})).toHaveCount(0);
+ await inEntity(preparer,subId);
+ await preparer.page.goto('/group/pairs');await settled(preparer.page);
+ await pairRow(preparer.page).getByRole('button',{name:'Accept into our books'}).click();
+ await expect(pairRow(preparer.page).getByRole('cell',{name:'accepted',exact:true})).toBeVisible({timeout:15000});
+ // The unapproved bill cannot post: the pair shows the exception; nothing is fabricated.
+ await pairRow(preparer.page).getByRole('button',{name:'Post our side'}).click();
+ await expect(pairRow(preparer.page).getByRole('cell',{name:'exception',exact:true})).toBeVisible({timeout:15000});
+ await expect(pairRow(preparer.page)).toContainText('STATE_CONFLICT');
+ await approveSubBillAndFreeze();
+ await preparer.page.goto('/group/pairs');await settled(preparer.page);
+ await pairRow(preparer.page).getByRole('button',{name:'Post our side'}).click();
+ await expect(pairRow(preparer.page).getByRole('cell',{name:'accepted',exact:true})).toBeVisible({timeout:15000});
+ await expect(pairRow(preparer.page)).toContainText('target');
+ await noSeriousViolations(preparer.page,'group /group/pairs');
+ await preparer.page.evaluate(()=>sessionStorage.removeItem('lara-entity'));
+ await preparer.page.goto('/group/pairs');await settled(preparer.page);
+ await pairRow(preparer.page).getByRole('button',{name:'Post our side'}).click();
+ await expect(pairRow(preparer.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible({timeout:15000});
+ // Frozen closes, readiness and the run.
+ await freezeCloses();
+ await preparer.page.goto('/group/consolidations');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Period end'}).fill('2026-10-31');
+ await expect(preparer.page.getByRole('row').filter({hasText:'CI Subsidiary'}).getByRole('cell',{name:'yes',exact:true})).toBeVisible({timeout:20000});
+ await preparer.page.getByRole('combobox',{name:'Rate set'}).selectOption({label:'2026-10'});
+ await preparer.page.getByRole('combobox',{name:'Mapping version'}).selectOption({label:'2026.1'});
+ await preparer.page.getByRole('button',{name:'Create run'}).click();
+ const runRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'v1',exact:true})});
+ await expect(runRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await runRow(preparer.page).getByRole('button',{name:'Preview'}).click();
+ await expect(runRow(preparer.page).getByRole('cell',{name:'previewed',exact:true})).toBeVisible({timeout:30000});
+ await runRow(preparer.page).getByRole('button',{name:'Worksheet'}).click();
+ await expect(preparer.page.getByRole('status').filter({hasText:'Translation reserve'})).toContainText('balanced',{timeout:15000});
+ await expect(preparer.page.getByRole('row').filter({hasText:'G1200 Receivables'})).toContainText('12,000.00');
+ await expect(preparer.page.getByRole('row').filter({hasText:'G5100 Intercompany services'})).toContainText('₱0.00');
+ await expect(preparer.page.getByRole('button',{name:'Approve',exact:true})).toHaveCount(0);
+ await noSeriousViolations(preparer.page,'group /group/consolidations');
+ await controller.page.goto('/group/consolidations');await settled(controller.page);
+ await runRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await runRow(controller.page).getByRole('button',{name:'Publish'}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'published',exact:true})).toBeVisible({timeout:15000});
+ await preparer.context.close();await controller.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/planning');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P16',{exact:false})).toBeVisible();
+ await clerk.page.goto('/local');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P17',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "031d61f99b83e7101487d70007bdb1bc551f12894981db05bef03ce3b34087a1",
+  "sha256": "66fd27bd3f0066eb8f15d44e59b9d3994783302543253922d5a109054c785bf3",
   "operations": [
     {
       "method": "POST",
@@ -2011,6 +2011,56 @@
       "method": "POST",
       "path": "/firm/bulk-reminders",
       "operationId": "post_firm_bulk_reminders"
+    },
+    {
+      "method": "POST",
+      "path": "/rate-sets",
+      "operationId": "post_rate_sets"
+    },
+    {
+      "method": "GET",
+      "path": "/rate-sets",
+      "operationId": "get_rate_sets"
+    },
+    {
+      "method": "GET",
+      "path": "/rate-sets/{id}",
+      "operationId": "get_rate_sets_id"
+    },
+    {
+      "method": "POST",
+      "path": "/rate-sets/{id}/approve",
+      "operationId": "post_rate_sets_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/groups/{id}/mappings",
+      "operationId": "post_groups_id_mappings"
+    },
+    {
+      "method": "GET",
+      "path": "/groups/{id}/mappings",
+      "operationId": "get_groups_id_mappings"
+    },
+    {
+      "method": "POST",
+      "path": "/group-mappings/{id}/approve",
+      "operationId": "post_group_mappings_id_approve"
+    },
+    {
+      "method": "GET",
+      "path": "/groups/{id}/readiness",
+      "operationId": "get_groups_id_readiness"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidations/{id}/eliminations",
+      "operationId": "post_consolidations_id_eliminations"
+    },
+    {
+      "method": "GET",
+      "path": "/consolidations/{id}/worksheet",
+      "operationId": "get_consolidations_id_worksheet"
     }
   ]
 }

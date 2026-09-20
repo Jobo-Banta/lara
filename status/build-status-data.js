@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-20T21:09:14+00:00",
+  "updated_at": "2026-09-20T23:57:20+00:00",
   "releases": [
     {
       "id": "P00",
@@ -4029,16 +4029,16 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [
         "P09",
         "P11"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas).",
+      "evidence": "Local: scripts/test-p15-schema.mjs passes (5 groups); migration applied on the dev database. CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P15-02",
@@ -4055,13 +4055,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run.",
+      "evidence": "Local: scripts/test-p15-domain.mjs passes (7 groups: P15-T01..T05). CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P15-03",
@@ -4078,13 +4078,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details.",
+      "evidence": "Local: scripts/test-p15-api.mjs passes (5 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P15-04",
@@ -4101,13 +4101,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 18/18 passed (21.9 min, includes the P15 group journey: group setup, mapping approval, pair accept/post, consolidation run preview/approve/publish). CI run pending.",
+      "updated_at": "2026-09-20T23:57:20+00:00"
     },
     {
       "id": "P15-05",
@@ -4124,13 +4124,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables.",
+      "evidence": "Local: p15 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P15-06",
@@ -4147,13 +4147,13 @@ window.LARA_BUILD_STATUS = {
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P16-01",
@@ -5521,48 +5521,6 @@ window.LARA_BUILD_STATUS = {
   ],
   "history": [
     {
-      "at": "2026-09-20T16:34:45+00:00",
-      "id": "P11-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T17:32:29+00:00",
-      "id": "P12-01",
-      "action": "in_review",
-      "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate."
-    },
-    {
-      "at": "2026-09-20T17:32:29+00:00",
-      "id": "P12-02",
-      "action": "in_review",
-      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider."
-    },
-    {
-      "at": "2026-09-20T17:32:29+00:00",
-      "id": "P12-03",
-      "action": "in_review",
-      "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only)."
-    },
-    {
-      "at": "2026-09-20T17:32:29+00:00",
-      "id": "P12-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T17:32:29+00:00",
-      "id": "P12-05",
-      "action": "in_review",
-      "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written."
-    },
-    {
-      "at": "2026-09-20T17:32:30+00:00",
-      "id": "P12-06",
-      "action": "blocked",
-      "note": "Release 0.12.0 drafted (docs/development/releases/0.12.0-draft.md). Blocked on the 0.7.0 (P07) release, privacy/security approval of a hosted provider's region, retention, training terms and subprocessors, the provider adapter itself (only the local fixture exists), a real held-out evaluation (200 local bills with handwriting and poor scans) accepted by Finance, Product's review-time measurement, contract operations for configuration and evaluation, requester and reviewer role templates, and the owner's tag, deployment and manifest run."
-    },
-    {
       "at": "2026-09-20T17:32:40+00:00",
       "id": "P11-01",
       "action": "done",
@@ -5699,6 +5657,48 @@ window.LARA_BUILD_STATUS = {
       "id": "P14-06",
       "action": "blocked",
       "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas)."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-02",
+      "action": "in_review",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-05",
+      "action": "in_review",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-06",
+      "action": "blocked",
+      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+    },
+    {
+      "at": "2026-09-20T23:57:20+00:00",
+      "id": "P15-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
     }
   ]
 };

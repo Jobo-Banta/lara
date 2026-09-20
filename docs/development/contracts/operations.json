@@ -3514,7 +3514,7 @@
     "phase": "P13",
     "method": "GET",
     "path": "/verify/{token}",
-    "permission": "none",
+    "permission": "evidence.read",
     "input": null,
     "response": "VerificationView"
   },
@@ -3523,7 +3523,7 @@
     "phase": "P13",
     "method": "POST",
     "path": "/portal-invites/{id}/accept",
-    "permission": "none",
+    "permission": "portal_invite.read",
     "input": "InviteAccept",
     "response": "CommandResult"
   },
@@ -3541,7 +3541,7 @@
     "phase": "P13",
     "method": "POST",
     "path": "/webhooks/{provider}",
-    "permission": "none",
+    "permission": "payment_link.edit",
     "input": "WebhookEvent",
     "response": "WebhookOutcome"
   },
@@ -3616,5 +3616,95 @@
     "permission": "firm_mandate.read",
     "input": "FirmBulkAction",
     "response": "FirmBulkOutcome"
+  },
+  {
+    "operationId": "post_rate_sets",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/rate-sets",
+    "permission": "consolidation.edit",
+    "input": "RateSetCreate",
+    "response": "RateSetResource"
+  },
+  {
+    "operationId": "get_rate_sets",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/rate-sets",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "RateSetResourceList"
+  },
+  {
+    "operationId": "get_rate_sets_id",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/rate-sets/{id}",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "RateSetResource"
+  },
+  {
+    "operationId": "post_rate_sets_id_approve",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/rate-sets/{id}/approve",
+    "permission": "consolidation.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_groups_id_mappings",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/groups/{id}/mappings",
+    "permission": "group.edit",
+    "input": "GroupMappingCreate",
+    "response": "GroupMappingResource"
+  },
+  {
+    "operationId": "get_groups_id_mappings",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups/{id}/mappings",
+    "permission": "group.read",
+    "input": null,
+    "response": "GroupMappingResourceList"
+  },
+  {
+    "operationId": "post_group_mappings_id_approve",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/group-mappings/{id}/approve",
+    "permission": "group.activate",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_groups_id_readiness",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups/{id}/readiness",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "GroupReadiness"
+  },
+  {
+    "operationId": "post_consolidations_id_eliminations",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations/{id}/eliminations",
+    "permission": "consolidation.edit",
+    "input": "EliminationCreate",
+    "response": "EliminationResource"
+  },
+  {
+    "operationId": "get_consolidations_id_worksheet",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/consolidations/{id}/worksheet",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "ConsolidationWorksheet"
   }
 ]

@@ -63,7 +63,7 @@ function DocumentEditor({entityId,bookId,kind,refs,orders,initial,onSave,label}:
 // duplicate needs a reason; the server refuses approval without one.
 function Approve({path,d,cmd,entityId,permission,can}:{path:string,d:Row,cmd:ReturnType<typeof useCommand>,entityId:string,permission:string,can:(p:string)=>boolean}){
  if(d.state!=='submitted'||!can(permission))return null;
- return <><Editor id={'approve'+d.id+d.version} label="Approve" onSave={async x=>!!await cmd.run('POST',path+'/'+d.id+'/approve',{entityId,ifMatch:d.version,body:{decision:'approve',contentVersion:d.contentVersion,...(x.reason?{reason:x.reason}:{})}})}>{input('Disposition (required for possible duplicates)','reason','','text',{maxLength:500})}</Editor>
+ return <><Editor id={'approve'+d.id+d.version} label="Approve" onSave={async x=>!!await cmd.run('POST',path+'/'+d.id+'/approve',{entityId,ifMatch:d.version,body:{decision:'approve',contentVersion:d.contentVersion,...(x.reason?{reason:x.reason}:{})}})}>{input('Disposition or override reason (required for possible duplicates and beyond a blocking budget)','reason','','text',{maxLength:500})}</Editor>
   <Editor id={'reject'+d.id+d.version} label="Request changes" onSave={async x=>!!await cmd.run('POST',path+'/'+d.id+'/approve',{entityId,ifMatch:d.version,body:{decision:'reject',contentVersion:d.contentVersion,reason:x.reason}})}>{input('Reason','reason','','text',{required:true})}</Editor></>;
 }
 

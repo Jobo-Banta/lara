@@ -94,7 +94,8 @@ try{
  r=await call(PARTNER,'GET','/firm/clients',{headers:{'x-tenant-id':firmTenant}});const clients=await must(r,200);contract('get_firm_clients',clients);assert.equal(clients.items.length,1);assert.equal(clients.items[0].entityName,'Alpha Trading');
  r=await call(PARTNER,'GET','/firm/rollup',{headers:{'x-tenant-id':firmTenant}});const roll=await must(r,200);contract('get_firm_rollup',roll);assert.equal(roll.items[0].counts.overdueObligations,1);assert.deepEqual(roll.items[0].counts.openItems,[]);
  r=await call(PARTNER,'GET','/firm/snapshots',{headers:{'x-tenant-id':firmTenant}});const snaps=await must(r,200);contract('get_firm_snapshots',snaps);assert.equal(snaps.items.length,1);
- r=await call(PARTNER,'GET','/tasks',{headers:eh});assert.equal(r.status,428,'two tenants: the client context header is required');
+ r=await call(PARTNER,'GET','/tasks',{headers:eh});assert.equal(r.status,404,'without the client context the call lands in the firm tenant, where the client entity does not exist');
+ r=await call(PARTNER,'GET','/me');assert.equal((await must(r,200)).tenantId,firmTenant,'the home tenant is the firm');
  r=await call(PARTNER,'GET','/tasks',{headers:{...eh,'x-tenant-id':clientTenant}});const tasks=await must(r,200);assert.equal(tasks.items.length,0);
  r=await call(PARTNER,'GET','/me',{headers:{'x-tenant-id':clientTenant}});const me=await must(r,200);assert.deepEqual(me.entityIds,[entityId]);assert.ok(me.permissions.includes('task.read')&&!me.permissions.includes('journal.post'));
  r=await call(PARTNER,'GET','/invoices',{headers:{...eh,'x-tenant-id':clientTenant}});assert.equal(r.status,403,'outside the mandate');
@@ -110,7 +111,7 @@ try{
  r=await call(STAFF,'GET','/open-items',{headers:{...eh,'x-tenant-id':clientTenant}});assert.equal(r.status,403,'the subset holds no open item read');
  r=await call(STAFF,'POST','/firm-assignments',{body:{mandateId:mandate.id,principalId:firmPrincipals.staff,entityIds:[entityId],permissionSubset:['task.read']},headers:{...key(),...eh,'x-tenant-id':clientTenant}});assert.equal(r.status,403,'staff assign nobody');
  r=await call(PARTNER,'POST','/firm/bulk-reminders',{body:{clients:[{tenantId:clientTenant,entityId}],templateVersion:'reminder-2026',channel:'email'},headers:{...key(),'x-tenant-id':firmTenant}});const bulk=await must(r,200);contract('post_firm_bulk_reminders',bulk);assert.ok(['nothing_due','failed'].includes(bulk.outcomes[0].outcome));
- pass('the partner lists the client scope and the labelled roll-up, must name the client context when two tenants apply, acts in the client as the delegated identity within the mandate only, assigns the staff member a subset (never wider), and the staff member sees that subset alone; bulk reminders answer per client');
+ pass('the partner lists the client scope and the labelled roll-up, lands in the firm tenant without the client context, acts in the client as the delegated identity within the mandate only, assigns the staff member a subset (never wider), and the staff member sees that subset alone; bulk reminders answer per client');
  // Revocation and gates.
  r=await call(PARTNER,'POST','/firm-mandates/'+mandate.id+'/revoke',{body:{reason:'x'},headers:{...key(),...eh,'x-tenant-id':clientTenant,...im(approved.version)}});assert.equal(r.status,403,'a delegate revokes nothing');
  r=await call(CTRL,'POST','/firm-mandates/'+mandate.id+'/revoke',{body:{reason:'Engagement ended'},headers:{...key(),...eh,...im(approved.version)}});const revoked=await must(r,200);contract('post_firm_mandates_id_revoke',revoked);assert.equal(revoked.state,'revoked');

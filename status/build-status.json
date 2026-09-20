@@ -674,46 +674,46 @@
       "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P15-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas).",
+      "evidence": "Local: scripts/test-p15-schema.mjs passes (5 groups); migration applied on the dev database. CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P15-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run.",
+      "evidence": "Local: scripts/test-p15-domain.mjs passes (7 groups: P15-T01..T05). CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P15-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details.",
+      "evidence": "Local: scripts/test-p15-api.mjs passes (5 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P15-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 18/18 passed (21.9 min, includes the P15 group journey: group setup, mapping approval, pair accept/post, consolidation run preview/approve/publish). CI run pending.",
+      "updated_at": "2026-09-20T23:57:20+00:00"
     },
     "P15-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables.",
+      "evidence": "Local: p15 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P15-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P16-01": {
       "status": "not_started",
@@ -1243,48 +1243,6 @@
     }
   },
   "history": [
-    {
-      "at": "2026-09-18T09:48:17+00:00",
-      "id": "P00-05",
-      "action": "in_progress",
-      "note": "Fixed Linux Python execution, added foundation/asset/spec checks and fail-closed release checker. Remote main, enforced checks and scan gates still need implementation."
-    },
-    {
-      "at": "2026-09-18T09:48:17+00:00",
-      "id": "P00-06",
-      "action": "in_progress",
-      "note": "Production mode rejects fixtures, non-demo API routes denied, seed requires explicit demo confirmation. Dedicated target and per-session entitlement enforcement remain."
-    },
-    {
-      "at": "2026-09-18T09:48:18+00:00",
-      "id": "P00-07",
-      "action": "in_progress",
-      "note": "Readiness now returns 200 with schema verification after migration 0005; verified database TLS and request IDs added. Authenticated version response and telemetry/alerts remain."
-    },
-    {
-      "at": "2026-09-18T09:48:18+00:00",
-      "id": "P00-08",
-      "action": "in_progress",
-      "note": "Reopened premature done status: previous metadata snapshot with zero fixtures is insufficient. Complete restore, signed tag and artifact delivery remain."
-    },
-    {
-      "at": "2026-09-18T09:54:43+00:00",
-      "id": "P00-03",
-      "action": "in_progress",
-      "note": "Migration 0006 applied; clean-schema upgrade, checksum rejection and runtime DDL negatives pass. Dedicated migrator provisioning and clean-database CI remain."
-    },
-    {
-      "at": "2026-09-18T09:54:44+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Signed BFF identity and forced subject-scoped RLS implemented. Seven tests and real Supabase cross-run read/write/insert/RLS-disable negatives pass. Real OIDC login/consent callback evidence remains."
-    },
-    {
-      "at": "2026-09-18T09:54:44+00:00",
-      "id": "P00-06",
-      "action": "in_progress",
-      "note": "Unassigned subjects denied; runs require operator assignment. Nine demo tables enforce RLS. Dedicated target checks and complete session reset remain."
-    },
     {
       "at": "2026-09-18T09:54:45+00:00",
       "id": "P00-07",
@@ -2442,7 +2400,49 @@
       "id": "P14-06",
       "action": "blocked",
       "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas)."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-02",
+      "action": "in_review",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-05",
+      "action": "in_review",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables."
+    },
+    {
+      "at": "2026-09-20T22:26:50+00:00",
+      "id": "P15-06",
+      "action": "blocked",
+      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+    },
+    {
+      "at": "2026-09-20T23:57:20+00:00",
+      "id": "P15-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
     }
   ],
-  "updated_at": "2026-09-20T21:09:14+00:00"
+  "updated_at": "2026-09-20T23:57:20+00:00"
 }

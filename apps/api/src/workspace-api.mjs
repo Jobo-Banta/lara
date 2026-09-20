@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -33,10 +33,14 @@ export async function resolveActor(db,identity_,{issuer,tenantHeader,traceId}){
  const rows=(await db.query('select tenant_id,principal_id from lara.principal_directory where oidc_issuer=$1 and oidc_subject=$2 order by tenant_id',[issuer,identity_.sub])).rows;
  if(!rows.length)fail('FORBIDDEN','No workspace membership for this account.');
  let match=rows[0];
- if(rows.length>1||tenantHeader){
-  if(!tenantHeader)fail('PRECONDITION_REQUIRED','X-Tenant-Id is required when the account belongs to several tenants.');
+ if(tenantHeader){
   match=rows.find(r=>r.tenant_id===tenantHeader);
   if(!match)fail('FORBIDDEN','No workspace membership in that tenant.');
+ }else if(rows.length>1){
+  // Without a header the home tenant is the one where the subject holds a membership (P14): a delegated identity in a client tenant is not a home; two homes need the header.
+  const homes=await inTransaction(db,{tenantId:rows[0].tenant_id,principalId:null},async tx=>{const out=[];for(const r of rows){await tx.query("select set_config('lara.tenant_id',$1,true)",[r.tenant_id]);if((await tx.query("select 1 from lara.memberships where tenant_id=$1 and principal_id=$2 and status='active'",[r.tenant_id,r.principal_id])).rowCount)out.push(r);}return out;});
+  if(homes.length!==1)fail('PRECONDITION_REQUIRED','X-Tenant-Id is required when the account belongs to several tenants.');
+  match=homes[0];
  }
  return inTransaction(db,{tenantId:match.tenant_id,principalId:match.principal_id},tx=>identity.actorContext(tx,match.tenant_id,match.principal_id,{traceId}));
 }
@@ -397,6 +401,35 @@ Object.assign(handlers,{
  get_firm_assignments:async(tx,ctx,{entityId,query})=>list(await firm.listAssignments(tx,ctx,entityId,query)),
  get_firm_assignments_id:async(tx,ctx,{entityId,params})=>ok(await firm.getAssignment(tx,ctx,entityId,params.id)),
  patch_firm_assignments_id:async(tx,ctx,{entityId,params,body,version})=>ok(await firm.updateAssignment(tx,ctx,entityId,params.id,version,body)),
+ // P15 intercompany and consolidation: the group and its reporting book in the parent entity; pairs accepted and posted under each entity's own authority; runs from approved member snapshots.
+ post_groups:async(tx,ctx,{entityId,body})=>created(await consolidation.createGroup(tx,ctx,entityId,body)),
+ get_groups:async(tx,ctx,{entityId,query})=>list(await consolidation.listGroups(tx,ctx,entityId,query)),
+ get_groups_id:async(tx,ctx,{entityId,params})=>ok(await consolidation.getGroup(tx,ctx,entityId,params.id)),
+ patch_groups_id:async(tx,ctx,{entityId,params,body,version})=>ok(await consolidation.updateGroup(tx,ctx,entityId,params.id,version,body)),
+ post_groups_id_activate:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.activateGroup(tx,ctx,entityId,params.id,body,version)),
+ post_groups_id_mappings:async(tx,ctx,{entityId,params,body})=>created(await consolidation.createMapping(tx,ctx,entityId,params.id,body)),
+ get_groups_id_mappings:async(tx,ctx,{entityId,params})=>list(await consolidation.listMappings(tx,ctx,entityId,params.id)),
+ post_group_mappings_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.approveMapping(tx,ctx,entityId,params.id,body,version)),
+ post_rate_sets:async(tx,ctx,{entityId,body})=>created(await consolidation.createRateSet(tx,ctx,entityId,body)),
+ get_rate_sets:async(tx,ctx,{entityId,query})=>list(await consolidation.listRateSets(tx,ctx,entityId,query)),
+ get_rate_sets_id:async(tx,ctx,{entityId,params})=>ok(await consolidation.getRateSet(tx,ctx,entityId,params.id)),
+ post_rate_sets_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.approveRateSet(tx,ctx,entityId,params.id,body,version)),
+ post_intercompany_pairs:async(tx,ctx,{entityId,body})=>created(await consolidation.createPair(tx,ctx,entityId,body)),
+ get_intercompany_pairs:async(tx,ctx,{entityId,query})=>list(query.detail==='1'?await consolidation.listPairDetails(tx,ctx,entityId,query):await consolidation.listPairs(tx,ctx,entityId,query)),
+ get_intercompany_pairs_id:async(tx,ctx,{entityId,params})=>ok(await consolidation.getPair(tx,ctx,entityId,params.id)),
+ patch_intercompany_pairs_id:async(tx,ctx,{entityId,params,body,version})=>ok(await consolidation.updatePair(tx,ctx,entityId,params.id,version,body)),
+ post_intercompany_pairs_id_accept:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.acceptPair(tx,ctx,entityId,params.id,body,version)),
+ post_intercompany_pairs_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await consolidation.postPair(tx,ctx,entityId,params.id,body,version)),
+ post_consolidations:async(tx,ctx,{entityId,body})=>created(await consolidation.createRun(tx,ctx,entityId,body)),
+ get_consolidations:async(tx,ctx,{entityId,query})=>list(query.detail==='1'?await consolidation.listRunDetails(tx,ctx,entityId,query):await consolidation.listRuns(tx,ctx,entityId,query)),
+ get_consolidations_id:async(tx,ctx,{entityId,params})=>ok(await consolidation.getRun(tx,ctx,entityId,params.id)),
+ patch_consolidations_id:async(tx,ctx,{entityId,params,body,version})=>ok(await consolidation.updateRun(tx,ctx,entityId,params.id,version,body)),
+ post_consolidations_id_preview:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.previewRun(tx,ctx,entityId,params.id,body,version)),
+ post_consolidations_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.approveRun(tx,ctx,entityId,params.id,body,version)),
+ post_consolidations_id_publish:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await consolidation.publishRun(tx,ctx,entityId,params.id,body,version)),
+ get_groups_id_readiness:async(tx,ctx,{entityId,params,query})=>({status:200,body:await consolidation.readiness(tx,ctx,entityId,params.id,{periodEnd:query.periodEnd})}),
+ post_consolidations_id_eliminations:async(tx,ctx,{entityId,params,body})=>({status:201,body:await consolidation.addElimination(tx,ctx,entityId,params.id,body)}),
+ get_consolidations_id_worksheet:async(tx,ctx,{entityId,params})=>({status:200,body:await consolidation.worksheet(tx,ctx,entityId,params.id)}),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
