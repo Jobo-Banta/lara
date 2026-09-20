@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:12:10+00:00",
+  "updated_at": "2026-09-20T13:13:18+00:00",
   "releases": [
     {
       "id": "P00",
@@ -2849,15 +2849,15 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [
         "P08"
       ],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally.",
-      "evidence": "Local: node scripts/test-p09-schema.mjs \u2192 P09-01 schema acceptance passed (5 groups); contracts regenerated and validate_specifications pass. CI run pending.",
-      "updated_at": "2026-09-20T11:17:04+00:00"
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:17+00:00"
     },
     {
       "id": "P09-02",
@@ -2875,13 +2875,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/fx.mjs with hooks in ledger, sales and purchasing: FX profile, rate review with the inverted-pair guard, documents posting both amounts at the document-date rate with open-item layers, settlements consuming layers proportionally with the final allocation absorbing rounding and realized FX as a functional adjustment (AC-10 exact), reversals at the original rate, revaluation of classified monetary accounts posting once per rate set with linked later sets, partitions with access grants and the combined management view; scripts/test-p09-domain.mjs covers P09-T01..T05 (7 groups).",
-      "evidence": "Local: node scripts/test-p09-domain.mjs \u2192 P09-02 domain acceptance passed (7 groups). CI run pending.",
-      "updated_at": "2026-09-20T11:17:04+00:00"
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:17+00:00"
     },
     {
       "id": "P09-03",
@@ -2899,13 +2899,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "All 17 P09 operations plus the four reads served by apps/api/src/workspace-api.mjs (books create/edit/activate/combined, rates, revaluation preview/approve/post with If-Match); scripts/test-p09-api.mjs (5 groups) runs the API as a process with AC-10 over HTTP.",
-      "evidence": "Local: node scripts/test-p09-api.mjs \u2192 P09-03 API acceptance passed (5 groups). CI run pending.",
-      "updated_at": "2026-09-20T11:17:04+00:00"
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-04",
@@ -2923,13 +2923,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; node scripts/test-demo-browser.mjs tests/browser/workspace.spec.mjs \u2192 12 passed (14.9m) including the multi-currency journey with WCAG checks. CI run pending.",
-      "updated_at": "2026-09-20T12:12:10+00:00"
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-05",
@@ -2947,13 +2947,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "in_review",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written.",
-      "evidence": "Local: p09 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T11:17:04+00:00"
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-06",
@@ -5521,36 +5521,6 @@
   ],
   "history": [
     {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-02",
-      "action": "in_review",
-      "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups)."
-    },
-    {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-03",
-      "action": "in_review",
-      "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes."
-    },
-    {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-05",
-      "action": "in_review",
-      "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written."
-    },
-    {
-      "at": "2026-09-20T07:07:06+00:00",
-      "id": "P07-06",
-      "action": "blocked",
-      "note": "Release 0.7.0 drafted (docs/development/releases/0.7.0-draft.md). Blocked on the 0.6.0 (P06) release, the tax lead's approval of official form artifacts and golden cases per enabled form, a certified provider adapter with sandbox certification, key and credential custody, contract operations for the compliance profile, regulatory profiles, artifacts and registration decisions, and the owner's tag, deployment and manifest run."
-    },
-    {
       "at": "2026-09-20T07:30:53+00:00",
       "id": "P07-04",
       "action": "in_review",
@@ -5699,6 +5669,36 @@
       "id": "P09-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T13:13:17+00:00",
+      "id": "P09-01",
+      "action": "done",
+      "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally."
+    },
+    {
+      "at": "2026-09-20T13:13:17+00:00",
+      "id": "P09-02",
+      "action": "done",
+      "note": "packages/domain/src/fx.mjs with hooks in ledger, sales and purchasing: FX profile, rate review with the inverted-pair guard, documents posting both amounts at the document-date rate with open-item layers, settlements consuming layers proportionally with the final allocation absorbing rounding and realized FX as a functional adjustment (AC-10 exact), reversals at the original rate, revaluation of classified monetary accounts posting once per rate set with linked later sets, partitions with access grants and the combined management view; scripts/test-p09-domain.mjs covers P09-T01..T05 (7 groups)."
+    },
+    {
+      "at": "2026-09-20T13:13:18+00:00",
+      "id": "P09-03",
+      "action": "done",
+      "note": "All 17 P09 operations plus the four reads served by apps/api/src/workspace-api.mjs (books create/edit/activate/combined, rates, revaluation preview/approve/post with If-Match); scripts/test-p09-api.mjs (5 groups) runs the API as a process with AC-10 over HTTP."
+    },
+    {
+      "at": "2026-09-20T13:13:18+00:00",
+      "id": "P09-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-20T13:13:18+00:00",
+      "id": "P09-05",
+      "action": "done",
+      "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written."
     }
   ]
 }
