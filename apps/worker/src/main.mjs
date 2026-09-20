@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {loadLocalEnv} from '../../../scripts/local-env.mjs';
 import {connectionOptions} from '../../../packages/database/src/connection.mjs';
-import {DomainError,inTransaction,audit,identity,evidence,ledger,sales} from '../../../packages/domain/src/index.mjs';
+import {DomainError,inTransaction,audit,identity,evidence,ledger,sales,treasury} from '../../../packages/domain/src/index.mjs';
 import {evidenceStoreFromEnv,scannerFromEnv} from '../../../packages/domain/src/adapters.mjs';
 loadLocalEnv();
 const pg=createRequire(new URL('../../api/package.json',import.meta.url))('pg');
@@ -35,7 +35,7 @@ export const handlers={
  'report.generate':async(tx,ctx,job)=>{
   const current=await identity.assertJobStillAuthorized(tx,job,'report.generate');
   const actor={...current,traceId:ctx.traceId};
-  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'})}});
+  const snap=await ledger.snapshotReport(tx,actor,job.entity_id,job.payload_ref,{builders:{aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd}),ap_aging:(t,c,e,input)=>sales.agingReport(t,c,e,{asOf:input.periodEnd,side:'AP'}),bank_reconciliation:(t,c,e,input)=>treasury.reconciliationReport(t,c,e,{bankAccountId:input.dimensions?.bankAccountId,asOf:input.periodEnd})}});
   const format=job.payload_ref.format||'json';
   let content,mime;
   if(format==='csv'){const rows=snap.payload.lines||snap.payload.parties.flatMap(p=>p.items.map(i=>({party:p.legalName,...i})));const cols=snap.payload.lines?['code','name','category','debit','credit','balance']:['party','officialNumber','dueDate','daysPastDue','outstanding'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';content=Buffer.from([cols.join(','),...rows.map(l=>cols.map(c=>esc(l[c])).join(','))].join('\n')+'\n');mime='text/csv';}
@@ -59,6 +59,11 @@ export const handlers={
   await tx.query("update lara.documents set delivery_state='sent' where tenant_id=$1 and id=$2",[job.tenant_id,delivery.document_id]);
   await audit(tx,{...ctx,principalId:job.requested_by},{entityId:job.entity_id,action:'invoice.delivered',resourceType:'delivery',resourceId:delivery.id,resourceVersion:Number(delivery.version)+1,afterRef:reference});
   return {resourceType:'delivery',resourceId:delivery.id,state:'sent',reference};},
+ // Match proposals after a statement commit: deterministic candidates become proposed matches; ambiguous lines stay unmatched.
+ 'bank.propose_matches':async(tx,ctx,job)=>{
+  const current=await identity.assertJobStillAuthorized(tx,job,'import.commit');
+  const r=await treasury.proposeMatches(tx,{...current,traceId:ctx.traceId},job.entity_id,{bankAccountId:job.payload_ref.bankAccountId,batchId:job.payload_ref.batchId});
+  return {resourceType:'bank_account',resourceId:job.payload_ref.bankAccountId,state:'proposed',proposed:r.proposed.length,ambiguous:r.ambiguous.length};},
  'export.evidence_manifest':(tx,ctx,job)=>exportRows(tx,ctx,job,'evidence_manifest','select id,filename,mime,byte_count,sha256,status,classification,created_at from lara.evidence where tenant_id=$1 and entity_id=$2 and created_at<=$3 order by created_at,id'),
 };
 async function exportRows(tx,ctx,job,kind,sql){

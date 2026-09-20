@@ -630,19 +630,24 @@ export async function authorizePayment(tx,ctx,entityId,id,input,expectedVersion)
 // Release records that money was sent outside the system: the authority must
 // still hold (same proposal content, same approved beneficiary), the channel
 // is manual in this release, and evidence is mandatory. Nothing posts yet.
-export async function releasePayment(tx,ctx,entityId,id,input,expectedVersion){
+export async function releasePayment(tx,ctx,entityId,id,input,expectedVersion,{bankFile=null,store=null}={}){
  requirePermission(ctx,'payment.release');requireEntity(ctx,entityId);assertInput('PaymentRelease',input);
  const row=await loadPayment(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(row.state!=='authorized')fail('STATE_CONFLICT','Payment is '+row.state+'; only authorized payments are released.');
- if(input.channel!=='manual')fail('FEATURE_NOT_ENABLED','Bank-file and API releases arrive with treasury (P06); record the manual release.');
+ if(input.channel==='qualified_api')fail('FEATURE_NOT_ENABLED','Direct bank API release is disabled unless separately contracted and tested; record a manual or bank-file release.');
+ if(input.channel==='bank_file'&&(!bankFile||!store))fail('FEATURE_NOT_ENABLED','Bank-file releases arrive with treasury (P06); record the manual release.');
  const settlement=await loadSettlement(tx,ctx,entityId,row.settlement_id);
- const beneficiary=(await tx.query('select status from lara.beneficiary_versions where tenant_id=$1 and id=$2',[ctx.tenantId,row.beneficiary_version_id])).rows[0];
+ const beneficiary=(await tx.query('select * from lara.beneficiary_versions where tenant_id=$1 and id=$2',[ctx.tenantId,row.beneficiary_version_id])).rows[0];
  // Changes to the proposal or the beneficiary already withdrew the authority; this recheck refuses a release that raced them.
  if(Number(settlement.content_version)!==Number(row.authorized_settlement_version)||settlement.state!=='approved'||beneficiary.status!=='approved')fail('STATE_CONFLICT','The authority no longer holds: the proposal or the beneficiary changed after authorization; submit and authorize the payment again.');
  await linkEvidence(tx,ctx,entityId,input.evidenceIds,'payment',id,Number(row.version)+1);
- const updated=(await tx.query("update lara.payment_orders set state='released',release_channel=$3,release_reference=$4,release_evidence_ids=$5,released_by=$6,released_at=now() where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,input.channel,input.externalReference.trim(),JSON.stringify([...input.evidenceIds].sort()),ctx.principalId])).rows[0];
- await audit(tx,ctx,{entityId,action:'payment.release',resourceType:'payment',resourceId:id,resourceVersion:Number(updated.version),afterRef:input.externalReference.trim()});
- return presult(updated);
+ // A bank-file release generates one locked, hashed file for this payment and stores it as restricted evidence; the file is the release reference.
+ const file=input.channel==='bank_file'?await bankFile(tx,ctx,entityId,{order:row,settlement,beneficiary,store}):null;
+ const reference=file?file.reference:input.externalReference.trim();
+ const evidenceIds=[...new Set([...input.evidenceIds,...(file?[file.evidenceId]:[])])].sort();
+ const updated=(await tx.query("update lara.payment_orders set state='released',release_channel=$3,release_reference=$4,release_evidence_ids=$5,released_by=$6,released_at=now() where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,input.channel,reference,JSON.stringify(evidenceIds),ctx.principalId])).rows[0];
+ await audit(tx,ctx,{entityId,action:'payment.release',resourceType:'payment',resourceId:id,resourceVersion:Number(updated.version),afterRef:reference,reason:file?'bank file run '+file.runId:null});
+ return presult(updated,{...(file?{bankFileRunId:file.runId}:{})});
 }
 // Settlement is the financial effect: Dr payable (or employee advance),
 // Cr cash and withholding payable, allocations applied, payment-time

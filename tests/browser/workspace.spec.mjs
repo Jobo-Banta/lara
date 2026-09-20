@@ -492,6 +492,127 @@ test('purchasing: capability activation, supplier and control accounts, purchase
  await controller.context.close();await preparer.context.close();await clerk.context.close();await treasury.context.close();
 });
 
+// The treasury profile and the transfer/handover approver permissions have no
+// reviewed operations or seeded template yet; the journey seeds them through
+// the runtime role as an operator would. Everything else goes through the screens.
+async function seedTreasury(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const acct=async code=>(await db.query('select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3',[tenantId,entity,code])).rows[0].id;
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const payload={cashAccountId:await acct('1010'),cashVarianceAccountId:await acct('5950'),fileFormatVersion:'lara-csv-1',matchWindowDays:3};
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",[JSON.stringify(payload)])).rows[0].h;
+  await db.query("insert into lara.settings_versions(tenant_id,entity_id,kind,version_number,payload,payload_hash,status,approved_by,effective_at,created_by) values($1,$2,'treasury_profile',1,$3,$4,'approved',$5,now(),$6)",[tenantId,entity,JSON.stringify(payload),hash,await principal('preparer'),await principal('controller')]);
+  const role=(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,'treasury_approver','Treasury approver','[\"transfer.approve\",\"transfer.post\",\"transfer.read\",\"cash_session.handover\",\"cash_session.read\"]','approved',$2,$3) returning id",[tenantId,hash,await principal('security')])).rows[0].id;
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4)',[tenantId,await principal('controller'),role,await principal('security')]);
+ }finally{await db.end();}
+}
+test('treasury: capability activation, reviewed bank accounts, statement import through the import pipeline, proposed matches confirmed on the reconciliation workbench, transfer, check custody to clearing, cash session with variance and independent handover',async({browser})=>{
+ test.setTimeout(480000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),treasury=await as(browser,'treasury');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Treasury cash and bank reconciliation'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Treasury go-live requested':'Reviewed treasury activation evidence');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await preparer.page.goto('/ledger/accounts');await settled(preparer.page);
+ const acct=async(code,name,category,control)=>{const f=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Create account'})});await f.getByLabel('Code',{exact:true}).fill(code);await f.getByLabel('Name',{exact:true}).fill(name);await f.getByRole('combobox',{name:'Category'}).selectOption(category);await f.getByRole('combobox',{name:'Control type'}).selectOption(control);await f.getByRole('button',{name:'Create account'}).click();await expect(preparer.page.getByRole('cell',{name:code,exact:true})).toBeVisible();};
+ await acct('1020','Bank BDO','asset','none');await acct('1030','Bank BPI','asset','none');await acct('5950','Cash over and short','expense','none');
+ await seedTreasury();
+ // Bank accounts entered by treasury, approved by the controller.
+ await treasury.page.goto('/bank/accounts');await settled(treasury.page);
+ await expect(treasury.page.getByText('No bank accounts yet.')).toBeVisible();
+ const bank=async(code,number,ledger)=>{await treasury.page.getByLabel('Bank code').fill(code);await treasury.page.getByLabel('Account number').fill(number);await treasury.page.getByRole('combobox',{name:'Ledger account'}).selectOption({label:ledger});await treasury.page.getByRole('combobox',{name:'Bank confirmation'}).selectOption({label:'registration.pdf'});await treasury.page.getByRole('button',{name:'Save draft'}).click();await expect(treasury.page.getByRole('row').filter({hasText:code}).getByRole('cell',{name:'draft',exact:true})).toBeVisible();};
+ await bank('BDO','001234567890','1020 Bank BDO');await bank('BPI','9988776655','1030 Bank BPI');
+ await expect(treasury.page.getByRole('button',{name:'Approve'})).toHaveCount(0);
+ await controller.page.goto('/bank/accounts');await settled(controller.page);
+ for(const code of ['BDO','BPI']){await controller.page.getByRole('row').filter({hasText:code}).getByRole('button',{name:'Approve'}).click();await expect(controller.page.getByRole('row').filter({hasText:code}).getByRole('cell',{name:'approved',exact:true})).toBeVisible();}
+ const bankAccounts=(await (await treasury.page.request.get('/api/v1/bank-accounts',{headers:{'x-entity-id':(await (await treasury.page.request.get('/api/v1/me')).json()).entityIds[0]}})).json()).items;
+ const bdoId=bankAccounts.find(b=>b.bankCode==='BDO').id;
+ // Statement upload as CSV evidence, then the import pipeline with the bank account as the source.
+ const statement=Buffer.from(['source_line_key,booked_date,value_date,signed_amount,currency,reference,description','opening_balance,2026-10-01,,0.00,PHP,,','closing_balance,2026-10-10,,0.00,PHP,,','L1,2026-10-06,2026-10-06,11200.00,PHP,,Northwind transfer','L2,2026-10-09,2026-10-09,-11200.00,PHP,,Supplies Inc payment'].join('\n')+'\n');
+ await treasury.page.goto('/evidence');await settled(treasury.page);
+ await treasury.page.locator('input[type="file"]').setInputFiles({name:'statement-october.csv',mimeType:'text/csv',buffer:statement});
+ await treasury.page.getByRole('button',{name:'Upload evidence'}).click();
+ await expect(treasury.page.getByRole('status').filter({hasText:'Queued for scanning'})).toBeVisible({timeout:30000});
+ await treasury.page.getByRole('link',{name:'statement-october.csv'}).click();
+ await expect(treasury.page.getByRole('status')).toContainText('Available',{timeout:60000});
+ await preparer.page.goto('/ledger/imports');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Kind'}).selectOption('bank_statement');
+ await preparer.page.getByRole('combobox',{name:'CSV evidence'}).selectOption({label:'statement-october.csv'});
+ await preparer.page.getByLabel('Mapping version').fill('lara-csv-1');
+ await preparer.page.getByLabel('Source system or bank account id').fill(bdoId);
+ await preparer.page.getByLabel('External batch id').fill('STMT-2026-10');
+ await preparer.page.getByLabel('Cutoff date').fill('2026-10-10');
+ await preparer.page.getByRole('button',{name:'Stage import'}).click();
+ const importRow=page=>page.getByRole('row').filter({hasText:'STMT-2026-10'});
+ await expect(importRow(preparer.page)).toBeVisible();
+ await importRow(preparer.page).getByRole('button',{name:'Validate'}).click();
+ await expect(importRow(preparer.page).getByRole('cell',{name:'validated',exact:true})).toBeVisible();
+ await controller.page.goto('/ledger/imports');await settled(controller.page);
+ await importRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(importRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await importRow(controller.page).getByRole('button',{name:'Commit'}).click();
+ await expect(importRow(controller.page).getByRole('cell',{name:'committed',exact:true})).toBeVisible();
+ // Reconciliation workbench: the worker proposes both exact-amount matches; the preparer confirms them.
+ await preparer.page.goto('/bank/reconcile');await settled(preparer.page);
+ await expect(preparer.page.getByRole('row').filter({hasText:'Northwind transfer'})).toBeVisible();
+ // The proposals arrive from the worker; bankId-dependent lists render empty before their fetch completes, so wait for the buttons after each reload.
+ await expect.poll(async()=>{await preparer.page.reload();await settled(preparer.page);return preparer.page.getByRole('button',{name:'Confirm',exact:true}).count().then(async n=>n===2?2:expect(preparer.page.getByRole('button',{name:'Confirm',exact:true})).toHaveCount(2,{timeout:5000}).then(()=>2).catch(()=>0));},{timeout:120000}).toBe(2);
+ for(let i=0;i<2;i++){await preparer.page.getByRole('button',{name:'Confirm',exact:true}).first().click();await expect(preparer.page.getByRole('button',{name:'Confirm',exact:true})).toHaveCount(1-i);}
+ await expect(preparer.page.getByRole('row').filter({hasText:'Northwind transfer'}).getByRole('cell',{name:'matched',exact:true})).toBeVisible();
+ await expect(preparer.page.getByText('0 unmatched statement line(s)',{exact:false})).toBeVisible();
+ // Transfer between the two accounts.
+ await treasury.page.goto('/bank/transfers');await settled(treasury.page);
+ await treasury.page.getByRole('combobox',{name:'From'}).selectOption({index:1});await treasury.page.getByRole('combobox',{name:'To'}).selectOption({index:2});
+ await treasury.page.getByRole('textbox',{name:'Amount'}).fill('1000');await treasury.page.getByRole('textbox',{name:'Value date'}).fill('2026-10-10');await treasury.page.getByRole('button',{name:'Save draft'}).click();
+ await expect(treasury.page.getByRole('cell',{name:'draft',exact:true})).toBeVisible();
+ await treasury.page.getByRole('button',{name:'Submit'}).click();
+ await expect(treasury.page.getByRole('cell',{name:'submitted',exact:true})).toBeVisible();
+ await controller.page.goto('/bank/transfers');await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Approve'}).click();
+ await expect(controller.page.getByRole('cell',{name:'approved',exact:true})).toBeVisible();
+ await controller.page.getByRole('button',{name:'Post transfer'}).click();
+ await expect(controller.page.getByRole('cell',{name:'posted',exact:true})).toBeVisible();
+ // Check register: custody, deposit, clearing.
+ await treasury.page.goto('/bank/checks');await settled(treasury.page);
+ await treasury.page.getByRole('combobox',{name:'Bank account'}).selectOption({index:1});
+ await treasury.page.getByLabel('Check number').fill('PDC-1001');await treasury.page.getByRole('textbox',{name:'Amount'}).fill('2500');await treasury.page.getByLabel('Due date').fill('2026-10-20');
+ await treasury.page.getByRole('combobox',{name:'Party'}).selectOption({index:1});
+ await treasury.page.getByRole('button',{name:'Register'}).click();
+ const checkRow=()=>treasury.page.getByRole('row').filter({hasText:'PDC-1001'});
+ await expect(checkRow().first().getByRole('cell',{name:'custody',exact:true})).toBeVisible();
+ await checkRow().last().getByLabel('Reason').fill('Deposited at branch');await checkRow().last().getByRole('button',{name:'Deposit'}).click();
+ await expect(checkRow().last().getByRole('cell',{name:'deposited',exact:true})).toBeVisible();
+ await checkRow().last().getByLabel('Reason').first().fill('Cleared per bank');await checkRow().last().getByRole('button',{name:'Clear'}).click();
+ await expect(checkRow().last().getByRole('cell',{name:'cleared',exact:true})).toBeVisible();
+ // Cash session: count with a variance, close, the cashier cannot attest, the controller attests.
+ await treasury.page.goto('/bank/cash');await settled(treasury.page);
+ await treasury.page.getByLabel('Business date').fill('2026-10-09');await treasury.page.getByLabel('Opening float').fill('5000');await treasury.page.getByRole('button',{name:'Open session'}).click();
+ await expect(treasury.page.getByRole('heading',{level:3})).toContainText('open');
+ await treasury.page.getByLabel('Quantity of 1000',{exact:true}).fill('4');await treasury.page.getByLabel('Quantity of 500',{exact:true}).fill('1');await treasury.page.getByLabel('Quantity of 100',{exact:true}).fill('3');
+ await expect(treasury.page.getByRole('status').filter({hasText:'Counted'})).toContainText('₱4,800.00');
+ await treasury.page.getByLabel('Variance reason (required when the count differs from the expected cash)').fill('Short 200: change given twice');
+ await treasury.page.getByRole('button',{name:'Record count'}).click();
+ await expect(treasury.page.getByRole('heading',{level:3})).toContainText('counted');
+ await treasury.page.getByRole('button',{name:'Close session'}).click();
+ await expect(treasury.page.getByRole('heading',{level:3})).toContainText('closed');
+ await treasury.page.getByRole('button',{name:'Attest handover'}).click();
+ await expect(treasury.page.locator('section[role="alert"]')).toContainText('cannot certify');
+ await controller.page.goto('/bank/cash');await settled(controller.page);
+ await controller.page.getByRole('button',{name:'Attest handover'}).click();
+ await expect(controller.page.getByRole('heading',{level:3})).toContainText('handed over');
+ for(const route of ['/bank/accounts','/bank/reconcile','/bank/transfers','/bank/checks','/bank/cash']){await controller.page.goto(route);await settled(controller.page);await noSeriousViolations(controller.page,'treasury '+route);}
+ await controller.context.close();await preparer.context.close();await treasury.context.close();
+});
+
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');

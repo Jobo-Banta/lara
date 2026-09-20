@@ -3,7 +3,9 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury} from '@lara/domain';
+// Bank statements validate and commit through the import pipeline with treasury's rules.
+const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 
 const MAX_JSON=1048576,MAX_UPLOAD=20971520;
 const buckets=new Map();
@@ -154,13 +156,13 @@ Object.assign(handlers,{
  get_imports:async(tx,ctx,{entityId,query})=>list(await ledger.listImports(tx,ctx,entityId,query)),
  get_imports_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getImport(tx,ctx,entityId,params.id)),
  patch_imports_id:async(tx,ctx,{entityId,params,body,version})=>ok(await ledger.updateImport(tx,ctx,entityId,params.id,version,body)),
- post_imports_id_validate:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await ledger.validateImport(tx,ctx,entityId,params.id,body,version,{store})),
+ post_imports_id_validate:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await ledger.validateImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement})),
  post_imports_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await ledger.approveImport(tx,ctx,entityId,params.id,body,version)),
- post_imports_id_commit:async(tx,ctx,{entityId,params,body,version})=>{const r=await ledger.commitImport(tx,ctx,entityId,params.id,body,version);return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
+ post_imports_id_commit:async(tx,ctx,{entityId,params,body,version,store})=>{const r=await ledger.commitImport(tx,ctx,entityId,params.id,body,version,{store,bankStatement});return {status:200,body:{...result(ctx,r).body,journalEntryIds:r.journalEntryIds}};},
  // Reports run as jobs: the worker rechecks the requester, snapshots the report and stores the rendered file as restricted evidence.
  post_reports:async(tx,ctx,{entityId,body})=>{
   if(!ctx.permissions.has('report.generate'))fail('FORBIDDEN','Permission report.generate is required.');
-  if(!['trial_balance','statements','aging','ap_aging'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
+  if(!['trial_balance','statements','aging','ap_aging','bank_reconciliation'].includes(body.reportType))fail('FEATURE_NOT_ENABLED','Report type '+body.reportType+' arrives with a later module.');
   const job=await enqueueJob(tx,ctx,{entityId,kind:'report.generate',payload:body});
   return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:null,resultResourceId:null}};},
  // P04 sales: tax rules, invoices and credit notes, sales orders and quotations, collections, allocations, open items.
@@ -235,9 +237,47 @@ Object.assign(handlers,{
  patch_payments_id:async(tx,ctx,{entityId,params,body,version})=>ok(await purchasing.updatePayment(tx,ctx,entityId,params.id,version,body)),
  post_payments_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.submitPayment(tx,ctx,entityId,params.id,body,version)),
  post_payments_id_authorize:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.authorizePayment(tx,ctx,entityId,params.id,body,version)),
- post_payments_id_release:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await purchasing.releasePayment(tx,ctx,entityId,params.id,body,version)),
+ post_payments_id_release:async(tx,ctx,{entityId,params,body,version,store})=>result(ctx,await purchasing.releasePayment(tx,ctx,entityId,params.id,body,version,{bankFile:treasury.generateBankFile,store})),
  post_payments_id_settle:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.settlePayment(tx,ctx,entityId,params.id,body,version)),
  post_payments_id_return:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await purchasing.returnPayment(tx,ctx,entityId,params.id,body,version)),
+});
+// P06 treasury: bank accounts, statement lines and reconciliation, matches, transfers, checks, cash sessions.
+Object.assign(handlers,{
+ post_bank_accounts:async(tx,ctx,{entityId,body})=>created(await treasury.createBankAccount(tx,ctx,entityId,body)),
+ get_bank_accounts:async(tx,ctx,{entityId,query})=>list(await treasury.listBankAccounts(tx,ctx,entityId,query)),
+ get_bank_accounts_id:async(tx,ctx,{entityId,params})=>ok(await treasury.getBankAccount(tx,ctx,entityId,params.id)),
+ patch_bank_accounts_id:async(tx,ctx,{entityId,params,body,version})=>ok(await treasury.updateBankAccount(tx,ctx,entityId,params.id,version,body)),
+ post_bank_accounts_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.approveBankAccount(tx,ctx,entityId,params.id,body,version)),
+ get_bank_statement_lines:async(tx,ctx,{entityId,query})=>{if(!isUuid(query.bankAccountId))fail('VALIDATION_FAILED','bankAccountId is required.',{fieldErrors:[{path:'bankAccountId',message:'UUID'}]});return list({items:await treasury.listStatementLines(tx,ctx,entityId,{bankAccountId:query.bankAccountId,matchState:query.matchState||null}),nextCursor:null});},
+ get_bank_reconciliation:async(tx,ctx,{entityId,query})=>{if(!isUuid(query.bankAccountId)||!/^\d{4}-\d{2}-\d{2}$/.test(query.asOf||''))fail('VALIDATION_FAILED','bankAccountId and asOf are required.',{fieldErrors:[{path:'asOf',message:'Date'}]});return {status:200,body:await treasury.reconciliationReport(tx,ctx,entityId,{bankAccountId:query.bankAccountId,asOf:query.asOf})};},
+ post_bank_matches:async(tx,ctx,{entityId,body})=>created(await treasury.createMatch(tx,ctx,entityId,body)),
+ get_bank_matches:async(tx,ctx,{entityId,query})=>list(await treasury.listMatches(tx,ctx,entityId,query)),
+ get_bank_matches_id:async(tx,ctx,{entityId,params})=>ok(await treasury.getMatch(tx,ctx,entityId,params.id)),
+ patch_bank_matches_id:async(tx,ctx,{entityId,params,body,version})=>ok(await treasury.updateMatch(tx,ctx,entityId,params.id,version,body)),
+ post_bank_matches_id_confirm:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.confirmMatch(tx,ctx,entityId,params.id,body,version)),
+ post_bank_matches_id_reverse:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.reverseMatch(tx,ctx,entityId,params.id,body,version)),
+ post_transfers:async(tx,ctx,{entityId,body})=>created(await treasury.createTransfer(tx,ctx,entityId,body)),
+ get_transfers:async(tx,ctx,{entityId,query})=>list(await treasury.listTransfers(tx,ctx,entityId,query)),
+ get_transfers_id:async(tx,ctx,{entityId,params})=>ok(await treasury.getTransfer(tx,ctx,entityId,params.id)),
+ patch_transfers_id:async(tx,ctx,{entityId,params,body,version})=>ok(await treasury.updateTransfer(tx,ctx,entityId,params.id,version,body)),
+ post_transfers_id_submit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.submitTransfer(tx,ctx,entityId,params.id,body,version)),
+ post_transfers_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.approveTransfer(tx,ctx,entityId,params.id,body,version)),
+ post_transfers_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await treasury.postTransfer(tx,ctx,entityId,params.id,body,version)),
+ post_checks:async(tx,ctx,{entityId,body})=>created(await treasury.createCheck(tx,ctx,entityId,body)),
+ get_checks:async(tx,ctx,{entityId,query})=>list(await treasury.listChecks(tx,ctx,entityId,query)),
+ get_checks_id:async(tx,ctx,{entityId,params})=>ok(await treasury.getCheck(tx,ctx,entityId,params.id)),
+ patch_checks_id:async(tx,ctx,{entityId,params,body,version})=>ok(await treasury.updateCheck(tx,ctx,entityId,params.id,version,body)),
+ post_checks_id_release:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.releaseCheck(tx,ctx,entityId,params.id,body,version)),
+ post_checks_id_deposit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.depositCheck(tx,ctx,entityId,params.id,body,version)),
+ post_checks_id_clear:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.clearCheck(tx,ctx,entityId,params.id,body,version)),
+ post_checks_id_dishonor:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await treasury.dishonorCheck(tx,ctx,entityId,params.id,body,version,{reverseSettlement:sales.reverseSettlementEffect})),
+ post_cash_sessions:async(tx,ctx,{entityId,body})=>created(await treasury.createCashSession(tx,ctx,entityId,body)),
+ get_cash_sessions:async(tx,ctx,{entityId,query})=>list(await treasury.listCashSessions(tx,ctx,entityId,query)),
+ get_cash_sessions_id:async(tx,ctx,{entityId,params})=>ok(await treasury.getCashSession(tx,ctx,entityId,params.id)),
+ patch_cash_sessions_id:async(tx,ctx,{entityId,params,body,version})=>ok(await treasury.updateCashSession(tx,ctx,entityId,params.id,version,body)),
+ post_cash_sessions_id_count:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.countCashSession(tx,ctx,entityId,params.id,body,version)),
+ post_cash_sessions_id_close:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await treasury.closeCashSession(tx,ctx,entityId,params.id,body,version)),
+ post_cash_sessions_id_handover:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await treasury.handoverCashSession(tx,ctx,entityId,params.id,body,version)),
 });
 handlers.post_approval_policies=handlers.get_approval_policies=handlers.get_approval_policies_id=handlers.patch_approval_policies_id=handlers.post_approval_policies_id_approve=handlers.post_approval_policies_id_activate=async()=>fail('FEATURE_NOT_ENABLED','Approval policy management is completed with the ledger approval routing.');
 

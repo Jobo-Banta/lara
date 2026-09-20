@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "4ea321765949f06c2cd78e52511964d38b7e310660e5e897038b17a431b8c1a3",
+  "sha256": "244d82fb958dc4a226ecd12a5fc26d7d3ecdaad52984ec8cfc0407f9588f61d1",
   "operations": [
     {
       "method": "POST",
@@ -1756,6 +1756,16 @@
       "method": "GET",
       "path": "/health/ready",
       "operationId": "get_health_ready"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-statement-lines",
+      "operationId": "get_bank_statement_lines"
+    },
+    {
+      "method": "GET",
+      "path": "/bank-reconciliation",
+      "operationId": "get_bank_reconciliation"
     }
   ]
 }

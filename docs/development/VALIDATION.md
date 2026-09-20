@@ -4,7 +4,7 @@ Status: **PASS**. Executed against the files in this package.
 
 - 346 BRD and acceptance requirements mapped with no duplicate IDs.
 - 26 dependency-checked release increments and 162 implementation tickets.
-- 351 unique API operations and 199 schemas checked for internal references, required fields, path parameters and command guards.
+- 353 unique API operations and 202 schemas checked for internal references, required fields, path parameters and command guards.
 - 4 concrete request examples checked against the supported schema constraints.
 - 10 accounting fixtures checked for exact decimal debit and credit balance.
 - State targets, terminal posted-document state, sensitive read-model masking and approval content-version binding checked.

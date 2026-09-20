@@ -3157,5 +3157,23 @@
     "permission": "health.read",
     "input": null,
     "response": "Health"
+  },
+  {
+    "operationId": "get_bank_statement_lines",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-statement-lines",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankStatementLineList"
+  },
+  {
+    "operationId": "get_bank_reconciliation",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-reconciliation",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankReconciliationView"
   }
 ]

@@ -9,9 +9,10 @@ import {api,asError,useCommand,ErrorPanel,Editor,table,link,useList,Loading,inpu
 import {LedgerAccounts,LedgerJournals,LedgerJournalDetail,LedgerImports,LedgerPeriods,LedgerReports,Capabilities} from './workspace-ledger';
 import {SalesInvoices,SalesInvoiceDetail,SalesOrders,SalesCollections,SalesCollectionDetail,SalesCustomers,TaxRules} from './workspace-sales';
 import {PurchasingBills,PurchasingBillDetail,PurchasingOrders,PurchasingClaims,PurchasingPayments,PurchasingPaymentDetail,PurchasingSuppliers} from './workspace-purchasing';
+import {TreasuryBankAccounts,TreasuryReconcile,TreasuryTransfers,TreasuryChecks,TreasuryCash} from './workspace-treasury';
 
-const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Compliance','/compliance']];
-const roadmap:Record<string,string>={'/compliance':'Compliance and e-invoicing arrive with P07.','/bank/reconcile':'Bank reconciliation arrives with treasury (P06).'};
+const nav:[string,string][]=[['My work','/work'],['Overview','/overview'],['Parties','/parties'],['Evidence','/evidence'],['Obligations','/obligations'],['Journals','/ledger/journals'],['Chart of accounts','/ledger/accounts'],['Periods and close','/ledger/periods'],['Imports','/ledger/imports'],['Reports','/reports'],['Invoices','/sales/invoices'],['Orders and quotes','/sales/orders'],['Receipts','/sales/collections'],['Customers','/sales/customers'],['Bills','/purchases/bills'],['Purchase orders','/purchases/orders'],['Expense claims','/purchases/claims'],['Payments','/payments'],['Suppliers','/purchases/suppliers'],['Bank accounts','/bank/accounts'],['Reconcile','/bank/reconcile'],['Transfers','/bank/transfers'],['Checks','/bank/checks'],['Cash','/bank/cash'],['Compliance','/compliance']];
+const roadmap:Record<string,string>={'/compliance':'Compliance and e-invoicing arrive with P07.'};
 export default function Workspace(){
  const path=usePathname();
  const [me,setMe]=useState<Row|null>(null),[meError,setMeError]=useState<ApiError|null>(null),[entityId,setEntityId]=useState<string|null>(null),[entity,setEntity]=useState<Row|null>(null),[tick,setTick]=useState(0);
@@ -52,6 +53,11 @@ export default function Workspace(){
  else if(path==='/purchases/suppliers'){title='Suppliers';content=<PurchasingSuppliers entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/payments'){title='Payments';content=<PurchasingPayments entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path.startsWith('/payments/')){title='Payment';content=<PurchasingPaymentDetail entityId={entityId!} id={id} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/bank/accounts'){title='Bank accounts';content=<TreasuryBankAccounts entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/bank/reconcile'){title='Bank reconciliation';content=<TreasuryReconcile entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/bank/transfers'){title='Transfers';content=<TreasuryTransfers entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/bank/checks'){title='Checks';content=<TreasuryChecks entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
+ else if(path==='/bank/cash'){title='Cash sessions';content=<TreasuryCash entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/tax-rules'){title='Tax rules';content=<TaxRules entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path==='/settings/capabilities'){title='Capabilities';content=<Capabilities entityId={entityId!} me={me} can={can} tick={tick} refresh={refresh}/>;}
  else if(path.startsWith('/settings')){title='Setup checklist';content=<Setup entityId={entityId} entity={entity} me={me} can={can} tick={tick} refresh={refresh} choose={(e:string)=>{try{sessionStorage.setItem('lara-entity',e);}catch{}setEntityId(e);}}/>;}

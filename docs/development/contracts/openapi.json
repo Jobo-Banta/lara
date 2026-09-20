@@ -54326,6 +54326,325 @@
         },
         "security": []
       }
+    },
+    "/bank-statement-lines": {
+      "get": {
+        "operationId": "get_bank_statement_lines",
+        "summary": "bank statement lines read",
+        "tags": [
+          "P06"
+        ],
+        "x-delivery-phase": "P06",
+        "x-required-permission": "bank_match.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "bankAccountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "matchState",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "unmatched",
+                "partially_matched",
+                "matched"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankStatementLineList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
+    },
+    "/bank-reconciliation": {
+      "get": {
+        "operationId": "get_bank_reconciliation",
+        "summary": "bank reconciliation read",
+        "tags": [
+          "P06"
+        ],
+        "x-delivery-phase": "P06",
+        "x-required-permission": "bank_match.read",
+        "x-scope": "entity",
+        "parameters": [
+          {
+            "name": "X-Entity-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "bankAccountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Committed local result",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Quoted resource version where a resource is returned"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankReconciliationView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Typed failure; see API error contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "AR requires sales capability P04; AP requires purchasing P05. Filter/scope guards apply before totals."
+      }
     }
   },
   "components": {
@@ -62375,6 +62694,192 @@
         "required": [
           "items",
           "nextCursor"
+        ]
+      },
+      "BankStatementLineView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "bankAccountId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "batchId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "sourceLineKey": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "bookedDate": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "valueDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signedAmount": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "matchState": {
+            "type": "string",
+            "enum": [
+              "unmatched",
+              "partially_matched",
+              "matched"
+            ]
+          },
+          "matchedAmount": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": [
+          "id",
+          "bankAccountId",
+          "batchId",
+          "sourceLineKey",
+          "bookedDate",
+          "valueDate",
+          "signedAmount",
+          "currency",
+          "reference",
+          "description",
+          "matchState",
+          "matchedAmount"
+        ]
+      },
+      "BankStatementLineList": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankStatementLineView"
+            },
+            "minItems": 0
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "BankReconciliationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bankAccountId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "asOf": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "statementBatchId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "statementBalance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ledgerBalance": {
+            "$ref": "#/components/schemas/Text"
+          },
+          "difference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unmatchedLines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankStatementLineView"
+            },
+            "minItems": 0
+          },
+          "unmatchedSettlements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "settlementId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "direction": {
+                  "type": "string",
+                  "enum": [
+                    "receipt",
+                    "payment"
+                  ]
+                },
+                "valueDate": {
+                  "$ref": "#/components/schemas/Date"
+                },
+                "cashAmount": {
+                  "$ref": "#/components/schemas/Money"
+                },
+                "matchedAmount": {
+                  "$ref": "#/components/schemas/Money"
+                },
+                "bankReference": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "settlementId",
+                "direction",
+                "valueDate",
+                "cashAmount",
+                "matchedAmount",
+                "bankReference"
+              ]
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "bankAccountId",
+          "asOf",
+          "statementBatchId",
+          "statementBalance",
+          "ledgerBalance",
+          "difference",
+          "unmatchedLines",
+          "unmatchedSettlements"
         ]
       }
     }

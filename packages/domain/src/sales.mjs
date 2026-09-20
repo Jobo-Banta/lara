@@ -7,6 +7,7 @@
 import {assertInput,audit,contentHash,cursorClause,cursorScope,emit,enqueueJob,expectVersion,fail,isUuid,iso,page,pageArgs,requireAnyPermission,requireEntity,requirePermission,resource} from './core.mjs';
 import {linkEvidence} from './evidence.mjs';
 import {micros,decimal} from './ledger.mjs';
+import {checkGate} from './treasury.mjs';
 
 const PICO=10n**12n;
 const MICRO=10n**6n;
@@ -555,6 +556,7 @@ export async function postCollection(tx,ctx,entityId,id,input,expectedVersion,{c
  if(row.state==='posted')return sresult(row,{journalEntryIds:[row.posted_entry_id]});
  if(row.state!=='approved')fail('STATE_CONFLICT','Approval is required before posting.');
  if(row.approved_by===ctx.principalId&&row.created_by===ctx.principalId)fail('SELF_APPROVAL','The preparer cannot both approve and post.');
+ await checkGate(tx,ctx,id);
  const profile=await salesProfile(tx,ctx,entityId);
  const branch=(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and status='active' order by created_at limit 1",[ctx.tenantId,entityId])).rows[0];
  const party=(await tx.query('select legal_name from lara.party where tenant_id=$1 and id=$2',[ctx.tenantId,row.party_id])).rows[0];
@@ -593,14 +595,21 @@ export async function reverseAllocation(tx,ctx,entityId,id,input){
 export async function reverseCollection(tx,ctx,entityId,id,input,expectedVersion,{commandId=null}={}){
  requirePermission(ctx,'collection.reverse');requireEntity(ctx,entityId);assertInput('Reversal',input);
  const row=await loadSettlement(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
- if(row.state!=='posted')fail('STATE_CONFLICT','Only posted collections are reversed.');
+ return reverseSettlementEffect(tx,ctx,entityId,row,input,{commandId,action:'collection.reverse'});
+}
+// The reversal effect of a posted settlement (receipt or payment): mirrored
+// entry, open allocations unwound, the settlement left as a reversed fact.
+// Callers hold their own permission (collection.reverse, check.dishonor).
+export async function reverseSettlementEffect(tx,ctx,entityId,row,input,{commandId=null,action='collection.reverse'}={}){
+ const id=row.id;
+ if(row.state!=='posted')fail('STATE_CONFLICT','Only posted settlements are reversed.');
  const entry=(await tx.query('select * from lara.journal_entries where tenant_id=$1 and id=$2',[ctx.tenantId,row.posted_entry_id])).rows[0];
  const lines=(await tx.query('select * from lara.journal_lines where tenant_id=$1 and entry_id=$2 order by line_no',[ctx.tenantId,row.posted_entry_id])).rows;
  const reversalId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:row.book_id,sourceType:'settlement',sourceId:id,sourceVersion:Number(row.content_version),purpose:'reversal',accountingDate:input.accountingDate,documentDate:input.accountingDate,description:'Reversal: '+entry.description+' — '+input.reason,currency:row.currency,manual:false,postingActor:ctx.principalId,commandId,reversalOf:row.posted_entry_id,lines:lines.map(l=>({accountId:l.account_id,branchId:l.branch_id,dimensions:l.dimensions_json||{},debit:String(l.txn_credit),credit:String(l.txn_debit)}))})])).rows[0].id;
  const applies=(await tx.query("select a.* from lara.allocation_events a where a.tenant_id=$1 and a.settlement_id=$2 and a.action='apply' and not exists (select 1 from lara.allocation_events r where r.tenant_id=a.tenant_id and r.reverses_id=a.id)",[ctx.tenantId,id])).rows;
  for(const a of applies){await tx.query("insert into lara.allocation_events(tenant_id,entity_id,settlement_id,open_item_id,amount,action,reverses_id,reason,created_by) values($1,$2,$3,$4,$5,'reverse',$6,$7,$8)",[ctx.tenantId,entityId,id,a.open_item_id,a.amount,a.id,'Receipt reversed: '+input.reason,ctx.principalId]);const item=(await tx.query('select document_id from lara.open_items where tenant_id=$1 and id=$2',[ctx.tenantId,a.open_item_id])).rows[0];await refreshSettlementState(tx,ctx,item.document_id);}
  const updated=(await tx.query("update lara.settlements set state='reversed',reversal_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,reversalId])).rows[0];
- await audit(tx,ctx,{entityId,action:'collection.reverse',resourceType:'collection',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason,afterRef:reversalId});
+ await audit(tx,ctx,{entityId,action,resourceType:row.direction==='receipt'?'collection':'settlement',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason,afterRef:reversalId});
  return sresult(updated,{journalEntryIds:[reversalId]});
 }
 export async function getCollection(tx,ctx,entityId,id){requirePermission(ctx,'collection.read');requireEntity(ctx,entityId);const row=(await tx.query("select * from lara.settlements where tenant_id=$1 and entity_id=$2 and id=$3 and direction='receipt'",[ctx.tenantId,entityId,id])).rows[0];if(!row)fail('NOT_FOUND','Collection not found.');return settlementResource(tx,ctx,row);}

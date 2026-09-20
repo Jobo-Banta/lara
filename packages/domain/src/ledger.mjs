@@ -317,12 +317,20 @@ export async function snapshotReport(tx,ctx,entityId,input,{ruleVersion='p03.1',
 export const importResource=b=>resource({...b,status:b.state},{kind:b.kind,evidenceId:b.evidence_id,mappingVersion:b.mapping_version,sourceId:b.source_id,externalBatchId:b.external_batch_id,cutoffDate:iso(b.cutoff)});
 export async function createImport(tx,ctx,entityId,input,{bookId}={}){
  requirePermission(ctx,'import.create');requireEntity(ctx,entityId);assertInput('ImportCreate',input);await requireLedger(tx,ctx,entityId);
- if(input.kind!=='openings')fail('FEATURE_NOT_ENABLED','Import kind '+input.kind+' arrives with its owning module.');
+ if(!['openings','bank_statement'].includes(input.kind))fail('FEATURE_NOT_ENABLED','Import kind '+input.kind+' arrives with its owning module.');
+ if(input.kind==='bank_statement'){
+  // sourceId names the approved bank account; the treasury capability must be active.
+  const treasury=(await tx.query("select 1 from lara.capability_activations where tenant_id=$1 and entity_id=$2 and capability='treasury' and status='active'",[ctx.tenantId,entityId])).rowCount;
+  if(!treasury)fail('FEATURE_NOT_ENABLED','Bank statement imports need the treasury capability.');
+  const account=isUuid(input.sourceId.trim())?(await tx.query("select * from lara.bank_accounts where tenant_id=$1 and entity_id=$2 and id=$3 and status='approved'",[ctx.tenantId,entityId,input.sourceId.trim()])).rows[0]:null;
+  if(!account)fail('VALIDATION_FAILED','sourceId names an approved bank account for statement imports.',{fieldErrors:[{path:'sourceId',message:'Approved bank account id'}]});
+  bookId=account.book_id;
+ }
  if(!bookId){const primary=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary' and status='active'",[ctx.tenantId,entityId])).rows[0];if(!primary)fail('STATE_CONFLICT','No active primary book.');bookId=primary.id;}
  const evidence=(await tx.query("select id,sha256,status,mime from lara.evidence where tenant_id=$1 and entity_id=$2 and id=$3",[ctx.tenantId,entityId,input.evidenceId])).rows[0];
  if(!evidence)fail('NOT_FOUND','Evidence not found.');
  if(evidence.status!=='available')fail('EVIDENCE_NOT_READY','Import evidence must be available.');
- if(evidence.mime!=='text/csv')fail('VALIDATION_FAILED','Opening imports read CSV evidence.',{fieldErrors:[{path:'evidenceId',message:'CSV required'}]});
+ if(evidence.mime!=='text/csv')fail('VALIDATION_FAILED','Imports read CSV evidence.',{fieldErrors:[{path:'evidenceId',message:'CSV required'}]});
  const row=(await tx.query('insert into lara.opening_batches(tenant_id,entity_id,book_id,kind,evidence_id,checksum,cutoff,source_id,external_batch_id,mapping_version,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning *',[ctx.tenantId,entityId,bookId,input.kind,input.evidenceId,evidence.sha256,input.cutoffDate,input.sourceId.trim(),input.externalBatchId.trim(),input.mappingVersion.trim(),ctx.principalId])).rows[0];
  await audit(tx,ctx,{entityId,action:'import.create',resourceType:'import',resourceId:row.id,resourceVersion:1,afterRef:evidence.sha256});
  return importResource(row);
@@ -336,7 +344,7 @@ export function parseOpeningCsv(text){
  for(const r of required)if(!header.includes(r))fail('VALIDATION_FAILED','CSV header lacks '+r+'.',{fieldErrors:[{path:'header',message:'Missing '+r}]});
  return lines.slice(1).map((l,i)=>{const c=cells(l);const row={};header.forEach((h,j)=>{row[h]=c[j]??'';});row.rowNo=i+1;row.dimensions={};for(const h of header)if(h.startsWith('dim_')&&row[h])row.dimensions[h.slice(4)]=row[h];return row;});
 }
-export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{store}){
+export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{store,bankStatement=null}){
  requirePermission(ctx,'import.validate');requireEntity(ctx,entityId);assertInput('Action',input||{});
  const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!batch)fail('NOT_FOUND','Import not found.');if(expectedVersion!==undefined)expectVersion(batch,expectedVersion);
@@ -344,6 +352,16 @@ export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{s
  const evidence=(await tx.query('select object_key,sha256 from lara.evidence where tenant_id=$1 and id=$2',[ctx.tenantId,batch.evidence_id])).rows[0];
  const bytes=await store.get(evidence.object_key);
  if(sha(bytes)!==batch.checksum)fail('STATE_CONFLICT','Evidence content no longer matches the import checksum.');
+ if(batch.kind==='bank_statement'){
+  // Statement validation is owned by treasury: balances, currency, single-use line keys.
+  if(!bankStatement)fail('FEATURE_NOT_ENABLED','Bank statement validation arrives with treasury (P06).');
+  const v=await bankStatement.validate(tx,ctx,entityId,batch,bytes.toString('utf8'));
+  const state=v.errors?'staged':'validated';
+  const updated=(await tx.query('update lara.opening_batches set state=$3,row_count=$4,error_count=$5,debit_total=$6,credit_total=$7 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,state,v.lines.length,v.errors,decimal(v.sum<0n?0n:v.sum),decimal(v.sum<0n?-v.sum:0n)])).rows[0];
+  await audit(tx,ctx,{entityId,action:'import.validate',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),reason:v.errors?v.errors+' error(s)'+(v.lines.balanceError?': '+v.lines.balanceError:''):'valid; '+v.duplicates+' line(s) already imported'});
+  if(v.errors)fail('VALIDATION_FAILED','The statement has '+v.errors+' error(s).'+(v.lines.balanceError?' '+v.lines.balanceError:''),{fieldErrors:v.lines.filter(l=>l.error).slice(0,50).map(l=>({path:'rows.'+l.rowNo,message:l.error}))});
+  return {resourceType:'import',resourceId:id,version:Number(updated.version),state,rows:v.lines.length,errors:0,duplicates:v.duplicates};
+ }
  const rows=parseOpeningCsv(bytes.toString('utf8'));
  const accounts=new Map((await tx.query("select id,code,status,control_type,(select count(*) from lara.accounts c where c.tenant_id=a.tenant_id and c.parent_id=a.id and c.status<>'archived') as children from lara.accounts a where tenant_id=$1 and entity_id=$2 and book_id=$3",[ctx.tenantId,entityId,batch.book_id])).rows.map(a=>[a.code,a]));
  const branches=new Map((await tx.query("select id,code from lara.branches where tenant_id=$1 and entity_id=$2 and status='active'",[ctx.tenantId,entityId])).rows.map(b=>[b.code,b.id]));
@@ -394,12 +412,22 @@ export async function approveImport(tx,ctx,entityId,id,input,expectedVersion){
 // Commit posts one opening entry for the batch through the posting function.
 // The same batch committed twice returns the same entry; another committed
 // openings batch with an overlapping cutoff for the book is refused.
-export async function commitImport(tx,ctx,entityId,id,input,expectedVersion,{commandId=null}={}){
+export async function commitImport(tx,ctx,entityId,id,input,expectedVersion,{commandId=null,store=null,bankStatement=null}={}){
  requirePermission(ctx,'import.commit');requireEntity(ctx,entityId);assertInput('Action',input||{});
  const batch=(await tx.query('select * from lara.opening_batches where tenant_id=$1 and entity_id=$2 and id=$3 for update',[ctx.tenantId,entityId,id])).rows[0];
  if(!batch)fail('NOT_FOUND','Import not found.');if(expectedVersion!==undefined)expectVersion(batch,expectedVersion);
- if(batch.state==='committed')return {resourceType:'import',resourceId:id,version:Number(batch.version),state:'committed',journalEntryIds:[batch.committed_entry_id]};
+ if(batch.state==='committed')return {resourceType:'import',resourceId:id,version:Number(batch.version),state:'committed',journalEntryIds:batch.committed_entry_id?[batch.committed_entry_id]:[]};
  if(batch.state!=='approved')fail('STATE_CONFLICT','Approve the import before committing.');
+ if(batch.kind==='bank_statement'){
+  if(!bankStatement||!store)fail('FEATURE_NOT_ENABLED','Bank statement commit arrives with treasury (P06).');
+  const evidence=(await tx.query('select object_key from lara.evidence where tenant_id=$1 and id=$2',[ctx.tenantId,batch.evidence_id])).rows[0];
+  const bytes=await store.get(evidence.object_key);
+  if(sha(bytes)!==batch.checksum)fail('STATE_CONFLICT','Evidence content no longer matches the import checksum.');
+  const r=await bankStatement.commit(tx,ctx,entityId,batch,bytes.toString('utf8'));
+  const updated=(await tx.query("update lara.opening_batches set state='committed' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id])).rows[0];
+  await audit(tx,ctx,{entityId,action:'import.commit',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),afterRef:r.batchId});
+  return {resourceType:'import',resourceId:id,version:Number(updated.version),state:'committed',journalEntryIds:[],jobId:r.jobId,batchId:r.batchId};
+ }
  const overlapping=(await tx.query("select id from lara.opening_batches where tenant_id=$1 and book_id=$2 and kind='openings' and state='committed' and id<>$3 and cutoff=$4",[ctx.tenantId,batch.book_id,id,batch.cutoff])).rows[0];
  if(overlapping)fail('STATE_CONFLICT','Openings for this cutoff were already committed by import '+overlapping.id+'.');
  const rows=(await tx.query("select * from lara.opening_rows where tenant_id=$1 and batch_id=$2 and status='valid' order by row_no",[ctx.tenantId,id])).rows;
