@@ -1,1 +1,1 @@
-{"name":"@lara/api","private":true,"version":"0.0.1","type":"module","scripts":{"dev":"node src/server.mjs"},"dependencies":{"@lara/config":"workspace:*","pg":"^8.16.3"}}
+{"name":"@lara/api","private":true,"version":"0.0.1","type":"module","scripts":{"dev":"node src/server.mjs"},"dependencies":{"@lara/config":"workspace:*","@lara/contracts":"workspace:*","@lara/domain":"workspace:*","pg":"^8.16.3"}}

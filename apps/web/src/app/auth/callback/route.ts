@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     body: new URLSearchParams({ grant_type: "authorization_code", code, code_verifier: stored.split(".")[2], redirect_uri: config.redirectUri }),
     cache: "no-store",
   });
-  if (!tokenResponse.ok) return NextResponse.json({ error: "OIDC token exchange failed" }, { status: 502 });
+  if (!tokenResponse.ok) { console.error(JSON.stringify({ service: "web", event: "oidc_token_exchange_failed", status: tokenResponse.status, body: (await tokenResponse.text()).slice(0, 500) })); return NextResponse.json({ error: "OIDC token exchange failed" }, { status: 502 }); }
   const tokens = await tokenResponse.json() as { id_token?: string };
   if (!tokens.id_token) return NextResponse.json({ error: "OIDC response did not contain an ID token" }, { status: 502 });
   const verified = await jwtVerify(tokens.id_token, createRemoteJWKSet(new URL(config.issuer + "/.well-known/jwks.json")), { issuer: config.issuer, audience: config.clientId });

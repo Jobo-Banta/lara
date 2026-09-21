@@ -3,6 +3,8 @@ import { signIdentity } from '../apps/api/src/identity.mjs';
 loadLocalEnv();
 import {spawn} from 'node:child_process';
 import assert from 'node:assert/strict';
+import {readdirSync} from 'node:fs';
+const latestMigration=readdirSync(new URL('../packages/database/migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort().at(-1).slice(0,-4);
 const child=spawn(process.execPath,['apps/api/src/server.mjs'],{env:{...process.env,API_PORT:'4011'},stdio:['ignore','pipe','pipe']});
 let errors='';child.stderr.on('data',b=>errors+=b);
 try {
@@ -15,7 +17,7 @@ try {
  assert.equal((await fetch('http://127.0.0.1:4011/demo/work')).status,401);
  const token=signIdentity('unassigned-test-subject','GET','/ops/version',process.env.SESSION_SECRET);
  const version=await fetch('http://127.0.0.1:4011/ops/version',{headers:{authorization:'Bearer '+token}});
- assert.equal(version.status,200);assert.equal((await version.json()).schema,'0008_demo_workspaces');
+ assert.equal(version.status,200);assert.equal((await version.json()).schema,latestMigration);
  const denied=await fetch('http://127.0.0.1:4011/demo/work',{headers:{authorization:'Bearer '+signIdentity('unassigned-test-subject','GET','/demo/work',process.env.SESSION_SECRET)}});
  assert.equal(denied.status,401);
  // P01-T03: outside demo mode the synthetic routes are not registered at all, even for a signed identity.

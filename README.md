@@ -15,6 +15,7 @@ Node 24.16.0, pnpm 9.15.5, Python 3.12, Git, and a dedicated Supabase demo proje
 5. Set `DEMO_DATABASE_CONFIRMED=true` in the ignored file and run `pnpm db:seed:demo`. The mode and database marker must both identify a demo target.
 6. Run `pnpm dev`. This starts the API, checks readiness, then starts the worker and web application. Open http://localhost:3000. The live build tracker runs at http://127.0.0.1:8765/build-status.html; start it independently with `pnpm status:serve`.
 7. Create an auto-confirmed Supabase Auth demo user, complete sign-in and consent, then assign its verified subject with `node scripts/provision-demo-subject.mjs <subject>`. Each subject receives an empty isolated workspace; canonical fixtures are never implicitly shared.
+8. For development and testing, `pnpm dev:account` creates (or resets) a confirmed Supabase Auth user and records `DEV_LOGIN_EMAIL`/`DEV_LOGIN_PASSWORD` in the ignored `.env.local`. In demo and local modes the consent page prefills those credentials and one click on **Sign in** grants the consent and opens the app; production and staging compositions never read them. Assign the printed subject with `provision-demo-subject.mjs` as in step 7.
 
 ## Verification
 

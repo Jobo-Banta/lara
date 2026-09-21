@@ -1,0 +1,51 @@
+{
+  "title": "Philippine retail pack",
+  "description": "Reviewed configuration for a single-store retailer: the store profile settings draft and two saved reports over posted ledger lines. Configuration only; no code runs at install.",
+  "dependencies": [
+    "capability:general_ledger",
+    "capability:report_authoring"
+  ],
+  "upgradesFrom": [],
+  "settings": {
+    "retail_profile": {
+      "profileVersion": "retail-1",
+      "storeHours": "09:00-21:00",
+      "cashCountFrequency": "daily",
+      "posRequired": true
+    }
+  },
+  "reportDefinitions": [
+    {
+      "name": "Retail sales by month",
+      "metricIds": [
+        "revenue"
+      ],
+      "dimensionIds": [
+        "month"
+      ],
+      "filters": [],
+      "sort": [
+        {
+          "field": "month",
+          "direction": "asc"
+        }
+      ]
+    },
+    {
+      "name": "Retail expenses by account",
+      "metricIds": [
+        "expense"
+      ],
+      "dimensionIds": [
+        "account"
+      ],
+      "filters": [],
+      "sort": [
+        {
+          "field": "expense",
+          "direction": "desc"
+        }
+      ]
+    }
+  ]
+}

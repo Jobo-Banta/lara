@@ -396,6 +396,15 @@
     "response": "CommandResult"
   },
   {
+    "operationId": "get_evidence",
+    "phase": "P02",
+    "method": "GET",
+    "path": "/evidence",
+    "permission": "evidence.read",
+    "input": null,
+    "response": "EvidenceResourceList"
+  },
+  {
     "operationId": "post_evidence_uploads",
     "phase": "P02",
     "method": "POST",
@@ -626,6 +635,33 @@
     "method": "POST",
     "path": "/periods/{id}/reopen",
     "permission": "period.reopen",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_periods_id_close_tasks",
+    "phase": "P03",
+    "method": "GET",
+    "path": "/periods/{id}/close-tasks",
+    "permission": "period.read",
+    "input": null,
+    "response": "CloseTaskResourceList"
+  },
+  {
+    "operationId": "post_periods_id_close_tasks",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/periods/{id}/close-tasks",
+    "permission": "period.edit",
+    "input": "CloseTaskCreate",
+    "response": "CloseTaskResource"
+  },
+  {
+    "operationId": "post_close_tasks_id_complete",
+    "phase": "P03",
+    "method": "POST",
+    "path": "/close-tasks/{id}/complete",
+    "permission": "period.edit",
     "input": "ReasonAction",
     "response": "CommandResult"
   },
@@ -3121,5 +3157,1121 @@
     "permission": "health.read",
     "input": null,
     "response": "Health"
+  },
+  {
+    "operationId": "get_bank_statement_lines",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-statement-lines",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankStatementLineList"
+  },
+  {
+    "operationId": "get_bank_reconciliation",
+    "phase": "P06",
+    "method": "GET",
+    "path": "/bank-reconciliation",
+    "permission": "bank_match.read",
+    "input": null,
+    "response": "BankReconciliationView"
+  },
+  {
+    "operationId": "get_returns_id_lines",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/returns/{id}/lines",
+    "permission": "return.read",
+    "input": null,
+    "response": "ReturnLinesView"
+  },
+  {
+    "operationId": "get_transmissions",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/transmissions",
+    "permission": "transmission.read",
+    "input": null,
+    "response": "TransmissionQueue"
+  },
+  {
+    "operationId": "get_compliance_readiness",
+    "phase": "P07",
+    "method": "GET",
+    "path": "/compliance/readiness",
+    "permission": "return.read",
+    "input": null,
+    "response": "ComplianceReadiness"
+  },
+  {
+    "operationId": "get_source_systems",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-systems",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceSystemList"
+  },
+  {
+    "operationId": "get_mapping_versions",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/mapping-versions",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "MappingVersionList"
+  },
+  {
+    "operationId": "get_mapping_versions_id_lines",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/mapping-versions/{id}/lines",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "MappingLinesView"
+  },
+  {
+    "operationId": "get_source_batches",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-batches",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceBatchList"
+  },
+  {
+    "operationId": "get_source_batches_id_rows",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/source-batches/{id}/rows",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "SourceRowList"
+  },
+  {
+    "operationId": "get_expected_batches",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/expected-batches",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "ExpectedBatchList"
+  },
+  {
+    "operationId": "get_feed_reconciliation",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/feed-reconciliation",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "FeedReconciliationView"
+  },
+  {
+    "operationId": "get_branch_rollup",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/branch-rollup",
+    "permission": "source_ownership.read",
+    "input": null,
+    "response": "BranchRollupView"
+  },
+  {
+    "operationId": "get_institution_tax_worksheet",
+    "phase": "P08",
+    "method": "GET",
+    "path": "/institution-tax-worksheet",
+    "permission": "tax_rule.read",
+    "input": null,
+    "response": "InstitutionTaxWorksheet"
+  },
+  {
+    "operationId": "get_currencies",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/currencies",
+    "permission": "book.read",
+    "input": null,
+    "response": "CurrencyList"
+  },
+  {
+    "operationId": "get_fx_layers",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/fx-layers",
+    "permission": "open_item.read",
+    "input": null,
+    "response": "FxLayerList"
+  },
+  {
+    "operationId": "get_revaluations_id_lines",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/revaluations/{id}/lines",
+    "permission": "revaluation.read",
+    "input": null,
+    "response": "RevaluationPreviewView"
+  },
+  {
+    "operationId": "get_books_id_combined",
+    "phase": "P09",
+    "method": "GET",
+    "path": "/books/{id}/combined",
+    "permission": "book.read",
+    "input": null,
+    "response": "CombinedBookView"
+  },
+  {
+    "operationId": "get_warehouses",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/warehouses",
+    "permission": "item.read",
+    "input": null,
+    "response": "WarehouseList"
+  },
+  {
+    "operationId": "get_stock_card",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-card",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "StockCardView"
+  },
+  {
+    "operationId": "get_inventory_valuation",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/inventory-valuation",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "InventoryValuationView"
+  },
+  {
+    "operationId": "get_stock_movements_id_recost",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-movements/{id}/recost",
+    "permission": "stock_movement.read",
+    "input": null,
+    "response": "RecostPreviewView"
+  },
+  {
+    "operationId": "get_stock_counts_id_lines",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/stock-counts/{id}/lines",
+    "permission": "stock_count.read",
+    "input": null,
+    "response": "CountLinesView"
+  },
+  {
+    "operationId": "get_landed_costs_id_lines",
+    "phase": "P10",
+    "method": "GET",
+    "path": "/landed-costs/{id}/lines",
+    "permission": "landed_cost.read",
+    "input": null,
+    "response": "LandedCostPreviewView"
+  },
+  {
+    "operationId": "get_asset_classes",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/asset-classes",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetClassList"
+  },
+  {
+    "operationId": "get_assets_id_events",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets/{id}/events",
+    "permission": "asset.read",
+    "input": null,
+    "response": "AssetEventsView"
+  },
+  {
+    "operationId": "get_assets_id_layers",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/assets/{id}/layers",
+    "permission": "asset.read",
+    "input": null,
+    "response": "BookTaxView"
+  },
+  {
+    "operationId": "get_schedules_id_lines",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedules/{id}/lines",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleLinesView"
+  },
+  {
+    "operationId": "get_schedule_runs",
+    "phase": "P11",
+    "method": "GET",
+    "path": "/schedule-runs",
+    "permission": "schedule.read",
+    "input": null,
+    "response": "ScheduleRunList"
+  },
+  {
+    "operationId": "get_assistant_runs",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/runs",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiRunList"
+  },
+  {
+    "operationId": "get_assistant_runs_id",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/runs/{id}",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiRunResource"
+  },
+  {
+    "operationId": "get_assistant_suggestions",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/suggestions",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiSuggestionList"
+  },
+  {
+    "operationId": "get_assistant_features",
+    "phase": "P12",
+    "method": "GET",
+    "path": "/assistant/features",
+    "permission": "assistant.read",
+    "input": null,
+    "response": "AiFeatureList"
+  },
+  {
+    "operationId": "patch_assistant_features_feature",
+    "phase": "P12",
+    "method": "PATCH",
+    "path": "/assistant/features/{feature}",
+    "permission": "assistant.review",
+    "input": "AiFeatureUpdate",
+    "response": "AiFeatureResource"
+  },
+  {
+    "operationId": "get_portal_memberships",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal-memberships",
+    "permission": "portal_invite.read",
+    "input": null,
+    "response": "PortalMembershipList"
+  },
+  {
+    "operationId": "get_portal_me",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/portal/me",
+    "permission": "session.read",
+    "input": null,
+    "response": "PortalMeView"
+  },
+  {
+    "operationId": "get_certificates",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/certificates",
+    "permission": "party.read",
+    "input": null,
+    "response": "CertificateList"
+  },
+  {
+    "operationId": "get_message_requests_id_receipts",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/message-requests/{id}/receipts",
+    "permission": "message_request.read",
+    "input": null,
+    "response": "DeliveryReceiptsView"
+  },
+  {
+    "operationId": "get_webhook_receipts",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/webhook-receipts",
+    "permission": "payment_link.read",
+    "input": null,
+    "response": "WebhookReceiptList"
+  },
+  {
+    "operationId": "get_verify_token",
+    "phase": "P13",
+    "method": "GET",
+    "path": "/verify/{token}",
+    "permission": "evidence.read",
+    "input": null,
+    "response": "VerificationView"
+  },
+  {
+    "operationId": "post_portal_invites_id_accept",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/portal-invites/{id}/accept",
+    "permission": "portal_invite.read",
+    "input": "InviteAccept",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payment_links_id_claim",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/payment-links/{id}/claim",
+    "permission": "payment_link.read",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_webhooks_provider",
+    "phase": "P13",
+    "method": "POST",
+    "path": "/webhooks/{provider}",
+    "permission": "payment_link.edit",
+    "input": "WebhookEvent",
+    "response": "WebhookOutcome"
+  },
+  {
+    "operationId": "post_firms",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firms",
+    "permission": "firm_assignment.create",
+    "input": "FirmCreate",
+    "response": "FirmResource"
+  },
+  {
+    "operationId": "get_firms",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firms",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmList"
+  },
+  {
+    "operationId": "post_firms_id_staff",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firms/{id}/staff",
+    "permission": "firm_assignment.create",
+    "input": "FirmStaffCreate",
+    "response": "FirmStaffResource"
+  },
+  {
+    "operationId": "get_firms_id_staff",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firms/{id}/staff",
+    "permission": "firm_assignment.read",
+    "input": null,
+    "response": "FirmStaffList"
+  },
+  {
+    "operationId": "get_firm_clients",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/clients",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmClientList"
+  },
+  {
+    "operationId": "get_firm_rollup",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/rollup",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmRollupView"
+  },
+  {
+    "operationId": "get_firm_snapshots",
+    "phase": "P14",
+    "method": "GET",
+    "path": "/firm/snapshots",
+    "permission": "firm_mandate.read",
+    "input": null,
+    "response": "FirmSnapshotList"
+  },
+  {
+    "operationId": "post_firm_bulk_reminders",
+    "phase": "P14",
+    "method": "POST",
+    "path": "/firm/bulk-reminders",
+    "permission": "firm_mandate.read",
+    "input": "FirmBulkAction",
+    "response": "FirmBulkOutcome"
+  },
+  {
+    "operationId": "post_rate_sets",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/rate-sets",
+    "permission": "consolidation.edit",
+    "input": "RateSetCreate",
+    "response": "RateSetResource"
+  },
+  {
+    "operationId": "get_rate_sets",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/rate-sets",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "RateSetResourceList"
+  },
+  {
+    "operationId": "get_rate_sets_id",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/rate-sets/{id}",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "RateSetResource"
+  },
+  {
+    "operationId": "post_rate_sets_id_approve",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/rate-sets/{id}/approve",
+    "permission": "consolidation.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_groups_id_mappings",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/groups/{id}/mappings",
+    "permission": "group.edit",
+    "input": "GroupMappingCreate",
+    "response": "GroupMappingResource"
+  },
+  {
+    "operationId": "get_groups_id_mappings",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups/{id}/mappings",
+    "permission": "group.read",
+    "input": null,
+    "response": "GroupMappingResourceList"
+  },
+  {
+    "operationId": "post_group_mappings_id_approve",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/group-mappings/{id}/approve",
+    "permission": "group.activate",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_groups_id_readiness",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/groups/{id}/readiness",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "GroupReadiness"
+  },
+  {
+    "operationId": "post_consolidations_id_eliminations",
+    "phase": "P15",
+    "method": "POST",
+    "path": "/consolidations/{id}/eliminations",
+    "permission": "consolidation.edit",
+    "input": "EliminationCreate",
+    "response": "EliminationResource"
+  },
+  {
+    "operationId": "get_consolidations_id_worksheet",
+    "phase": "P15",
+    "method": "GET",
+    "path": "/consolidations/{id}/worksheet",
+    "permission": "consolidation.read",
+    "input": null,
+    "response": "ConsolidationWorksheet"
+  },
+  {
+    "operationId": "get_budgets_id_availability",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/budgets/{id}/availability",
+    "permission": "budget.read",
+    "input": null,
+    "response": "BudgetAvailability"
+  },
+  {
+    "operationId": "get_commitments",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/commitments",
+    "permission": "budget.read",
+    "input": null,
+    "response": "CommitmentList"
+  },
+  {
+    "operationId": "post_allocation_rules",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-rules",
+    "permission": "allocation_run.edit",
+    "input": "AllocationRuleCreate",
+    "response": "AllocationRuleResource"
+  },
+  {
+    "operationId": "get_allocation_rules",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-rules",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRuleResourceList"
+  },
+  {
+    "operationId": "post_allocation_rules_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-rules/{id}/approve",
+    "permission": "allocation_run.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_allocation_runs_id_lines",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-runs/{id}/lines",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRunLines"
+  },
+  {
+    "operationId": "post_projects_id_milestones",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/milestones",
+    "permission": "project.edit",
+    "input": "MilestoneCreate",
+    "response": "MilestoneResource"
+  },
+  {
+    "operationId": "get_projects_id_milestones",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/milestones",
+    "permission": "project.read",
+    "input": null,
+    "response": "MilestoneResourceList"
+  },
+  {
+    "operationId": "post_milestones_id_certify",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/milestones/{id}/certify",
+    "permission": "project.progress_billing",
+    "input": "MilestoneCertify",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_projects_id_change_orders",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/change-orders",
+    "permission": "project.edit",
+    "input": "ChangeOrderCreate",
+    "response": "ContractVersionResource"
+  },
+  {
+    "operationId": "get_projects_id_change_orders",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/change-orders",
+    "permission": "project.read",
+    "input": null,
+    "response": "ContractVersionResourceList"
+  },
+  {
+    "operationId": "post_change_orders_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/change-orders/{id}/approve",
+    "permission": "project.progress_billing",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_projects_id_advances",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/advances",
+    "permission": "project.edit",
+    "input": "ProjectAdvanceCreate",
+    "response": "ProjectAdvanceResource"
+  },
+  {
+    "operationId": "get_projects_id_advances",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/advances",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectAdvanceResourceList"
+  },
+  {
+    "operationId": "get_projects_id_retention",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/retention",
+    "permission": "project.read",
+    "input": null,
+    "response": "RetentionItemList"
+  },
+  {
+    "operationId": "post_retention_items_id_release",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/retention-items/{id}/release",
+    "permission": "project.progress_billing",
+    "input": "RetentionRelease",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_projects_id_profitability",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/profitability",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectProfitability"
+  },
+  {
+    "operationId": "get_leases_id_schedule",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases/{id}/schedule",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseSchedule"
+  },
+  {
+    "operationId": "post_leases_id_events",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases/{id}/events",
+    "permission": "lease.edit",
+    "input": "LeaseEventCreate",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_leases_id_events",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases/{id}/events",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseEventList"
+  },
+  {
+    "operationId": "post_leases_id_bill",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases/{id}/bill",
+    "permission": "lease.edit",
+    "input": "LeaseBilling",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_statutory_discount",
+    "phase": "P17B",
+    "method": "POST",
+    "path": "/invoices/{id}/statutory-discount",
+    "permission": "discount_eligibility.approve",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_invoices_id_statutory_discount",
+    "phase": "P17B",
+    "method": "GET",
+    "path": "/invoices/{id}/statutory-discount",
+    "permission": "discount_eligibility.read",
+    "input": null,
+    "response": "DiscountLineList"
+  },
+  {
+    "operationId": "post_channels",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/channels",
+    "permission": "channel.create",
+    "input": "ChannelCreate",
+    "response": "ChannelResource"
+  },
+  {
+    "operationId": "get_channels",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/channels",
+    "permission": "channel.read",
+    "input": null,
+    "response": "ChannelResourceList"
+  },
+  {
+    "operationId": "post_payouts",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts",
+    "permission": "payout.create",
+    "input": "PayoutCreate",
+    "response": "PayoutResource"
+  },
+  {
+    "operationId": "get_payouts",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/payouts",
+    "permission": "payout.read",
+    "input": null,
+    "response": "PayoutResourceList"
+  },
+  {
+    "operationId": "get_payouts_id",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/payouts/{id}",
+    "permission": "payout.read",
+    "input": null,
+    "response": "PayoutResource"
+  },
+  {
+    "operationId": "post_payouts_id_reconcile",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts/{id}/reconcile",
+    "permission": "payout.reconcile",
+    "input": "PayoutReconcile",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payouts_id_post",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts/{id}/post",
+    "permission": "payout.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_pos_machines",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-machines",
+    "permission": "channel.create",
+    "input": "PosMachineCreate",
+    "response": "PosMachineResource"
+  },
+  {
+    "operationId": "get_pos_machines",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/pos-machines",
+    "permission": "channel.read",
+    "input": null,
+    "response": "PosMachineResourceList"
+  },
+  {
+    "operationId": "post_pos_closings",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings",
+    "permission": "pos_closing.create",
+    "input": "PosClosingCreate",
+    "response": "PosClosingResource"
+  },
+  {
+    "operationId": "get_pos_closings",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/pos-closings",
+    "permission": "pos_closing.read",
+    "input": null,
+    "response": "PosClosingResourceList"
+  },
+  {
+    "operationId": "post_pos_closings_id_approve",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings/{id}/approve",
+    "permission": "pos_closing.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_pos_closings_id_match",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings/{id}/match",
+    "permission": "pos_closing.approve",
+    "input": "PosMatch",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payroll_batches",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches",
+    "permission": "payroll_batch.create",
+    "input": "PayrollBatchCreate",
+    "response": "PayrollBatchResource"
+  },
+  {
+    "operationId": "get_payroll_batches",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches",
+    "permission": "payroll_batch.read",
+    "input": null,
+    "response": "PayrollBatchResourceList"
+  },
+  {
+    "operationId": "get_payroll_batches_id",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches/{id}",
+    "permission": "payroll_batch.read",
+    "input": null,
+    "response": "PayrollBatchResource"
+  },
+  {
+    "operationId": "get_payroll_batches_id_records",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches/{id}/records",
+    "permission": "payroll_record.read",
+    "input": null,
+    "response": "PayrollRecordList"
+  },
+  {
+    "operationId": "post_payroll_batches_id_approve",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches/{id}/approve",
+    "permission": "payroll_batch.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payroll_batches_id_post",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches/{id}/post",
+    "permission": "payroll_batch.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_remittances",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances",
+    "permission": "remittance.create",
+    "input": "RemittanceCreate",
+    "response": "RemittanceResource"
+  },
+  {
+    "operationId": "get_remittances",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/remittances",
+    "permission": "remittance.read",
+    "input": null,
+    "response": "RemittanceResourceList"
+  },
+  {
+    "operationId": "post_remittances_id_approve",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances/{id}/approve",
+    "permission": "remittance.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_remittances_id_remit",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances/{id}/remit",
+    "permission": "remittance.approve",
+    "input": "RemittanceRemit",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_local_obligations",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations",
+    "permission": "local_obligation.create",
+    "input": "LocalObligationCreate",
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "get_local_obligations",
+    "phase": "P17E",
+    "method": "GET",
+    "path": "/local-obligations",
+    "permission": "local_obligation.read",
+    "input": null,
+    "response": "LocalObligationResourceList"
+  },
+  {
+    "operationId": "get_local_obligations_id",
+    "phase": "P17E",
+    "method": "GET",
+    "path": "/local-obligations/{id}",
+    "permission": "local_obligation.read",
+    "input": null,
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "patch_local_obligations_id",
+    "phase": "P17E",
+    "method": "PATCH",
+    "path": "/local-obligations/{id}",
+    "permission": "local_obligation.edit",
+    "input": "LocalObligationCreate",
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "post_local_obligations_id_complete",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations/{id}/complete",
+    "permission": "local_obligation.complete",
+    "input": "LocalObligationComplete",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_local_obligations_id_waive",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations/{id}/waive",
+    "permission": "local_obligation.complete",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_report_catalog",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/report-catalog",
+    "permission": "report_definition.read",
+    "input": null,
+    "response": "ReportCatalog"
+  },
+  {
+    "operationId": "post_report_definitions_id_run",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/report-definitions/{id}/run",
+    "permission": "report_definition.run",
+    "input": "ReportRun",
+    "response": "ReportRunResult"
+  },
+  {
+    "operationId": "post_custom_fields",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/custom-fields",
+    "permission": "custom_field.create",
+    "input": "CustomFieldCreate",
+    "response": "CustomFieldResource"
+  },
+  {
+    "operationId": "get_custom_fields",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/custom-fields",
+    "permission": "custom_field.read",
+    "input": null,
+    "response": "CustomFieldResourceList"
+  },
+  {
+    "operationId": "post_custom_fields_id_publish",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/custom-fields/{id}/publish",
+    "permission": "custom_field.publish",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_rule_proposals_id_impact",
+    "phase": "P18B",
+    "method": "GET",
+    "path": "/rule-proposals/{id}/impact",
+    "permission": "rule_proposal.read",
+    "input": null,
+    "response": "RuleImpact"
+  },
+  {
+    "operationId": "post_tool_runs",
+    "phase": "P18C",
+    "method": "POST",
+    "path": "/tool-runs",
+    "permission": "tool.execute",
+    "input": "ToolRunRequest",
+    "response": "ToolRunResult"
+  },
+  {
+    "operationId": "get_tool_runs",
+    "phase": "P18C",
+    "method": "GET",
+    "path": "/tool-runs",
+    "permission": "tool_grant.read",
+    "input": null,
+    "response": "ToolRunList"
+  },
+  {
+    "operationId": "get_packs",
+    "phase": "P18D",
+    "method": "GET",
+    "path": "/packs",
+    "permission": "pack.read",
+    "input": null,
+    "response": "PackCatalog"
+  },
+  {
+    "operationId": "get_pack_installs",
+    "phase": "P18D",
+    "method": "GET",
+    "path": "/pack-installs",
+    "permission": "pack.read",
+    "input": null,
+    "response": "PackVersionList"
+  },
+  {
+    "operationId": "post_pack_installs_id_rollback",
+    "phase": "P18D",
+    "method": "POST",
+    "path": "/pack-installs/{id}/rollback",
+    "permission": "pack.install",
+    "input": "ReasonAction",
+    "response": "Job"
   }
 ]

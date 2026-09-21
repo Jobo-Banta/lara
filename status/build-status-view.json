@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T17:00:58+00:00",
+  "updated_at": "2026-09-21T16:43:47+00:00",
   "releases": [
     {
       "id": "P00",
@@ -734,15 +734,15 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P01"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0009 creates the production workspace schema with composite scoped keys, forced RLS, immutable audit chain, maker-checker and state-machine triggers, and seeds 291 permissions, 15 capabilities and 9 role templates. @lara/contracts compiles the reviewed OpenAPI into validators and operation metadata.",
+      "evidence": "GitHub CI 35374766881 (0ba6b7a-range, branch feat/p02-contracts-migrations) passed: migration 0009 fresh and upgrade on PostgreSQL 18, scripts/test-p02-schema.mjs 15 groups in both databases, tests/contracts.test.mjs, restore rehearsal with new tables, image scans. Applied to engineering Supabase (PostgreSQL 17.6) 2026-09-19. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:34:29+00:00"
     },
     {
       "id": "P02-02",
@@ -793,13 +793,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "@lara/domain implements identity, organization, parties, evidence and workflow rules over the P02 schema with a shared idempotent command envelope, audit and outbox. Real-database test covers P02-T01..T05 at the domain layer.",
+      "evidence": "GitHub CI 35376135655 passed: scripts/test-p02-domain.mjs 10 groups in fresh and upgrade PostgreSQL 18 databases through the runtime role, tests/domain.test.mjs, foundation 22/22, image scans. Local Supabase run 2026-09-19 PASS with test tenants removed. docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T17:48:26+00:00"
     },
     {
       "id": "P02-03",
@@ -850,13 +850,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck.",
+      "evidence": "GitHub CI 35382047360 passed: scripts/test-p02-api.mjs 7 groups (API and worker processes, fresh and upgrade PostgreSQL 18), schema 15, domain 10, readiness, worker, restore with principal directory, foundation 23/23, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P02-REVIEW.md. Review correction \u2014 non-UUID ids and undecodable paths answer 404; the worker lease renews on its own connection (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P02-04",
@@ -907,13 +907,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Production workspace screens over /v1 through the BFF with mode-based composition; setup checklist, my work and task detail, parties, evidence upload/scan/download, obligations, roadmap and error/stale/forbidden states; operator tenant provisioning. Contract additions (GET /evidence, list filters) flagged for owner review.",
+      "evidence": "GitHub CI 35389296479 passed: tests/browser/workspace.spec.mjs five journeys on the LARA_MODE=local composition plus demo/accessibility/foundation suites (22 browser tests), API 7 groups, domain 10, schema 15 in fresh and upgrade PostgreSQL 18, foundation 23/23, specification validation 348 operations, image scans. Local Supabase full browser run 22/22 on 2026-09-19. Contract additions (GET /evidence, list filters) recorded in docs/development/P02-REVIEW.md for owner review.",
+      "updated_at": "2026-09-18T20:07:47+00:00"
     },
     {
       "id": "P02-05",
@@ -964,13 +964,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Runbooks written (P02-RUNBOOK.md); cursor scope binding and identity clock-skew tolerance added to the security matrix; load measurement script reports p50/p95 and asserts the operational profile in CI; regression suites for P00/P01/P02 run in both CI databases.",
+      "evidence": "GitHub CI 35390504685 passed: load profile asserted (p95 under 2 s, command p95 under 1 s) on PostgreSQL 18, cursor scope negatives in scripts/test-p02-api.mjs, identity skew unit test, P00/P01/P02 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook: docs/development/P02-RUNBOOK.md. Local remote-database load report recorded in docs/development/P02-REVIEW.md.",
+      "updated_at": "2026-09-18T20:19:44+00:00"
     },
     {
       "id": "P02-06",
@@ -1021,13 +1021,13 @@
         "REV-016"
       ],
       "acceptance": "P02-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.2.0-draft.md) with the RG-01..08 evidence map and activation boundaries. Blocked: P01 release is not recorded (release plan dependency), the tag/deployment/manifest are owner actions, and the first live activation needs qualified S3 store and scanner adapters plus review of the contract additions.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T20:17:48+00:00"
     },
     {
       "id": "P03-01",
@@ -1063,15 +1063,15 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P02"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0012 adds the ledger schema (accounts with cycle prevention and control types, dimensions and rules, non-overlapping periods with the published state machine, append-only journals written only through the granted posting function, openings, snapshots, close tasks, substantiations, statement mappings, templates and journal drafts). P03 operations already exist in the reviewed OpenAPI and compile in @lara/contracts.",
+      "evidence": "GitHub CI 35391416551 passed: migration 0012 fresh and upgrade on PostgreSQL 18, scripts/test-p03-schema.mjs 7 groups in both databases, restore rehearsal with ledger tables, P00-P02 regression suites, image scans. Applied to engineering Supabase (17.6) 2026-09-19. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T20:31:20+00:00"
     },
     {
       "id": "P03-02",
@@ -1109,13 +1109,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
+      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md. Review correction \u2014 fiscal-year close on contra-income and credit-balance expense accounts; opening-row errors stage (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P03-03",
@@ -1153,13 +1153,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 27 P03 operations served over the contract with idempotent commands and If-Match; report jobs snapshot and store renderings as restricted evidence; general_ledger activation opens the primary PHP book.",
+      "evidence": "GitHub CI 35394822049 passed: scripts/test-p03-api.mjs 6 groups with API and worker processes (fresh and upgrade PostgreSQL 18), P03 schema and domain, P02 suites, restore, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:08:53+00:00"
     },
     {
       "id": "P03-04",
@@ -1197,13 +1197,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger screens over the contract: capabilities, chart tree, journal editor with running difference and review actions, imports, periods with close checklist, reports from snapshots; close-task operations added to the reviewed OpenAPI for owner review.",
+      "evidence": "GitHub CI 35397177439 passed: ledger browser journey in tests/browser/workspace.spec.mjs (two-principal activation, chart, period, journal review and posting, close checklist, trial balance report, WCAG scans) on the production composition plus all P00-P03 suites in fresh and upgrade PostgreSQL 18, image scans. Local Supabase full browser suite 23/23 on 2026-09-19. Contract additions recorded in docs/development/P03-REVIEW.md.",
+      "updated_at": "2026-09-18T21:36:00+00:00"
     },
     {
       "id": "P03-05",
@@ -1241,13 +1241,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Ledger runbook written; posting profile added to the load measurement and asserted in CI; regression suites for P00-P03 run in both CI databases.",
+      "evidence": "GitHub CI 35397473671 (push) and 35397578851 (pull request) passed: posting load profile asserted on PostgreSQL 18 (post p95 under 1 s), P00-P03 regression suites in fresh and upgrade databases, restore rehearsal, image scans. Runbook docs/development/P03-RUNBOOK.md; remote load report in docs/development/P03-REVIEW.md. One pull-request-event run (35397477270) failed only in the gitleaks git range scan while the base moved; the same commit's push run passed.",
+      "updated_at": "2026-09-18T21:39:28+00:00"
     },
     {
       "id": "P03-06",
@@ -1285,13 +1285,13 @@
         "RPT-014"
       ],
       "acceptance": "P03-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Claude Code",
+      "note": "Release record drafted (docs/development/releases/0.3.0-draft.md). Blocked on the P02 release, owner tag/deployment, review of the contract additions and controller sign-off on mapping, openings, source ownership and a close rehearsal.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-18T21:34:50+00:00"
     },
     {
       "id": "P04-01",
@@ -1341,15 +1341,15 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P03"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0016 (sales and tax kernel schema) with trigger-enforced invariants, RLS and grants; scripts/test-p04-schema.mjs (8 groups) in CI; docs/development/P04-REVIEW.md.",
+      "evidence": "GitHub Actions CI run 35398987989 (push, be097cd) and 35398990518 (pull_request) succeeded: verify + images; includes scripts/test-p04-schema.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T21:57:19+00:00"
     },
     {
       "id": "P04-02",
@@ -1401,13 +1401,13 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI.",
+      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases Review correction \u2014 order conversions bill by source line with the discount carried once (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P04-03",
@@ -1459,13 +1459,13 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "34 P04 operations over /v1 (tax rules, invoices/credit notes, sales orders, collections, allocations, open items), aging report builder, worker document.deliver job; scripts/test-p04-api.mjs (6 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35402118677 (push, 91e86fe) and 35402121963 (pull_request) succeeded: verify + images incl. scripts/test-p04-api.mjs on fresh and upgraded databases",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P04-04",
@@ -1517,13 +1517,13 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-sales.tsx: invoices (list, editor, detail with four statuses, timeline, credit preview), orders, receipts with allocation workbench, customers statement and aging, tax rules; sales capability card; browser sales journey in tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded: seeded browser suite incl. the sales journey on the production composition, verify + images",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     {
       "id": "P04-05",
@@ -1575,13 +1575,13 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P04-T01\u2013T05 in domain/API suites, issuance load profile asserting unique numbers and p95 on the CI database, P04-RUNBOOK.md, 0.4.0 release draft.",
+      "evidence": "GitHub Actions CI run 35406317214 (push, c68ea17) and 35406319181 (pull_request) succeeded with LARA_LOAD_ASSERT=1 (issuance profile) and fresh/upgrade migration and restore checks",
+      "updated_at": "2026-09-18T23:40:31+00:00"
     },
     {
       "id": "P04-06",
@@ -1633,13 +1633,13 @@
         "RPT-015"
       ],
       "acceptance": "P04-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Owner",
+      "note": "Release 0.4.0 drafted (docs/development/releases/0.4.0-draft.md). Blocked on the P03 release, owner sign-offs of the sales profile, series and tax rule evidence, and a qualified delivery adapter.",
+      "evidence": "docs/development/releases/0.4.0-draft.md",
+      "updated_at": "2026-09-18T23:17:39+00:00"
     },
     {
       "id": "P05-01",
@@ -1665,15 +1665,15 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P04"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migrations 0019 (purchasing tables, payment order and beneficiary state machines, advances, expense claim facts, withholding certificates) and 0020 (supplier credits on the payable side, settled payments returnable); scripts/test-p05-schema.mjs (9 groups) in CI; the 36 P05 operations, permissions and the purchasing capability were already in the reviewed contract and seeds.",
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
+      "updated_at": "2026-09-20T00:31:42+00:00"
     },
     {
       "id": "P05-02",
@@ -1701,13 +1701,13 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups).",
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs Review correction \u2014 additional invoices link to their bill with distinct references (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P05-03",
@@ -1735,13 +1735,13 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "36 P05 operations served by apps/api/src/workspace-api.mjs; ap_aging report builder in the worker; scripts/test-p05-api.mjs (7 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
+      "updated_at": "2026-09-20T00:31:43+00:00"
     },
     {
       "id": "P05-04",
@@ -1769,13 +1769,13 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-purchasing.tsx: bills (editor, four statuses, duplicate disposition, supplier credit preview), purchase orders with the two-way match columns, expense claims, payment proposals with the payable allocation workbench and payment detail (order, authority, manual release, settlement, return), suppliers with statement and AP aging; routes, nav and capabilities wired; browser purchasing journey in tests/browser/workspace.spec.mjs; provisioning gains --treasury.",
+      "evidence": "GitHub Actions CI run 35480573825 (push, 2f4b59c) and 35480575787 (pull request) succeeded: verify + images; fresh database runs the browser suite with the purchasing journey and the load profile with the bill and duplicate-race checks; upgrade path runs the P05 suites",
+      "updated_at": "2026-09-20T01:14:07+00:00"
     },
     {
       "id": "P05-05",
@@ -1803,13 +1803,13 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P05-T01..T05 in scripts/test-p05-domain.mjs and test-p05-api.mjs; bill load profile and concurrent duplicate race in scripts/test-p02-load.mjs; docs/development/P05-REVIEW.md, P05-RUNBOOK.md and releases/0.5.0-draft.md written.",
+      "evidence": "GitHub Actions CI run 35480573825 (push, 2f4b59c) and 35480575787 (pull request) succeeded: verify + images; fresh database runs the browser suite with the purchasing journey and the load profile with the bill and duplicate-race checks; upgrade path runs the P05 suites",
+      "updated_at": "2026-09-20T01:14:07+00:00"
     },
     {
       "id": "P05-06",
@@ -1837,13 +1837,13 @@
         "RPT-008"
       ],
       "acceptance": "P05-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.5.0 drafted (docs/development/releases/0.5.0-draft.md). Blocked on the 0.4.0 (P04) release, finance sign-offs on withholding timing, PO/receipt-of-service policy, manual payment responsibility and certificate obligations, contract operations for the purchasing profile, beneficiaries, receipts, advances and certificates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T01:08:28+00:00"
     },
     {
       "id": "P06-01",
@@ -1872,15 +1872,15 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P05"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0021 (bank accounts, statement batches and lines, reconciliation matches and guarded allocations, checks, transfers, cash sessions with counts and handovers, bank file runs); GET /bank-statement-lines and GET /bank-reconciliation added to the reviewed contract (353 operations); scripts/test-p06-schema.mjs (9 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-02",
@@ -1911,13 +1911,13 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups).",
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey Review correction \u2014 settlements carry a branch; the cash session counts its branch only; variance entry in the book currency (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P06-03",
@@ -1948,13 +1948,13 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "36 P06 operations served by apps/api/src/workspace-api.mjs (imports carry the treasury hooks, payments carry the bank-file generator, dishonor carries the settlement reversal); worker bank.propose_matches job and bank_reconciliation report; scripts/test-p06-api.mjs (8 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-04",
@@ -1985,13 +1985,13 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-treasury.tsx: bank accounts, reconciliation workbench (difference breakdown, statement lines, counterparts, journal allocations, proposals with confirm/reject/reverse), transfers, check register with release calendar, cashier sessions with denomination counts and handover; imports screen offers bank statements; routes /bank/*; browser treasury journey.",
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-05",
@@ -2022,13 +2022,13 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P06-T01..T05 in scripts/test-p06-domain.mjs and test-p06-api.mjs; docs/development/P06-REVIEW.md, P06-RUNBOOK.md and releases/0.6.0-draft.md written; later-phase probes moved to P07 operations.",
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
+      "updated_at": "2026-09-20T06:10:34+00:00"
     },
     {
       "id": "P06-06",
@@ -2059,13 +2059,13 @@
         "RPT-011"
       ],
       "acceptance": "P06-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.6.0 drafted (docs/development/releases/0.6.0-draft.md). Blocked on the 0.5.0 (P05) release, pilot bank format acceptance by bank and customer, signer matrix and outbound custody controls, contract operations for the treasury profile, statement batches, bank file runs and cash counts, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T06:02:37+00:00"
     },
     {
       "id": "P07-01",
@@ -2150,15 +2150,15 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P06"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0022 (regulatory profiles, schema artifacts, return runs with lines and source links guarded once approved, filing records, transmission jobs with append-only attempts, registration cases); GET /returns/{id}/lines, GET /transmissions and GET /compliance/readiness added to the reviewed contract (356 operations); scripts/test-p07-schema.mjs (8 groups) in CI.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-02",
@@ -2245,13 +2245,13 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/compliance.mjs: compliance profile, regulatory profiles and reviewed mapping artifacts from CSV evidence, return preparation at a frozen cutoff with source links, ledger tie-out and reproducible snapshot hash (unmapped events refuse rather than zero), independent approval and filing from acknowledgement evidence, immutable signed transmissions with unknown-outcome reconciliation and envelope/financial rejection handling, registration packs that never mark a permit, readiness, fixture transport; scripts/test-p07-domain.mjs covers P07-T01..T05 (7 groups).",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-03",
@@ -2338,13 +2338,13 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 11 P07 operations plus the three reads served by apps/api/src/workspace-api.mjs with If-Match on return actions and job rows for reconcile/retry/registration packs; worker jobs einvoice.transmit, einvoice.reconcile and registration.pack with the fixture transport built from EINVOICE_ADAPTER; scripts/test-p07-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-04",
@@ -2431,13 +2431,13 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-compliance.tsx at /compliance: readiness gates and form states, return runs with prepare/approve/reject/record filing, lines panel with tie-out and filing record, reporting queue with deadlines and plain-language rejection view, reconcile/retry, registration pack job; capabilities screen offers compliance; browser compliance journey in tests/browser/workspace.spec.mjs with WCAG checks.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-05",
@@ -2524,13 +2524,13 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P07-T01..T05 in scripts/test-p07-domain.mjs and scripts/test-p07-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs (fresh and upgraded databases); teardown and snapshot tooling cover the compliance tables; docs/development/P07-REVIEW.md, P07-RUNBOOK.md and releases/0.7.0-draft.md written.",
+      "evidence": "GitHub Actions CI run 35497998831 (push, b04f518) succeeded: verify + images; fresh and upgraded databases run scripts/test-p07-schema.mjs, test-p07-domain.mjs, test-p07-api.mjs; the fresh database runs the browser suite with the compliance journey",
+      "updated_at": "2026-09-20T09:02:12+00:00"
     },
     {
       "id": "P07-06",
@@ -2617,13 +2617,13 @@
         "RPT-013"
       ],
       "acceptance": "P07-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.7.0 drafted (docs/development/releases/0.7.0-draft.md). Blocked on the 0.6.0 (P06) release, the tax lead's approval of official form artifacts and golden cases per enabled form, a certified provider adapter with sandbox certification, key and credential custody, contract operations for the compliance profile, regulatory profiles, artifacts and registration decisions, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T07:07:06+00:00"
     },
     {
       "id": "P08-01",
@@ -2650,15 +2650,15 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P07"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0023 (source systems, source ownership windows, mapping versions and frozen lines, source batches with manifests and staged rows, expected batches, balance snapshots, instrument facts, branch roll-ups); nine reads added to the reviewed contract (365 operations); feeds ride the reviewed import operations; scripts/test-p08-schema.mjs (7 groups) passes locally.",
+      "evidence": "GitHub Actions CI run 35503479657 (push, e136fb2) succeeded: verify + images; fresh and upgraded databases run scripts/test-p08-schema.mjs, test-p08-domain.mjs, test-p08-api.mjs; the fresh database runs the browser suite with the institution journey",
+      "updated_at": "2026-09-20T10:54:20+00:00"
     },
     {
       "id": "P08-02",
@@ -2687,13 +2687,13 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/fi.mjs: institution profile, source systems and approved ownership windows, mapping versions from reviewed CSV with diffs, the lara-feed-1 manifest contract through the import pipeline (duplicate rule, error workbench, one posting per batch, linked replacements, balance snapshots, instrument facts), expected batches raising close tasks on the affected period only, feed reconciliation, branch roll-up with interbranch elimination, institution tax worksheet through reviewed rule versions; scripts/test-p08-domain.mjs covers P08-T01..T05 (9 groups).",
+      "evidence": "GitHub Actions CI run 35503479657 (push, e136fb2) succeeded: verify + images; fresh and upgraded databases run scripts/test-p08-schema.mjs, test-p08-domain.mjs, test-p08-api.mjs; the fresh database runs the browser suite with the institution journey",
+      "updated_at": "2026-09-20T10:54:21+00:00"
     },
     {
       "id": "P08-03",
@@ -2722,13 +2722,13 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "The 5 source-ownership operations plus nine reads served by apps/api/src/workspace-api.mjs; import operations carry the sourceFeed hook and period soft-close/lock carry the feeds hook; worker job feed.sweep and report types branch_rollup, institution_tax, feed_reconciliation; scripts/test-p08-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "GitHub Actions CI run 35503479657 (push, e136fb2) succeeded: verify + images; fresh and upgraded databases run scripts/test-p08-schema.mjs, test-p08-domain.mjs, test-p08-api.mjs; the fresh database runs the browser suite with the institution journey",
+      "updated_at": "2026-09-20T10:54:21+00:00"
     },
     {
       "id": "P08-04",
@@ -2757,13 +2757,13 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-fi.tsx: source ownership matrix (/institution/ownership), batch monitor and error workbench with the feed calendar and mapping diff preview (/institution/feeds), branch reconciliation and missing-feed dashboard (/institution/branches), institution tax worksheet with drill-through (/institution/tax); imports screen offers the feed kinds; capabilities screen offers fi_coexistence; browser institution journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub Actions CI run 35503479657 (push, e136fb2) succeeded: verify + images; fresh and upgraded databases run scripts/test-p08-schema.mjs, test-p08-domain.mjs, test-p08-api.mjs; the fresh database runs the browser suite with the institution journey",
+      "updated_at": "2026-09-20T10:54:21+00:00"
     },
     {
       "id": "P08-05",
@@ -2792,13 +2792,13 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P08-T01..T05 in scripts/test-p08-domain.mjs and scripts/test-p08-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the institution tables; docs/development/P08-REVIEW.md, P08-RUNBOOK.md and releases/0.8.0-draft.md written.",
+      "evidence": "GitHub Actions CI run 35503479657 (push, e136fb2) succeeded: verify + images; fresh and upgraded databases run scripts/test-p08-schema.mjs, test-p08-domain.mjs, test-p08-api.mjs; the fresh database runs the browser suite with the institution journey",
+      "updated_at": "2026-09-20T10:54:21+00:00"
     },
     {
       "id": "P08-06",
@@ -2827,13 +2827,13 @@
         "REV-015"
       ],
       "acceptance": "P08-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.8.0 drafted (docs/development/releases/0.8.0-draft.md). Blocked on the 0.7.0 (P07) release, the design partner's signed entity/books/currency/tax/feed matrix and parallel month, source system owners and cutoffs, the tax advisor's GRT/DST rule versions with golden cases, contract operations for source systems, mapping versions, expected batches and the institution profile, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T09:14:18+00:00"
     },
     {
       "id": "P09-01",
@@ -2849,15 +2849,15 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P08"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0024 (currency metadata, book kinds and access grants, book links, reviewed FX rates, fx_rate on entries with the backfill at 1, append-only FX layers, revaluation runs; the posting function translates foreign-currency lines at the approved rate with balanced functional totals, refuses a missing rate, a management view and a closed partition); GET /currencies, GET /fx-layers, GET /revaluations/{id}/lines and GET /books/{id}/combined added to the reviewed contract (369 operations); scripts/test-p09-schema.mjs (5 groups) passes locally.",
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:17+00:00"
     },
     {
       "id": "P09-02",
@@ -2875,13 +2875,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/fx.mjs with hooks in ledger, sales and purchasing: FX profile, rate review with the inverted-pair guard, documents posting both amounts at the document-date rate with open-item layers, settlements consuming layers proportionally with the final allocation absorbing rounding and realized FX as a functional adjustment (AC-10 exact), reversals at the original rate, revaluation of classified monetary accounts posting once per rate set with linked later sets, partitions with access grants and the combined management view; scripts/test-p09-domain.mjs covers P09-T01..T05 (7 groups).",
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:17+00:00"
     },
     {
       "id": "P09-03",
@@ -2899,13 +2899,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 17 P09 operations plus the four reads served by apps/api/src/workspace-api.mjs (books create/edit/activate/combined, rates, revaluation preview/approve/post with If-Match); scripts/test-p09-api.mjs (5 groups) runs the API as a process with AC-10 over HTTP.",
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-04",
@@ -2923,13 +2923,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-fx.tsx: rate import and review (/fx/rates), revaluation preview/approve/post (/fx/revaluations), books with partitions, activation and the combined management view (/books); invoice and receipt editors offer a currency under the capability and the invoice detail shows transaction and functional amounts with the layer history; browser multi-currency journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-05",
@@ -2947,13 +2947,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P09-T01..T05 and AC-10 in scripts/test-p09-domain.mjs and scripts/test-p09-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the FX tables; docs/development/P09-REVIEW.md, P09-RUNBOOK.md and releases/0.9.0-draft.md written.",
+      "evidence": "GitHub Actions CI run 35512462608 (push, 91dcac9) succeeded: verify + images; fresh and upgraded databases run scripts/test-p09-schema.mjs, test-p09-domain.mjs, test-p09-api.mjs; the fresh database runs the browser suite with the multi-currency journey",
+      "updated_at": "2026-09-20T13:13:18+00:00"
     },
     {
       "id": "P09-06",
@@ -2971,13 +2971,13 @@
         "FR-PH-025"
       ],
       "acceptance": "P09-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.9.0 drafted (docs/development/releases/0.9.0-draft.md). Blocked on the 0.8.0 (P08) release, the controller's approval of the monetary classification, FX sources, functional currencies and book boundaries, tested separate-book reports, contract operations for the FX profile, book access grants, book links and currency metadata, FX desk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T11:17:04+00:00"
     },
     {
       "id": "P10-01",
@@ -2999,15 +2999,15 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P06"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Migration 0025 (warehouses, items with fixed cost method, stock movements and frozen lines, non-negative balances, valuation layers, append-only allocations, lot and serial tracking, count sessions and lines, landed cost runs and allocations); six reads added to the reviewed contract (375 operations); scripts/test-p10-schema.mjs (5 groups) passes locally.",
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-02",
@@ -3031,13 +3031,13 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/inventory.mjs with the three-way hook in purchasing: inventory profile, items and warehouses, movements posted once with FIFO or moving-average costing (AC-09), sorted balance locks refusing negative stock, serials in one warehouse, transfers conserving value, deterministic recost for backdated receipts as a linked adjustment, counts with frozen expected quantities, landed cost by value or quantity with the sold portion to cost of sales, valuation versus ledger, and the three-way match mandating the goods receipt; scripts/test-p10-domain.mjs covers P10-T01..T05 (7 groups).",
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-03",
@@ -3061,13 +3061,13 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "All 24 P10 operations plus the six reads served by apps/api/src/workspace-api.mjs; the worker renders inventory_valuation reports; scripts/test-p10-api.mjs (5 groups) runs API and worker as processes.",
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-04",
@@ -3091,13 +3091,13 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-inventory.tsx: items and stock card with the stock-to-ledger differences (/inventory), movement workbench with the recost preview (/inventory/movements), count entry and review (/inventory/counts), landed-cost preview (/inventory/landed-costs); capabilities screen offers inventory; browser inventory journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-05",
@@ -3121,13 +3121,13 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P10-T01..T05 and AC-09 in scripts/test-p10-domain.mjs and scripts/test-p10-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the inventory tables; docs/development/P10-REVIEW.md, P10-RUNBOOK.md and releases/0.10.0-draft.md written.",
+      "evidence": "GitHub CI run 35515799578 (commit 59884a4): fresh and upgrade migrations, workflow suite, P10 schema/domain/API suites and the Playwright suite (13 tests incl. the inventory journey) passed.",
+      "updated_at": "2026-09-20T15:47:12+00:00"
     },
     {
       "id": "P10-06",
@@ -3151,13 +3151,13 @@
         "FR-IN-007"
       ],
       "acceptance": "P10-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.10.0 drafted (docs/development/releases/0.10.0-draft.md). Blocked on the 0.6.0 (P06) release, the controller's signed costing method, unit conversions, cutoff, negative-stock policy and opening count, the stock/GL/AR/AP and inventory outputs on a parallel month, contract operations for warehouses, the inventory profile and the opening stock import, stock clerk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T13:33:27+00:00"
     },
     {
       "id": "P11-01",
@@ -3183,16 +3183,16 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P03",
         "P05"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0026_p11_assets_and_schedules.sql: asset classes, assets with independent approval and fixed facts once approved, append-only events and components, recognition schedules with one live per source, reviewed versions, lines unique per period and immutable once executed, schedule runs, append-only book/tax layers; RLS and grants (worker executes runs). Five reads added to the reviewed contract (asset classes, asset events, asset layers, schedule lines, schedule runs); 380 operations validate.",
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     {
       "id": "P11-02",
@@ -3220,13 +3220,13 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report.",
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed. Review correction \u2014 asset events without proceeds or amount are typed refusals (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P11-03",
@@ -3254,13 +3254,13 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 13 P11 operations plus five reads; POST /schedule-runs queues the schedule.run job (202); apps/worker/src/main.mjs executes runs under the rechecked schedule.execute authority and renders the asset_register report.",
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     {
       "id": "P11-04",
@@ -3288,13 +3288,13 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-assets.tsx: register with capitalization drafts, approval, asset detail (events, components, carrying amount, event form) and the book/tax comparison (/assets); schedule workbench with the deterministic preview, versions, approval, pause/resume, run per period and the run calendar (/assets/schedules); capabilities screen offers assets; Assistant placeholder for P12; browser assets journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     {
       "id": "P11-05",
@@ -3322,13 +3322,13 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P11-T01..T05 and AC-08 in scripts/test-p11-domain.mjs and scripts/test-p11-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the asset and schedule tables; docs/development/P11-REVIEW.md, P11-RUNBOOK.md and releases/0.11.0-draft.md written.",
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
+      "updated_at": "2026-09-20T17:32:40+00:00"
     },
     {
       "id": "P11-06",
@@ -3356,13 +3356,13 @@
         "FR-SH-008"
       ],
       "acceptance": "P11-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.11.0 drafted (docs/development/releases/0.11.0-draft.md). Blocked on the 0.5.0 (P05) release, the controller's approved classes, recognition methods, opening register, impairment and revaluation journals and disclosure boundary, contract operations for classes, the asset profile, policies and the opening register import, asset clerk and approver role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T15:57:22+00:00"
     },
     {
       "id": "P12-01",
@@ -3410,15 +3410,15 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P07"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0027_p12_ai_assistance.sql: evaluation sets and results (append-only, one Finance acceptance), model feature configs gated on a passing accepted evaluation of the exact model and prompt (200 items for capture, approver other than the configurer, no model change while enabled), AI runs immutable once completed with every tool call recorded, suggestions one per run with a frozen proposal reviewed once; RLS and grants. Five operations added to the reviewed contract (runs list/read, suggestions list, features list, versioned feature opt-in/opt-out); 385 operations validate.",
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:05+00:00"
     },
     {
       "id": "P12-02",
@@ -3468,13 +3468,13 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider.",
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed. Review correction \u2014 monthly assistant budgets roll over (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P12-03",
@@ -3524,13 +3524,13 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 3 P12 operations plus the five additions; POST /assistant/runs queues the assistant.run job (202); apps/worker/src/main.mjs executes runs with the provider from AI_PROVIDER (fixture only).",
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     {
       "id": "P12-04",
@@ -3580,13 +3580,13 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-assistant.tsx at /assistant: feature switches with evaluations and budgets, the request form over the requester's evidence and records (question and period for ask-your-books), run history with tool calls and cost, the source/draft split view with per-field evidence, locator and uncertainty marker, scope banner, abstention notice and accept/edit/reject for the reviewer; capabilities screen offers ai_assistance; Portal placeholder for P13; browser assistant journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     {
       "id": "P12-05",
@@ -3636,13 +3636,13 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P12-T01..T05 in scripts/test-p12-domain.mjs and scripts/test-p12-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the AI tables; docs/development/P12-REVIEW.md, P12-RUNBOOK.md and releases/0.12.0-draft.md written.",
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
+      "updated_at": "2026-09-20T19:54:06+00:00"
     },
     {
       "id": "P12-06",
@@ -3692,13 +3692,13 @@
         "REV-012"
       ],
       "acceptance": "P12-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.12.0 drafted (docs/development/releases/0.12.0-draft.md). Blocked on the 0.7.0 (P07) release, privacy/security approval of a hosted provider's region, retention, training terms and subprocessors, the provider adapter itself (only the local fixture exists), a real held-out evaluation (200 local bills with handwriting and poor scans) accepted by Finance, Product's review-time measurement, contract operations for configuration and evaluation, requester and reviewer role templates, and the owner's tag, deployment and manifest run.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T17:32:30+00:00"
     },
     {
       "id": "P13-01",
@@ -3720,7 +3720,7 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P04",
         "P05",
@@ -3728,10 +3728,10 @@
         "P07"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 the worker rotates share tokens (0034 grant) (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P13-02",
@@ -3755,13 +3755,13 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 delivered share links carry a token minted at delivery and open the public verify page (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P13-03",
@@ -3785,13 +3785,13 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P13-04",
@@ -3815,13 +3815,13 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P13-05",
@@ -3845,13 +3845,13 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P13-06",
@@ -3875,13 +3875,13 @@
         "FR-PL-013"
       ],
       "acceptance": "P13-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.13.0 drafted (docs/development/releases/0.13.0-draft.md). Blocked on the 0.7.0 (P07) release, a qualified messaging channel and payment provider with their adapters, the consent and notification policy, terms and support, a contract operation for the portal profile, relations and authorizer role templates, and the owner's tag, deployment and manifest run; without provider evidence the portal ships with messaging and links disabled.",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T19:53:47+00:00"
     },
     {
       "id": "P14-01",
@@ -3895,16 +3895,16 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P07",
         "P13"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas).",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P14-02",
@@ -3920,13 +3920,13 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 firm rollup scopes run under savepoints (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P14-03",
@@ -3942,13 +3942,13 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P14-04",
@@ -3964,13 +3964,13 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P14-05",
@@ -3986,13 +3986,13 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P14-06",
@@ -4008,13 +4008,13 @@
         "FR-PL-016"
       ],
       "acceptance": "P14-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T21:09:14+00:00"
     },
     {
       "id": "P15-01",
@@ -4029,16 +4029,16 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P09",
         "P11"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas).",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     {
       "id": "P15-02",
@@ -4055,13 +4055,13 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 database-raised refusals become pair exceptions (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P15-03",
@@ -4078,13 +4078,13 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     {
       "id": "P15-04",
@@ -4101,13 +4101,13 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     {
       "id": "P15-05",
@@ -4124,13 +4124,13 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables.",
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     {
       "id": "P15-06",
@@ -4147,13 +4147,13 @@
         "RPT-010"
       ],
       "acceptance": "P15-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-20T22:26:50+00:00"
     },
     {
       "id": "P16-01",
@@ -4170,16 +4170,16 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [
         "P10",
         "P11"
       ],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0031_p16_planning.sql: budgets versioned per book and period with one active and buckets per account and dimension set; commitments one per order line with consumption never reduced, warnings and overrides; allocation rule versions and runs (posted once per rule version and period, inputs frozen once approved); projects, contract versions, milestones, advances, billings and retention items; contracts add availability, commitments, rule versions, run lines, milestones, change orders, advances, retention and profitability (429 operations).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:52:59+00:00"
     },
     {
       "id": "P16-02",
@@ -4198,13 +4198,13 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 budget actuals net reversals (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P16-03",
@@ -4223,13 +4223,13 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P16 operations plus the seventeen additions; the P05 and P04 operations carry the reservation, consumption, release and billing hooks.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:52:59+00:00"
     },
     {
       "id": "P16-04",
@@ -4248,13 +4248,13 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:52:59+00:00"
     },
     {
       "id": "P16-05",
@@ -4273,13 +4273,13 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P16-T01..T05 in scripts/test-p16-domain.mjs and scripts/test-p16-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P16-REVIEW.md and P16-RUNBOOK.md written; teardown and snapshot scripts cover the planning tables.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:52:59+00:00"
     },
     {
       "id": "P16-06",
@@ -4298,13 +4298,13 @@
         "RPT-012"
       ],
       "acceptance": "P16-T01..T05 and RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "depends_on_releases": [],
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
+      "owner": "Owner",
+      "note": "Release 0.16.0 drafted (docs/development/releases/0.16.0-draft.md). Blocked on the 0.10.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     {
       "id": "P17A-01",
@@ -4321,12 +4321,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0032_p17_local_operations.sql (shared by P17A\u2013E): lease_contracts (one per billing schedule, evidence, approved by another principal, terms frozen once approved) and append-only lease_events; capabilities leases/statutory_discounts/marketplace_pos/payroll_data/local_obligations and 22 permissions. Lease operations (5 reviewed + schedule, events, billing) in the OpenAPI with escalation steps and base rent added to the lease schema.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:52:59+00:00"
     },
     {
       "id": "P17A-02",
@@ -4342,12 +4342,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/localops.mjs leases: schedule from the base rent with escalation steps compounded from their boundary; billing one schedule month at the escalated rent from the recurring template; deposits and advances received into the profile's liabilities within the contract, applied by another principal as a non-cash settlement through the allocation model or refunded (P17-T01).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17A-03",
@@ -4363,12 +4363,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the lease operations; FEATURE_NOT_ENABLED until the leases capability is active and RULE_PROFILE_NOT_APPROVED until lease_profile and lease_withholding_profile are approved; teardown and snapshot tooling cover the tables.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17A-04",
@@ -4384,12 +4384,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-localops.tsx /local: leases drafted with escalation steps and evidence, approved by another principal, the rent schedule with per-month billing, deposit and advance events with evidence; capabilities screen offers leases; browser local operations journey covers activation on screen, approval, schedule, billing and the deposit.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17A-05",
@@ -4405,12 +4405,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T01 in scripts/test-p17-domain.mjs and the lease process in scripts/test-p17-api.mjs; negatives: escalation outside the term, deposit beyond the contract, self-application, application beyond what is held, second billing of a period. Runbook P17A section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17A-06",
@@ -4426,12 +4426,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (docs/development/releases/0.17.0-draft.md, feature tag v0.17.0-a). Blocked on the owner: lease accounting examples and the withholding profile reviewed by the advisor, the hosted run and RG-06 task-based acceptance, RG-07 profile review, RG-08 manifest from the exact-source run.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-01",
@@ -4449,12 +4449,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: discount_eligibility (one live per customer and category, evidence, approved by another principal, immutable once approved, revoked final) and discount_lines (one per document line); eligibility operations (5 reviewed) with the masked identity reference plus the invoice discount application and its lines.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17B-02",
@@ -4471,12 +4471,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs discounts: eligibility validated against the approved discount profile (required identity evidence, expiry, one live per customer and category); application to a draft invoice discounts each line on an eligible account on the profile's basis and exempts it, records the golden case, refuses customers without approved eligibility, expired eligibility at the document date and posted invoices (P17-T02).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17B-03",
@@ -4493,12 +4493,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves eligibility and discount operations behind the statutory_discounts capability and the discount_profile_<category> profile.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17B-04",
@@ -4515,12 +4515,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17B-05",
@@ -4537,12 +4537,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T02 in the domain and API suites; negatives: ineligible and expired customers, self-approval, re-discounting a posted invoice. Runbook P17B section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:00+00:00"
     },
     {
       "id": "P17B-06",
@@ -4559,12 +4559,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-b). Blocked on the owner: discount profiles per category reviewed by the advisor, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17C-01",
@@ -4584,12 +4584,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: channels, payout_batches (unique per channel and source; net = gross \u2212 fees \u2212 withholding \u2212 other deductions; posted only from reconciled; immutable once posted), pos_machines (unique per serial and MIN), pos_closings (unique per machine, shift and reading; gross = ending \u2212 beginning; approved by another principal; matched only with a deposit); channel, payout (reconcile, post), machine and closing (approve, match) operations.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17C-02",
@@ -4608,12 +4608,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs channels: a payout's deductions must explain the net; reconciliation to posted invoices or entries whose total equals the gross, each sales reference once; posting once with the net to clearing, fees and withholding recognized and the channel receivable settled; replayed statements refused; closings validated and matched to a posted deposit with the difference as an exception (P17-T03).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17C-03",
@@ -4632,12 +4632,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves channel, payout and POS operations behind the marketplace_pos capability; channel sales ride the existing journal and invoice imports.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17C-04",
@@ -4656,12 +4656,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17C-05",
@@ -4680,12 +4680,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T03 in the domain and API suites; negatives: unexplained payout nets, replayed statements, posting before reconciliation, sales reconciled twice, closings with inconsistent readings. Runbook P17C section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17C-06",
@@ -4704,12 +4704,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-c). Blocked on the owner: provider statement formats and channel accounting reviewed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-01",
@@ -4727,12 +4727,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: payroll_batches (unique per file; approved by another principal; posted once per source and period), append-only employee_tax_records (identifier encrypted and masked, payroll_record.read), remittance_records (unique per agency, period and batch; remitted only with reference and evidence); batch (records, approve, post) and remittance (approve, remit) operations.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17D-02",
@@ -4750,12 +4750,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs payroll: records validated line by line and against the totals (an untying file stays an exception), file hash refuses replays, records restricted and masked with an audit per read, the journal per the approved payroll profile once per source and period, remittances tied to the batch totals and remitted on evidence (P17-T04).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17D-03",
@@ -4773,12 +4773,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves payroll and remittance operations behind the payroll_data capability and payroll_profile; encrypted identifiers under FIELD_ENCRYPTION_KEY.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17D-04",
@@ -4796,12 +4796,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:01+00:00"
     },
     {
       "id": "P17D-05",
@@ -4819,12 +4819,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T04 in the domain and API suites; negatives: untying totals, replayed files, records without payroll_record.read, second posting of a period, remittance without evidence. Runbook P17D section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17D-06",
@@ -4842,12 +4842,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-d). Blocked on the owner: payroll file format and profile reviewed, hosted run, RG-06/07/08; integrations beyond file import are Phase 3.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-01",
@@ -4864,12 +4864,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: local_obligations (unique per authority, kind, period and property; complete only with payment evidence and, where required, filing evidence; complete and waived final); obligation operations (create, edit, list, read, complete, waive).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17E-02",
@@ -4885,12 +4885,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs obligations: the approved authority profile decides kinds and filing requirements; completion needs payment evidence and, where required, filing evidence by the completing authority; waivers need a reason (P17-T05).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17E-03",
@@ -4906,12 +4906,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves local obligation operations behind the local_obligations capability and local_authority_profile.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17E-04",
@@ -4927,12 +4927,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17E-05",
@@ -4948,12 +4948,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T05 in the domain and API suites; negatives: completion without the required filing evidence, kinds outside the profile, waiver without reason. Runbook P17E section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P17E-06",
@@ -4969,12 +4969,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-e). Blocked on the owner: authority profile reviewed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P18A-01",
@@ -4992,12 +4992,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0033_p18_extensibility.sql (shared by P18A\u2013D): report_definitions (one live version per name, validated query AST with version and cost, published by another principal, immutable once published) and append-only report_runs (scope, checksum, payload); custom_fields (cf_ keys only, never statutory, published by another principal); capabilities report_authoring/rule_proposals/client_tools/industry_packs and six permissions. Catalog, run and custom-field operations added to the OpenAPI; publish takes a reason.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P18A-02",
@@ -5014,12 +5014,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/extensibility.mjs reports: the catalog is the allowlist (metrics with their permissions, dimensions, budget); definitions compile to a versioned AST or are refused (unlisted field, unfilterable, unselected sort, over budget); one parameterized statement per run under row, cost and time budgets; the caller's scope on every row and the aggregate, entities outside the scope not disclosed, a reproducible checksum (P18-T01, P18-T05); custom fields never take statutory keys.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P18A-03",
@@ -5036,12 +5036,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the report and custom-field operations; FEATURE_NOT_ENABLED until report_authoring is active; teardown and snapshot tooling cover the tables.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:02+00:00"
     },
     {
       "id": "P18A-04",
@@ -5058,12 +5058,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-extend.tsx /extend: the catalog with its budget, the definition builder, publication by the reviewer, runs with rows, aggregate, scope and checksum, custom fields with independent publication; capabilities screen offers report_authoring; browser extensibility journey covers activation on screen, a definition published and run and a custom field published.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18A-05",
@@ -5080,12 +5080,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T01 and P18-T05 in scripts/test-p18-domain.mjs and the report process in scripts/test-p18-api.mjs; negatives: unlisted fields and joins, unselected sort, over-budget definitions, injected filter values, drafts run, author publishing, edits after publication, entities outside the scope, metrics without their permission, reserved custom-field keys. Runbook P18A section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18A-06",
@@ -5102,12 +5102,12 @@
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (docs/development/releases/0.18.0-draft.md, feature tag v0.18.0-a). Blocked on the owner: Security/Finance acceptance of the report catalog and budget, the hosted run and RG-06 task-based acceptance, RG-07 review, RG-08 manifest from the exact-source run.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-01",
@@ -5126,12 +5126,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: rule_proposals (source evidence, affected profiles, proposed draft rule versions, golden cases; assessed only with an impact; approved only by another principal when the impact passed; approved and rejected final); the impact read added; RuleProposalCreate.summary optional.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18B-02",
@@ -5150,12 +5150,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs proposals: citations validated (evidence, profiles, draft rules, shipped golden cases); the impact run recomputes each case's tax effect with the proposed rule through the deterministic kernel and reads open periods and posted documents without touching them; approval needs the impact, a passing result, the reviewed content version and a principal other than the proposer, and activates no rule (P18-T03).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18B-03",
@@ -5174,12 +5174,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves the proposal operations behind the rule_proposals capability with the shipped accounting-case definitions.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18B-04",
@@ -5198,12 +5198,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/rules: proposals with evidence, rules and cases, the impact per case and profile, independent approval and rejection; browser journey covers assessment and approval.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18B-05",
@@ -5222,12 +5222,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T03 in the domain and API suites; negatives: unknown golden cases, approval before or against a failing impact, self-approval, stale content versions, active rules as proposals. Runbook P18B section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18B-06",
@@ -5246,12 +5246,12 @@
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-b). Blocked on the owner: qualified review process and software release assessment agreed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18C-01",
@@ -5269,12 +5269,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: tool_grants (client principal, allowlisted tools, entity ids, expiry within a year, rate limit; approved by another principal; never widened once approved; revoked final) and append-only tool_runs (request hash, outcome, reason, result reference); tool run operations added; ToolGrantCreate.rateLimitPerMinute optional.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:03+00:00"
     },
     {
       "id": "P18C-02",
@@ -5291,12 +5291,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 tool runs keyed by grant across every granted entity; the grant naming the tool serves the call (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P18C-03",
@@ -5313,12 +5313,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves grant and tool-run operations behind the client_tools capability; /me shows tool.execute alone for a client; queued work rechecks authorization.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18C-04",
@@ -5335,12 +5335,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/tools: grants with tools, entities, expiry and rate limit, approval and revocation, the request log with denials; browser journey covers a grant approved, a denied request in the log and the revocation.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18C-05",
@@ -5357,12 +5357,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T02 in the domain and API suites; negatives: grants to members, entities outside the granter's scope, unapproved grants, widening, ungranted and non-allowlisted tools, injected instructions, entities outside the grant, rate limit, the client reading the log, requests after revocation. Runbook P18C section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18C-06",
@@ -5379,12 +5379,12 @@
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-c). Blocked on the owner: Security acceptance of the tool allowlist and client identity provisioning, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-01",
@@ -5406,12 +5406,12 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: pack_versions (unique per pack and semantic version, one installed per pack, manifest and hash frozen, profile snapshot, applied definitions, previous version; superseded reinstated only by rollback; failed and rolled back final); catalog, installs and rollback operations added; PackVersion exposes versionNo. Catalog fixtures under packages/packs (retail-ph 1.0.0/1.1.0, services-ph 1.0.0).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18D-02",
@@ -5427,12 +5427,12 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04).",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 pack attempts recover from dead jobs, retry after rollback, versions compare numerically (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P18D-03",
@@ -5448,12 +5448,12 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves pack operations behind the industry_packs capability; worker runs pack.install and pack.rollback with the authorization recheck.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18D-04",
@@ -5469,12 +5469,12 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/packs: the reviewed catalog with hashes and upgrade paths (unsupported paths disabled), installation as a job, installed versions with rollback; browser journey covers an install by the worker and its rollback.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18D-05",
@@ -5490,12 +5490,12 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "done",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T04 in the domain and API suites; negatives: tampered hashes, unsupported upgrade paths, reinstalling, installing without pack authority. Runbook P18D section.",
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
+      "updated_at": "2026-09-21T09:53:04+00:00"
     },
     {
       "id": "P18D-06",
@@ -5511,194 +5511,194 @@
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-d). Blocked on the owner: per-pack manifests and tests accepted, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     }
   ],
   "history": [
     {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-01",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18A-05",
       "action": "done",
-      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented."
+      "note": "P18-T01 and P18-T05 in scripts/test-p18-domain.mjs and the report process in scripts/test-p18-api.mjs; negatives: unlisted fields and joins, unselected sort, over-budget definitions, injected filter values, drafts run, author publishing, edits after publication, entities outside the scope, metrics without their permission, reserved custom-field keys. Runbook P18A section."
     },
     {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-05",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18B-01",
       "action": "done",
-      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
+      "note": "0033: rule_proposals (source evidence, affected profiles, proposed draft rule versions, golden cases; assessed only with an impact; approved only by another principal when the impact passed; approved and rejected final); the impact read added; RuleProposalCreate.summary optional."
     },
     {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00-08",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18B-02",
       "action": "done",
-      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance."
+      "note": "extensibility.mjs proposals: citations validated (evidence, profiles, draft rules, shipped golden cases); the impact run recomputes each case's tax effect with the proposed rule through the deterministic kernel and reads open periods and posted documents without touching them; approval needs the impact, a passing result, the reviewed content version and a principal other than the proposer, and activates no rule (P18-T03)."
     },
     {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00",
-      "action": "release",
-      "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
-    },
-    {
-      "at": "2026-09-18T15:55:28+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open."
-    },
-    {
-      "at": "2026-09-18T15:55:29+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-03",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-04",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-05",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-06",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-07",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:53+00:00",
-      "id": "P01-08",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T16:44:03+00:00",
-      "id": "P01-02",
-      "action": "in_review",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-03",
-      "action": "in_review",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-04",
-      "action": "in_review",
-      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-05",
-      "action": "in_review",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-06",
-      "action": "in_review",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-07",
-      "action": "in_review",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-08",
-      "action": "in_review",
-      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
-    },
-    {
-      "at": "2026-09-18T16:44:04+00:00",
-      "id": "P01-10",
-      "action": "blocked",
-      "note": "render.yaml, demo-host image target, loopback API supervisor and /api/health/ready prepared. Blocked: no hosting account, domain or dashboard secrets have been provisioned; deployment needs the owner."
-    },
-    {
-      "at": "2026-09-18T16:57:31+00:00",
-      "id": "P01-01",
-      "action": "in_review",
-      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
-    },
-    {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-01",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18B-03",
       "action": "done",
-      "note": "Shell, detail routes, responsive layouts, focusable scroll regions and blur-time money preview implemented. Automated WCAG 2.1 A/AA scan (axe) passes on 13 routes at 1440 and 390; keyboard skip-link, field focus and mobile Enter-key approval verified in Playwright."
+      "note": "API serves the proposal operations behind the rule_proposals capability with the shipped accounting-case definitions."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-02",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18B-04",
       "action": "done",
-      "note": "Session-bound workspace aggregate with retry receipts, version conflicts and scoped reset; all eight browser scenarios pass locally."
+      "note": "workspace-extend.tsx /extend/rules: proposals with evidence, rules and cases, the impact per case and profile, independent approval and rejection; browser journey covers assessment and approval."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-03",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18B-05",
       "action": "done",
-      "note": "DEMO-01/03 pass in browser: draft persists, cross-role approval, posting, collection, dropped-response replay yields one journal."
+      "note": "P18-T03 in the domain and API suites; negatives: unknown golden cases, approval before or against a failing impact, self-approval, stale content versions, active rules as proposals. Runbook P18B section."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-04",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18C-01",
       "action": "done",
-      "note": "DEMO-02 passes in browser: low-confidence correction persists, payment authority created on posting, beneficiary change invalidates approval."
+      "note": "0033: tool_grants (client principal, allowlisted tools, entity ids, expiry within a year, rate limit; approved by another principal; never widened once approved; revoked final) and append-only tool_runs (request hash, outcome, reason, result reference); tool run operations added; ToolGrantCreate.rateLimitPerMinute optional."
     },
     {
-      "at": "2026-09-18T17:00:57+00:00",
-      "id": "P01-05",
+      "at": "2026-09-21T09:53:03+00:00",
+      "id": "P18C-02",
       "action": "done",
-      "note": "DEMO-05 passes in browser: partial then completing allocation and explicit fee adjustment tie all statement lines."
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02)."
     },
     {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-06",
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18C-03",
       "action": "done",
-      "note": "DEMO-04/06 pass in browser: rejected and unknown acknowledgements repaired without changing source; close requires owned evidence and retains report."
+      "note": "API serves grant and tool-run operations behind the client_tools capability; /me shows tool.execute alone for a client; queued work rechecks authorization."
     },
     {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-07",
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18C-04",
       "action": "done",
-      "note": "DEMO-07/08 pass in browser: TB to journal to evidence drill-through, 404 cross-tenant and 409 quarantine, role-scoped watermarked export, offline draft retained and stale save requires explicit reload."
+      "note": "workspace-extend.tsx /extend/tools: grants with tools, entities, expiry and rate limit, approval and revocation, the request log with denials; browser journey covers a grant approved, a denied request in the log and the revocation."
     },
     {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-08",
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18C-05",
       "action": "done",
-      "note": "Per-session reset, simulation labels, actor switch and branch context isolation exercised in browser; legacy demo handlers removed so only the session-bound command service remains."
+      "note": "P18-T02 in the domain and API suites; negatives: grants to members, entities outside the granter's scope, unapproved grants, widening, ungranted and non-allowlisted tools, injected instructions, entities outside the grant, rate limit, the client reading the log, requests after revocation. Runbook P18C section."
     },
     {
-      "at": "2026-09-18T17:00:58+00:00",
-      "id": "P01-09",
-      "action": "in_review",
-      "note": "Facilitator guide, six task cards, usability template and gate checker (scripts/check-p01-usability.mjs) exist; feedback capture persisted and browser-tested. Acceptance P01-T08 requires eight actual participants during the release activity."
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18D-01",
+      "action": "done",
+      "note": "0033: pack_versions (unique per pack and semantic version, one installed per pack, manifest and hash frozen, profile snapshot, applied definitions, previous version; superseded reinstated only by rollback; failed and rolled back final); catalog, installs and rollback operations added; PackVersion exposes versionNo. Catalog fixtures under packages/packs (retail-ph 1.0.0/1.1.0, services-ph 1.0.0)."
+    },
+    {
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18D-02",
+      "action": "done",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04)."
+    },
+    {
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18D-03",
+      "action": "done",
+      "note": "API serves pack operations behind the industry_packs capability; worker runs pack.install and pack.rollback with the authorization recheck."
+    },
+    {
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18D-04",
+      "action": "done",
+      "note": "workspace-extend.tsx /extend/packs: the reviewed catalog with hashes and upgrade paths (unsupported paths disabled), installation as a job, installed versions with rollback; browser journey covers an install by the worker and its rollback."
+    },
+    {
+      "at": "2026-09-21T09:53:04+00:00",
+      "id": "P18D-05",
+      "action": "done",
+      "note": "P18-T04 in the domain and API suites; negatives: tampered hashes, unsupported upgrade paths, reinstalling, installing without pack authority. Runbook P18D section."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P02-03",
+      "action": "done",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P03-02",
+      "action": "done",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P04-02",
+      "action": "done",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P05-02",
+      "action": "done",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P06-02",
+      "action": "done",
+      "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P11-02",
+      "action": "done",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P12-02",
+      "action": "done",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P13-01",
+      "action": "done",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P13-02",
+      "action": "done",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P14-02",
+      "action": "done",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P15-02",
+      "action": "done",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P16-02",
+      "action": "done",
+      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P18C-02",
+      "action": "done",
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P18D-02",
+      "action": "done",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04)."
     }
   ]
 }

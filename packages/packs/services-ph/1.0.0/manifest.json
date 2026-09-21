@@ -1,0 +1,35 @@
+{
+  "title": "Philippine professional services pack",
+  "description": "Reviewed configuration for a services firm: the engagement profile draft and a net income report by month. Depends on the retail pack being absent of conflicts; none declared.",
+  "dependencies": [
+    "capability:general_ledger",
+    "capability:sales",
+    "capability:report_authoring"
+  ],
+  "upgradesFrom": [],
+  "settings": {
+    "services_profile": {
+      "profileVersion": "services-1",
+      "retainerBilling": "monthly",
+      "timesheetsRequired": false
+    }
+  },
+  "reportDefinitions": [
+    {
+      "name": "Net income by month",
+      "metricIds": [
+        "net_income"
+      ],
+      "dimensionIds": [
+        "month"
+      ],
+      "filters": [],
+      "sort": [
+        {
+          "field": "month",
+          "direction": "asc"
+        }
+      ]
+    }
+  ]
+}
