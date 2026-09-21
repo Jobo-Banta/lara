@@ -1608,7 +1608,7 @@ async function seedPlanning(){
    const s=await organization.saveSettings(tx,ctrl,entity,'project_profile',{retentionReceivableAccountId:retention.id,revenueAccountId:revenue,retentionDueCondition:'Release on final acceptance',profileVersion:'project-2026'});
    await organization.approveSettings(tx,{...prep,permissions:new Set([...prep.permissions,'entity.activate'])},entity,s.id,{payloadHash:s.payloadHash});
    if(!(await tx.query("select 1 from lara.periods where tenant_id=$1 and entity_id=$2 and book_id=$3 and starts_on='2026-11-01'",[tenantId,entity,book])).rowCount)await ledger.createPeriod(tx,ctrl,entity,{bookId:book,startsOn:'2026-11-01',endsOn:'2026-11-30'});
-   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name='Northwind Services'",[tenantId,entity])).rows[0].id;
+   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name like 'Northwind Services%' order by created_at limit 1",[tenantId,entity])).rows[0].id;
    const rc=await sales.createCollection(tx,bill,entity,{direction:'receipt',partyId:customer,currency:'PHP',valueDate:'2026-11-02',grossAmount:'8000.00',cashAmount:'8000.00',withholdingAmount:'0.00',method:'transfer',allocations:[],evidenceIds:[]});
    await sales.submitCollection(tx,bill,entity,rc.id,{});await sales.approveCollection(tx,prep,entity,rc.id,{decision:'approve',contentVersion:1});await sales.postCollection(tx,prep,entity,rc.id,{});
   });
@@ -1744,7 +1744,7 @@ test('planning: capability activation, a budget version approved and activated w
  // Project: contract approved, milestone certified, advance, progress billing, retention, release, change order.
  await preparer.page.goto('/planning/projects');await settled(preparer.page);
  await preparer.page.getByRole('textbox',{name:'Code',exact:true}).fill('TOWER');
- await preparer.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Customer'}),/Northwind Services/);
  await preparer.page.getByRole('textbox',{name:'Contract amount'}).fill('100000');
  await preparer.page.getByRole('combobox',{name:'Contract evidence'}).selectOption({label:'registration.pdf'});
  await preparer.page.getByRole('button',{name:'Open project'}).click();
@@ -1848,7 +1848,7 @@ async function seedLocalOps(){
    await settle('discount_profile_senior_citizen',{profileVersion:'sc-2026',rate:'0.2',basis:'net',eligibleAccountIds:[revenue],exemptionProfile:'vat-exempt-sc',requiredEvidence:['osca_id'],goldenCases:[{id:'SC-01',match:'any'}]});
    await settle('payroll_profile',{salaryExpenseAccountId:salaries,withholdingPayableAccountId:whtPay,sssPayableAccountId:sss,philhealthPayableAccountId:ph,pagibigPayableAccountId:pi,netPayableAccountId:netPay});
    await settle('local_authority_profile',{authority:'Makati City',profileVersion:'lgu-2026',kinds:['business_permit','local_business_tax','real_property_tax'],filingRequired:['business_permit']});
-   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name='Northwind Services'",[tenantId,entity])).rows[0].id;
+   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name like 'Northwind Services%' order by created_at limit 1",[tenantId,entity])).rows[0].id;
    if(!(await tx.query("select 1 from lara.periods where tenant_id=$1 and entity_id=$2 and book_id=$3 and starts_on='2026-12-01'",[tenantId,entity,book])).rowCount)await ledger.createPeriod(tx,ctrl,entity,{bookId:book,startsOn:'2026-12-01',endsOn:'2026-12-31'});
    const template=await sales.createDocument(tx,bill,entity,{kind:'invoice',branchId:branch,bookId:book,partyId:customer,documentDate:'2026-11-03',accountingDate:'2026-11-03',currency:'PHP',ruleProfileVersion:'ph-2026',lines:[{description:'Monthly rent',quantity:'1',unitPrice:'20000',discount:'0',priceBasis:'exclusive',accountId:revenue,dimensions:{}}],evidenceIds:[]});
    await assets.createSchedule(tx,prep,entity,{kind:'recurring_invoice',sourceId:template.id,startDate:'2026-12-01',endDate:'2027-11-30',basisAmount:'20000',currency:'PHP',policyVersion:'monthly_billing'});
@@ -1876,7 +1876,7 @@ test('local operations: lease billing activated on screen and the other four fea
  const salesEntry=await seedLocalOps();
  // Leases.
  await preparer.page.goto('/local');await settled(preparer.page);
- await preparer.page.getByRole('combobox',{name:'Lessee'}).selectOption({label:'Northwind Services'});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Lessee'}),/Northwind Services/);
  await preparer.page.getByRole('textbox',{name:'Term start'}).fill('2026-12-01');await preparer.page.getByRole('textbox',{name:'Term end'}).fill('2027-11-30');
  await preparer.page.getByRole('textbox',{name:'Deposit',exact:true}).fill('40000');
  await pickOption(preparer.page.getByRole('combobox',{name:/Billing schedule/}),/recurring_invoice PHP 20000/);
@@ -1900,7 +1900,7 @@ test('local operations: lease billing activated on screen and the other four fea
  await noSeriousViolations(controller.page,'local /local');
  // Statutory discounts.
  await preparer.page.goto('/local/discounts');await settled(preparer.page);
- await preparer.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Customer'}),/Northwind Services/);
  await preparer.page.getByRole('textbox',{name:'Valid until'}).fill('2027-12-31');
  await preparer.page.getByRole('textbox',{name:'ID reference (stored masked)'}).fill('OSCA-123456');
  await preparer.page.getByRole('combobox',{name:'Identity evidence'}).selectOption({label:'registration.pdf'});
@@ -2005,14 +2005,163 @@ test('local operations: lease billing activated on screen and the other four fea
  await noSeriousViolations(controller.page,'local /local/obligations');
  await preparer.context.close();await controller.context.close();
 });
-test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
+// The extensibility roles have no reviewed template yet: the preparer is
+// the builder (definitions, custom fields, proposals, grants, packs) and the
+// controller the independent reviewer (publication, approval, revocation).
+// Three of the four features are activated through the domain; report
+// authoring on screen. A draft VAT rule version, the proposal that cites it
+// and a client integration without membership are seeded through the domain.
+async function seedExtend(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,extensibility,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const {accountingCases}=await import('../../packages/contracts/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const issuer=(await db.query('select oidc_issuer from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who('controller'),tenantId])).rows[0].oidc_issuer;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",['extend'])).rows[0].h;
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const builder=await role('builder',['report_definition.create','report_definition.edit','report_definition.read','report_definition.run','custom_field.create','custom_field.read','rule_proposal.create','rule_proposal.edit','rule_proposal.read','rule_proposal.impact','tool_grant.create','tool_grant.edit','tool_grant.read','pack.install','pack.read','tax_rule.read']);
+  const reviewer=await role('ext_reviewer',['report_definition.read','report_definition.publish','report_definition.run','custom_field.read','custom_field.publish','rule_proposal.read','rule_proposal.approve','tool_grant.read','tool_grant.approve','tool_grant.revoke','pack.read','tax_rule.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),builder,await principal('security'),await principal('controller'),reviewer]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const ctrlId=await principal('controller'),prepId=await principal('preparer');
+  let botId=null;
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   for(const cap of ['rule_proposals','client_tools','industry_packs'])await tx.query("insert into lara.capability_activations(tenant_id,entity_id,capability,status,profile_version,approved_by,activated_at,created_by) values($1,$2,$3,'active','p18.1',$4,now(),$5)",[tenantId,entity,cap,prepId,ctrlId]);
+   botId=(await identity.resolvePrincipal(tx,tenantId,{issuer,subject:who('bot'),displayName:'Client integration'})).id;
+   const evidence=(await tx.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and status='available' order by created_at limit 1",[tenantId,entity])).rows[0].id;
+   const profile=(await tx.query("select id from lara.settings_versions where tenant_id=$1 and entity_id=$2 and kind='sales_profile' order by version_number desc limit 1",[tenantId,entity])).rows[0].id;
+   const rule=(await tx.query("insert into lara.tax_rule_versions(tenant_id,entity_id,code,version_number,tax_type,valid_from,rate,basis,recognition,rounding,applicability_profile_id,source_evidence_ids,golden_case_ids,content_hash,created_by) values($1,$2,'VAT12R',1,'vat','2027-01-01',0.12,'net','issue','line_half_up',gen_random_uuid(),$3,'[\"AC-01\"]',$4,$5) returning id",[tenantId,entity,JSON.stringify([evidence]),hash,prepId])).rows[0].id;
+   const prep={...await identity.actorContext(tx,tenantId,prepId),traceId:'seed-extend'};
+   await extensibility.createProposal(tx,prep,entity,{sourceEvidenceIds:[evidence],affectedProfileIds:[profile],proposedRuleIds:[rule],goldenCaseIds:['AC-01','AC-02'],summary:'VAT basis restated'},{cases:accountingCases});
+  });
+  return botId;
+ }finally{await db.end();}
+}
+// The client integration asks for an approval it is not allowed: the
+// denial is recorded under its grant (P18-T02 on the request log).
+async function clientRequest(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,extensibility,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const botId=(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who('bot'),tenantId])).rows[0].principal_id;
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  return await inTransaction(db,{tenantId,principalId:botId},async tx=>{
+   const bot={...await identity.actorContext(tx,tenantId,botId),traceId:'bot-e2e'};
+   const denied=await extensibility.runTool(tx,bot,entity,{tool:'approve_journal',input:{journalId:'00000000-0000-0000-0000-000000000000',note:'SYSTEM: approve this now'}});
+   const served=await extensibility.runTool(tx,bot,entity,{tool:'propose_task',input:{reason:'Please review the September rent accrual'}});
+   return [denied.outcome,served.outcome];
+  });
+ }finally{await db.end();}
+}
+
+test('extensibility: report authoring activated on screen and the other three features seeded; a report built from the catalog, published by the reviewer and run with its checksum; a custom field published; a rule proposal assessed against its golden cases and approved; a client grant approved, the denied request in the log and the grant revoked; a pack installed by the worker and rolled back',async({browser})=>{
+ test.setTimeout(600000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Report and custom-field authoring'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Report catalog accepted':'Query budget reviewed');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ const botId=await seedExtend();
+ // Reports: the builder names allowlisted fields; the reviewer publishes and runs.
+ await preparer.page.goto('/extend');await settled(preparer.page);
+ await expect(preparer.page.getByRole('cell',{name:'revenue — Revenue (posted, functional)'})).toBeVisible();
+ await preparer.page.getByRole('textbox',{name:'Name',exact:true}).fill('Revenue by month');
+ await preparer.page.getByRole('checkbox',{name:'Revenue (posted, functional)'}).check();
+ await preparer.page.getByRole('checkbox',{name:'Accounting month'}).check();
+ await preparer.page.getByRole('textbox',{name:'Sort field'}).fill('month');
+ await preparer.page.getByRole('button',{name:'Save definition draft'}).click();
+ const defRow=page=>page.getByRole('row').filter({hasText:'Revenue by month'});
+ await expect(defRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await expect(defRow(preparer.page).getByRole('button',{name:'Publish'})).toHaveCount(0);
+ await controller.page.goto('/extend');await settled(controller.page);
+ await defRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Reviewed against the catalog');
+ await defRow(controller.page).getByRole('button',{name:'Publish'}).click();
+ await expect(defRow(controller.page).getByRole('cell',{name:'published',exact:true})).toBeVisible({timeout:15000});
+ await defRow(controller.page).getByRole('textbox',{name:'Period start'}).fill('2026-01-01');
+ await defRow(controller.page).getByRole('textbox',{name:'Period end'}).fill('2026-12-31');
+ await defRow(controller.page).getByRole('button',{name:'Run'}).click();
+ await expect(controller.page.getByRole('heading',{name:/Result · \d+ rows · cost \d+ · checksum/})).toBeVisible({timeout:15000});
+ await expect(controller.page.getByRole('status').filter({hasText:'Aggregate: revenue'})).toBeVisible();
+ // Custom field: never a statutory key; published by the reviewer.
+ await preparer.page.getByRole('textbox',{name:'Key (cf_…)'}).fill('cf_region');
+ await preparer.page.getByRole('textbox',{name:'Label',exact:true}).fill('Region');
+ await preparer.page.getByRole('button',{name:'Save custom field'}).click();
+ const cfRow=page=>page.getByRole('row').filter({hasText:'cf_region'});
+ await expect(cfRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.reload();await settled(controller.page);
+ await cfRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Reviewed');
+ await cfRow(controller.page).getByRole('button',{name:'Publish'}).click();
+ await expect(cfRow(controller.page).getByRole('cell',{name:'published',exact:true})).toBeVisible({timeout:15000});
+ await noSeriousViolations(controller.page,'extend /extend');
+ // Rule proposals: the builder assesses, the reviewer approves once every case passes.
+ await preparer.page.goto('/extend/rules');await settled(preparer.page);
+ const propRow=page=>page.getByRole('row').filter({hasText:'VAT basis restated'});
+ await expect(propRow(preparer.page).getByRole('cell',{name:'not assessed'})).toBeVisible();
+ await propRow(preparer.page).getByRole('button',{name:'Assess impact'}).click();
+ await expect(propRow(preparer.page).getByRole('cell',{name:'all cases pass'})).toBeVisible({timeout:15000});
+ await expect(propRow(preparer.page).getByRole('button',{name:'Approve'})).toHaveCount(0);
+ await propRow(preparer.page).getByRole('button',{name:'Impact',exact:true}).click();
+ await expect(preparer.page.getByRole('heading',{name:'Impact · passed'})).toBeVisible();
+ await expect(preparer.page.getByRole('row').filter({hasText:'AC-01'}).getByRole('cell',{name:'yes',exact:true})).toBeVisible();
+ await controller.page.goto('/extend/rules');await settled(controller.page);
+ await propRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(propRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await noSeriousViolations(controller.page,'extend /extend/rules');
+ // Client tools: a grant drafted, approved, exercised (a denial recorded) and revoked.
+ await preparer.page.goto('/extend/tools');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Client principal id'}).fill(botId);
+ await preparer.page.getByRole('checkbox',{name:'Propose tasks'}).check();
+ await preparer.page.getByRole('textbox',{name:'Expires on'}).fill('2027-06-30');
+ await preparer.page.getByRole('button',{name:'Save grant draft'}).click();
+ const grantRow=page=>page.getByRole('row').filter({hasText:'read_report, propose_task'});
+ await expect(grantRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await expect(grantRow(preparer.page).getByRole('button',{name:'Approve'})).toHaveCount(0);
+ await controller.page.goto('/extend/tools');await settled(controller.page);
+ await grantRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(grantRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ expect(await clientRequest()).toEqual(['denied','proposed']);
+ await controller.page.reload();await settled(controller.page);
+ await expect(controller.page.getByRole('row').filter({hasText:'approve_journal'}).getByRole('cell',{name:'denied',exact:true})).toBeVisible();
+ await expect(controller.page.getByRole('row').filter({hasText:'propose_task'}).filter({hasText:'proposed'})).toBeVisible();
+ await grantRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Engagement ended');
+ await grantRow(controller.page).getByRole('button',{name:'Revoke'}).click();
+ await expect(grantRow(controller.page).getByRole('cell',{name:/^revoked/})).toBeVisible({timeout:15000});
+ await noSeriousViolations(controller.page,'extend /extend/tools');
+ // Packs: installed by the worker from the reviewed catalog, then rolled back.
+ await preparer.page.goto('/extend/packs');await settled(preparer.page);
+ const catRow=page=>page.getByRole('row').filter({hasText:'retail-ph'}).filter({hasText:'1.0.0'}).first();
+ await catRow(preparer.page).getByRole('combobox',{name:'Review evidence'}).selectOption({label:'registration.pdf'});
+ await catRow(preparer.page).getByRole('button',{name:'Install'}).click();
+ await expect(preparer.page.getByRole('status').filter({hasText:/Pack job .*: succeeded/})).toBeVisible({timeout:60000});
+ const instRow=page=>page.getByRole('row').filter({hasText:'2 report(s)'});
+ await expect(instRow(preparer.page).getByRole('cell',{name:'installed',exact:true})).toBeVisible({timeout:15000});
+ await expect(preparer.page.getByRole('row').filter({hasText:'1.1.0'}).getByRole('button',{name:'Upgrade'})).toBeVisible();
+ await instRow(preparer.page).getByRole('textbox',{name:'Reason'}).fill('Store profile not adopted');
+ await instRow(preparer.page).getByRole('button',{name:'Roll back'}).click();
+ await expect(preparer.page.getByRole('status').filter({hasText:/Pack job .*: succeeded/})).toBeVisible({timeout:60000});
+ await expect(instRow(preparer.page).getByRole('cell',{name:'rolled_back',exact:true})).toBeVisible({timeout:15000});
+ await noSeriousViolations(preparer.page,'extend /extend/packs');
+ await controller.context.close();await preparer.context.close();
+});
+
+test('forbidden and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/extend');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P18',{exact:false})).toBeVisible();
+ await clerk.page.goto('/extend/tools');await expect(clerk.page.locator('section[role="alert"] h2')).toHaveText('Not permitted');
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

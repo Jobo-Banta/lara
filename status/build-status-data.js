@@ -1,6 +1,6 @@
 window.LARA_BUILD_STATUS = {
   "version": 1,
-  "updated_at": "2026-09-21T05:55:38+00:00",
+  "updated_at": "2026-09-21T08:49:04+00:00",
   "releases": [
     {
       "id": "P00",
@@ -4992,12 +4992,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0033_p18_extensibility.sql (shared by P18A\u2013D): report_definitions (one live version per name, validated query AST with version and cost, published by another principal, immutable once published) and append-only report_runs (scope, checksum, payload); custom_fields (cf_ keys only, never statutory, published by another principal); capabilities report_authoring/rule_proposals/client_tools/industry_packs and six permissions. Catalog, run and custom-field operations added to the OpenAPI; publish takes a reason.",
+      "evidence": "Local: scripts/test-p18-schema.mjs passes (6 groups); migration 0033 applied on the dev database; validate_specifications PASS (475 operations). CI run pending.",
+      "updated_at": "2026-09-21T06:26:06+00:00"
     },
     {
       "id": "P18A-02",
@@ -5014,12 +5014,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/extensibility.mjs reports: the catalog is the allowlist (metrics with their permissions, dimensions, budget); definitions compile to a versioned AST or are refused (unlisted field, unfilterable, unselected sort, over budget); one parameterized statement per run under row, cost and time budgets; the caller's scope on every row and the aggregate, entities outside the scope not disclosed, a reproducible checksum (P18-T01, P18-T05); custom fields never take statutory keys.",
+      "evidence": "Local: scripts/test-p18-domain.mjs passes (6 groups: P18-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T06:26:06+00:00"
     },
     {
       "id": "P18A-03",
@@ -5036,12 +5036,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the report and custom-field operations; FEATURE_NOT_ENABLED until report_authoring is active; teardown and snapshot tooling cover the tables.",
+      "evidence": "Local: scripts/test-p18-api.mjs passes (5 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-21T06:26:06+00:00"
     },
     {
       "id": "P18A-04",
@@ -5058,12 +5058,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-extend.tsx /extend: the catalog with its budget, the definition builder, publication by the reviewer, runs with rows, aggregate, scope and checksum, custom fields with independent publication; capabilities screen offers report_authoring; browser extensibility journey covers activation on screen, a definition published and run and a custom field published.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 21/21 passed (~35 min, includes the extensibility journey: report authoring activated on screen, a definition built from the catalog, published by the reviewer and run with its checksum, a custom field published, a proposal assessed and approved, a client grant approved with a denied request in the log and revoked, a pack installed by the worker and rolled back). CI run pending.",
+      "updated_at": "2026-09-21T08:49:04+00:00"
     },
     {
       "id": "P18A-05",
@@ -5080,12 +5080,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T01 and P18-T05 in scripts/test-p18-domain.mjs and the report process in scripts/test-p18-api.mjs; negatives: unlisted fields and joins, unselected sort, over-budget definitions, injected filter values, drafts run, author publishing, edits after publication, entities outside the scope, metrics without their permission, reserved custom-field keys. Runbook P18A section.",
+      "evidence": "Local: P18-T01..T05 pass in scripts/test-p18-domain.mjs and scripts/test-p18-api.mjs; ci-database.mjs runs the P18 suites on fresh and upgraded databases; docs/development/P18-RUNBOOK.md and P18-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T06:26:06+00:00"
     },
     {
       "id": "P18A-06",
@@ -5102,12 +5102,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-009"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (docs/development/releases/0.18.0-draft.md, feature tag v0.18.0-a). Blocked on the owner: Security/Finance acceptance of the report catalog and budget, the hosted run and RG-06 task-based acceptance, RG-07 review, RG-08 manifest from the exact-source run.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-01",
@@ -5126,12 +5126,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: rule_proposals (source evidence, affected profiles, proposed draft rule versions, golden cases; assessed only with an impact; approved only by another principal when the impact passed; approved and rejected final); the impact read added; RuleProposalCreate.summary optional.",
+      "evidence": "Local: scripts/test-p18-schema.mjs passes (6 groups); migration 0033 applied on the dev database; validate_specifications PASS (475 operations). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-02",
@@ -5150,12 +5150,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs proposals: citations validated (evidence, profiles, draft rules, shipped golden cases); the impact run recomputes each case's tax effect with the proposed rule through the deterministic kernel and reads open periods and posted documents without touching them; approval needs the impact, a passing result, the reviewed content version and a principal other than the proposer, and activates no rule (P18-T03).",
+      "evidence": "Local: scripts/test-p18-domain.mjs passes (6 groups: P18-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-03",
@@ -5174,12 +5174,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves the proposal operations behind the rule_proposals capability with the shipped accounting-case definitions.",
+      "evidence": "Local: scripts/test-p18-api.mjs passes (5 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-04",
@@ -5198,12 +5198,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/rules: proposals with evidence, rules and cases, the impact per case and profile, independent approval and rejection; browser journey covers assessment and approval.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 21/21 passed (~35 min, includes the extensibility journey: report authoring activated on screen, a definition built from the catalog, published by the reviewer and run with its checksum, a custom field published, a proposal assessed and approved, a client grant approved with a denied request in the log and revoked, a pack installed by the worker and rolled back). CI run pending.",
+      "updated_at": "2026-09-21T08:49:04+00:00"
     },
     {
       "id": "P18B-05",
@@ -5222,12 +5222,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T03 in the domain and API suites; negatives: unknown golden cases, approval before or against a failing impact, self-approval, stale content versions, active rules as proposals. Runbook P18B section.",
+      "evidence": "Local: P18-T01..T05 pass in scripts/test-p18-domain.mjs and scripts/test-p18-api.mjs; ci-database.mjs runs the P18 suites on fresh and upgraded databases; docs/development/P18-RUNBOOK.md and P18-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18B-06",
@@ -5246,12 +5246,12 @@ window.LARA_BUILD_STATUS = {
         "AI-035"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-b). Blocked on the owner: qualified review process and software release assessment agreed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18C-01",
@@ -5269,12 +5269,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: tool_grants (client principal, allowlisted tools, entity ids, expiry within a year, rate limit; approved by another principal; never widened once approved; revoked final) and append-only tool_runs (request hash, outcome, reason, result reference); tool run operations added; ToolGrantCreate.rateLimitPerMinute optional.",
+      "evidence": "Local: scripts/test-p18-schema.mjs passes (6 groups); migration 0033 applied on the dev database; validate_specifications PASS (475 operations). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18C-02",
@@ -5291,12 +5291,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02).",
+      "evidence": "Local: scripts/test-p18-domain.mjs passes (6 groups: P18-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18C-03",
@@ -5313,12 +5313,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves grant and tool-run operations behind the client_tools capability; /me shows tool.execute alone for a client; queued work rechecks authorization.",
+      "evidence": "Local: scripts/test-p18-api.mjs passes (5 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-21T06:26:07+00:00"
     },
     {
       "id": "P18C-04",
@@ -5335,12 +5335,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/tools: grants with tools, entities, expiry and rate limit, approval and revocation, the request log with denials; browser journey covers a grant approved, a denied request in the log and the revocation.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 21/21 passed (~35 min, includes the extensibility journey: report authoring activated on screen, a definition built from the catalog, published by the reviewer and run with its checksum, a custom field published, a proposal assessed and approved, a client grant approved with a denied request in the log and revoked, a pack installed by the worker and rolled back). CI run pending.",
+      "updated_at": "2026-09-21T08:49:04+00:00"
     },
     {
       "id": "P18C-05",
@@ -5357,12 +5357,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T02 in the domain and API suites; negatives: grants to members, entities outside the granter's scope, unapproved grants, widening, ungranted and non-allowlisted tools, injected instructions, entities outside the grant, rate limit, the client reading the log, requests after revocation. Runbook P18C section.",
+      "evidence": "Local: P18-T01..T05 pass in scripts/test-p18-domain.mjs and scripts/test-p18-api.mjs; ci-database.mjs runs the P18 suites on fresh and upgraded databases; docs/development/P18-RUNBOOK.md and P18-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18C-06",
@@ -5379,12 +5379,12 @@ window.LARA_BUILD_STATUS = {
         "FR-PL-014"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-c). Blocked on the owner: Security acceptance of the tool allowlist and client identity provisioning, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-01",
@@ -5406,12 +5406,12 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0033: pack_versions (unique per pack and semantic version, one installed per pack, manifest and hash frozen, profile snapshot, applied definitions, previous version; superseded reinstated only by rollback; failed and rolled back final); catalog, installs and rollback operations added; PackVersion exposes versionNo. Catalog fixtures under packages/packs (retail-ph 1.0.0/1.1.0, services-ph 1.0.0).",
+      "evidence": "Local: scripts/test-p18-schema.mjs passes (6 groups); migration 0033 applied on the dev database; validate_specifications PASS (475 operations). CI run pending.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-02",
@@ -5427,12 +5427,12 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04).",
+      "evidence": "Local: scripts/test-p18-domain.mjs passes (6 groups: P18-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-03",
@@ -5448,12 +5448,12 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves pack operations behind the industry_packs capability; worker runs pack.install and pack.rollback with the authorization recheck.",
+      "evidence": "Local: scripts/test-p18-api.mjs passes (5 groups, API and worker as processes). CI run pending.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-04",
@@ -5469,12 +5469,12 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-extend.tsx /extend/packs: the reviewed catalog with hashes and upgrade paths (unsupported paths disabled), installation as a job, installed versions with rollback; browser journey covers an install by the worker and its rollback.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 21/21 passed (~35 min, includes the extensibility journey: report authoring activated on screen, a definition built from the catalog, published by the reviewer and run with its checksum, a custom field published, a proposal assessed and approved, a client grant approved with a denied request in the log and revoked, a pack installed by the worker and rolled back). CI run pending.",
+      "updated_at": "2026-09-21T08:49:04+00:00"
     },
     {
       "id": "P18D-05",
@@ -5490,12 +5490,12 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P18-T04 in the domain and API suites; negatives: tampered hashes, unsupported upgrade paths, reinstalling, installing without pack authority. Runbook P18D section.",
+      "evidence": "Local: P18-T01..T05 pass in scripts/test-p18-domain.mjs and scripts/test-p18-api.mjs; ci-database.mjs runs the P18 suites on fresh and upgraded databases; docs/development/P18-RUNBOOK.md and P18-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     },
     {
       "id": "P18D-06",
@@ -5511,184 +5511,16 @@ window.LARA_BUILD_STATUS = {
         "OBJ-7"
       ],
       "acceptance": "P18 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-d). Blocked on the owner: per-pack manifests and tests accepted, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T06:26:08+00:00"
     }
   ],
   "history": [
     {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17A-06",
-      "action": "blocked",
-      "note": "Release 0.17.0 drafted (docs/development/releases/0.17.0-draft.md, feature tag v0.17.0-a). Blocked on the owner: lease accounting examples and the withholding profile reviewed by the advisor, the hosted run and RG-06 task-based acceptance, RG-07 profile review, RG-08 manifest from the exact-source run."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-01",
-      "action": "in_review",
-      "note": "0032: discount_eligibility (one live per customer and category, evidence, approved by another principal, immutable once approved, revoked final) and discount_lines (one per document line); eligibility operations (5 reviewed) with the masked identity reference plus the invoice discount application and its lines."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-02",
-      "action": "in_review",
-      "note": "localops.mjs discounts: eligibility validated against the approved discount profile (required identity evidence, expiry, one live per customer and category); application to a draft invoice discounts each line on an eligible account on the profile's basis and exempts it, records the golden case, refuses customers without approved eligibility, expired eligibility at the document date and posted invoices (P17-T02)."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-03",
-      "action": "in_review",
-      "note": "API serves eligibility and discount operations behind the statutory_discounts capability and the discount_profile_<category> profile."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-05",
-      "action": "in_review",
-      "note": "P17-T02 in the domain and API suites; negatives: ineligible and expired customers, self-approval, re-discounting a posted invoice. Runbook P17B section."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17B-06",
-      "action": "blocked",
-      "note": "Release 0.17.0 drafted (feature tag v0.17.0-b). Blocked on the owner: discount profiles per category reviewed by the advisor, hosted run, RG-06/07/08."
-    },
-    {
-      "at": "2026-09-21T02:55:15+00:00",
-      "id": "P17C-01",
-      "action": "in_review",
-      "note": "0032: channels, payout_batches (unique per channel and source; net = gross \u2212 fees \u2212 withholding \u2212 other deductions; posted only from reconciled; immutable once posted), pos_machines (unique per serial and MIN), pos_closings (unique per machine, shift and reading; gross = ending \u2212 beginning; approved by another principal; matched only with a deposit); channel, payout (reconcile, post), machine and closing (approve, match) operations."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17C-02",
-      "action": "in_review",
-      "note": "localops.mjs channels: a payout's deductions must explain the net; reconciliation to posted invoices or entries whose total equals the gross, each sales reference once; posting once with the net to clearing, fees and withholding recognized and the channel receivable settled; replayed statements refused; closings validated and matched to a posted deposit with the difference as an exception (P17-T03)."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17C-03",
-      "action": "in_review",
-      "note": "API serves channel, payout and POS operations behind the marketplace_pos capability; channel sales ride the existing journal and invoice imports."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17C-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17C-05",
-      "action": "in_review",
-      "note": "P17-T03 in the domain and API suites; negatives: unexplained payout nets, replayed statements, posting before reconciliation, sales reconciled twice, closings with inconsistent readings. Runbook P17C section."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17C-06",
-      "action": "blocked",
-      "note": "Release 0.17.0 drafted (feature tag v0.17.0-c). Blocked on the owner: provider statement formats and channel accounting reviewed, hosted run, RG-06/07/08."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17D-01",
-      "action": "in_review",
-      "note": "0032: payroll_batches (unique per file; approved by another principal; posted once per source and period), append-only employee_tax_records (identifier encrypted and masked, payroll_record.read), remittance_records (unique per agency, period and batch; remitted only with reference and evidence); batch (records, approve, post) and remittance (approve, remit) operations."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17D-02",
-      "action": "in_review",
-      "note": "localops.mjs payroll: records validated line by line and against the totals (an untying file stays an exception), file hash refuses replays, records restricted and masked with an audit per read, the journal per the approved payroll profile once per source and period, remittances tied to the batch totals and remitted on evidence (P17-T04)."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17D-03",
-      "action": "in_review",
-      "note": "API serves payroll and remittance operations behind the payroll_data capability and payroll_profile; encrypted identifiers under FIELD_ENCRYPTION_KEY."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17D-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance."
-    },
-    {
-      "at": "2026-09-21T02:55:16+00:00",
-      "id": "P17D-05",
-      "action": "in_review",
-      "note": "P17-T04 in the domain and API suites; negatives: untying totals, replayed files, records without payroll_record.read, second posting of a period, remittance without evidence. Runbook P17D section."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17D-06",
-      "action": "blocked",
-      "note": "Release 0.17.0 drafted (feature tag v0.17.0-d). Blocked on the owner: payroll file format and profile reviewed, hosted run, RG-06/07/08; integrations beyond file import are Phase 3."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-01",
-      "action": "in_review",
-      "note": "0032: local_obligations (unique per authority, kind, period and property; complete only with payment evidence and, where required, filing evidence; complete and waived final); obligation operations (create, edit, list, read, complete, waive)."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-02",
-      "action": "in_review",
-      "note": "localops.mjs obligations: the approved authority profile decides kinds and filing requirements; completion needs payment evidence and, where required, filing evidence by the completing authority; waivers need a reason (P17-T05)."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-03",
-      "action": "in_review",
-      "note": "API serves local obligation operations behind the local_obligations capability and local_authority_profile."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-05",
-      "action": "in_review",
-      "note": "P17-T05 in the domain and API suites; negatives: completion without the required filing evidence, kinds outside the profile, waiver without reason. Runbook P17E section."
-    },
-    {
-      "at": "2026-09-21T02:55:17+00:00",
-      "id": "P17E-06",
-      "action": "blocked",
-      "note": "Release 0.17.0 drafted (feature tag v0.17.0-e). Blocked on the owner: authority profile reviewed, hosted run, RG-06/07/08."
-    },
-    {
-      "at": "2026-09-21T05:55:37+00:00",
-      "id": "P17A-04",
-      "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-localops.tsx /local: leases drafted with escalation steps and evidence, approved by another principal, the rent schedule with per-month billing, deposit and advance events with evidence; capabilities screen offers leases; browser local operations journey covers activation on screen, approval, schedule, billing and the deposit."
-    },
-    {
-      "at": "2026-09-21T05:55:38+00:00",
-      "id": "P17B-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it."
-    },
-    {
-      "at": "2026-09-21T05:55:38+00:00",
-      "id": "P17C-04",
-      "action": "in_review",
-      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched."
-    },
-    {
       "at": "2026-09-21T05:55:38+00:00",
       "id": "P17D-04",
       "action": "in_review",
@@ -5699,6 +5531,174 @@ window.LARA_BUILD_STATUS = {
       "id": "P17E-04",
       "action": "in_review",
       "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks."
+    },
+    {
+      "at": "2026-09-21T06:26:06+00:00",
+      "id": "P18A-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0033_p18_extensibility.sql (shared by P18A\u2013D): report_definitions (one live version per name, validated query AST with version and cost, published by another principal, immutable once published) and append-only report_runs (scope, checksum, payload); custom_fields (cf_ keys only, never statutory, published by another principal); capabilities report_authoring/rule_proposals/client_tools/industry_packs and six permissions. Catalog, run and custom-field operations added to the OpenAPI; publish takes a reason."
+    },
+    {
+      "at": "2026-09-21T06:26:06+00:00",
+      "id": "P18A-02",
+      "action": "in_review",
+      "note": "packages/domain/src/extensibility.mjs reports: the catalog is the allowlist (metrics with their permissions, dimensions, budget); definitions compile to a versioned AST or are refused (unlisted field, unfilterable, unselected sort, over budget); one parameterized statement per run under row, cost and time budgets; the caller's scope on every row and the aggregate, entities outside the scope not disclosed, a reproducible checksum (P18-T01, P18-T05); custom fields never take statutory keys."
+    },
+    {
+      "at": "2026-09-21T06:26:06+00:00",
+      "id": "P18A-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the report and custom-field operations; FEATURE_NOT_ENABLED until report_authoring is active; teardown and snapshot tooling cover the tables."
+    },
+    {
+      "at": "2026-09-21T06:26:06+00:00",
+      "id": "P18A-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-extend.tsx /extend: the catalog with its budget, the definition builder, publication by the reviewer, runs with rows, aggregate, scope and checksum, custom fields with independent publication; capabilities screen offers report_authoring; browser extensibility journey covers activation on screen, a definition published and run and a custom field published."
+    },
+    {
+      "at": "2026-09-21T06:26:06+00:00",
+      "id": "P18A-05",
+      "action": "in_review",
+      "note": "P18-T01 and P18-T05 in scripts/test-p18-domain.mjs and the report process in scripts/test-p18-api.mjs; negatives: unlisted fields and joins, unselected sort, over-budget definitions, injected filter values, drafts run, author publishing, edits after publication, entities outside the scope, metrics without their permission, reserved custom-field keys. Runbook P18A section."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18A-06",
+      "action": "blocked",
+      "note": "Release 0.18.0 drafted (docs/development/releases/0.18.0-draft.md, feature tag v0.18.0-a). Blocked on the owner: Security/Finance acceptance of the report catalog and budget, the hosted run and RG-06 task-based acceptance, RG-07 review, RG-08 manifest from the exact-source run."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-01",
+      "action": "in_review",
+      "note": "0033: rule_proposals (source evidence, affected profiles, proposed draft rule versions, golden cases; assessed only with an impact; approved only by another principal when the impact passed; approved and rejected final); the impact read added; RuleProposalCreate.summary optional."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-02",
+      "action": "in_review",
+      "note": "extensibility.mjs proposals: citations validated (evidence, profiles, draft rules, shipped golden cases); the impact run recomputes each case's tax effect with the proposed rule through the deterministic kernel and reads open periods and posted documents without touching them; approval needs the impact, a passing result, the reviewed content version and a principal other than the proposer, and activates no rule (P18-T03)."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-03",
+      "action": "in_review",
+      "note": "API serves the proposal operations behind the rule_proposals capability with the shipped accounting-case definitions."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/rules: proposals with evidence, rules and cases, the impact per case and profile, independent approval and rejection; browser journey covers assessment and approval."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-05",
+      "action": "in_review",
+      "note": "P18-T03 in the domain and API suites; negatives: unknown golden cases, approval before or against a failing impact, self-approval, stale content versions, active rules as proposals. Runbook P18B section."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18B-06",
+      "action": "blocked",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-b). Blocked on the owner: qualified review process and software release assessment agreed, hosted run, RG-06/07/08."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18C-01",
+      "action": "in_review",
+      "note": "0033: tool_grants (client principal, allowlisted tools, entity ids, expiry within a year, rate limit; approved by another principal; never widened once approved; revoked final) and append-only tool_runs (request hash, outcome, reason, result reference); tool run operations added; ToolGrantCreate.rateLimitPerMinute optional."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18C-02",
+      "action": "in_review",
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02)."
+    },
+    {
+      "at": "2026-09-21T06:26:07+00:00",
+      "id": "P18C-03",
+      "action": "in_review",
+      "note": "API serves grant and tool-run operations behind the client_tools capability; /me shows tool.execute alone for a client; queued work rechecks authorization."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18C-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/tools: grants with tools, entities, expiry and rate limit, approval and revocation, the request log with denials; browser journey covers a grant approved, a denied request in the log and the revocation."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18C-05",
+      "action": "in_review",
+      "note": "P18-T02 in the domain and API suites; negatives: grants to members, entities outside the granter's scope, unapproved grants, widening, ungranted and non-allowlisted tools, injected instructions, entities outside the grant, rate limit, the client reading the log, requests after revocation. Runbook P18C section."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18C-06",
+      "action": "blocked",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-c). Blocked on the owner: Security acceptance of the tool allowlist and client identity provisioning, hosted run, RG-06/07/08."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-01",
+      "action": "in_review",
+      "note": "0033: pack_versions (unique per pack and semantic version, one installed per pack, manifest and hash frozen, profile snapshot, applied definitions, previous version; superseded reinstated only by rollback; failed and rolled back final); catalog, installs and rollback operations added; PackVersion exposes versionNo. Catalog fixtures under packages/packs (retail-ph 1.0.0/1.1.0, services-ph 1.0.0)."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-02",
+      "action": "in_review",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04)."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-03",
+      "action": "in_review",
+      "note": "API serves pack operations behind the industry_packs capability; worker runs pack.install and pack.rollback with the authorization recheck."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/packs: the reviewed catalog with hashes and upgrade paths (unsupported paths disabled), installation as a job, installed versions with rollback; browser journey covers an install by the worker and its rollback."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-05",
+      "action": "in_review",
+      "note": "P18-T04 in the domain and API suites; negatives: tampered hashes, unsupported upgrade paths, reinstalling, installing without pack authority. Runbook P18D section."
+    },
+    {
+      "at": "2026-09-21T06:26:08+00:00",
+      "id": "P18D-06",
+      "action": "blocked",
+      "note": "Release 0.18.0 drafted (feature tag v0.18.0-d). Blocked on the owner: per-pack manifests and tests accepted, hosted run, RG-06/07/08."
+    },
+    {
+      "at": "2026-09-21T08:49:04+00:00",
+      "id": "P18A-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-extend.tsx /extend: the catalog with its budget, the definition builder, publication by the reviewer, runs with rows, aggregate, scope and checksum, custom fields with independent publication; capabilities screen offers report_authoring; browser extensibility journey covers activation on screen, a definition published and run and a custom field published."
+    },
+    {
+      "at": "2026-09-21T08:49:04+00:00",
+      "id": "P18B-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/rules: proposals with evidence, rules and cases, the impact per case and profile, independent approval and rejection; browser journey covers assessment and approval."
+    },
+    {
+      "at": "2026-09-21T08:49:04+00:00",
+      "id": "P18C-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/tools: grants with tools, entities, expiry and rate limit, approval and revocation, the request log with denials; browser journey covers a grant approved, a denied request in the log and the revocation."
+    },
+    {
+      "at": "2026-09-21T08:49:04+00:00",
+      "id": "P18D-04",
+      "action": "in_review",
+      "note": "workspace-extend.tsx /extend/packs: the reviewed catalog with hashes and upgrade paths (unsupported paths disabled), installation as a job, installed versions with rollback; browser journey covers an install by the worker and its rollback."
     }
   ]
 };

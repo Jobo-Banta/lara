@@ -121,7 +121,7 @@ try{
  r=await call('auditor','GET','/assistant/suggestions/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
  r=await call('auditor','GET','/assistant/runs/'+run1.id,{headers:{'x-entity-id':randomUUID()}});assert.equal(r.status,404);
  r=await call('auditor','GET','/assistant/features/x',{headers:eh});assert.ok([404,409].includes(r.status));
- r=await call('auditor','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([404,409].includes(r.status),'later-phase operations stay gated');
+ r=await call('auditor','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
  pass('unknown records and foreign entities answer 404; later-phase operations stay gated');
  console.log('P12-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split(String.fromCharCode(10)).slice(-40).join(String.fromCharCode(10)));console.error(worker?.log().split(String.fromCharCode(10)).slice(-8).join(String.fromCharCode(10))||'');throw e;}

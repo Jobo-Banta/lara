@@ -32,7 +32,10 @@ export async function actorContext(tx,tenantId,principalId,{traceId}={}){
  if(!memberships.rows.length){const {portalScope}=await import('./portals.mjs');portal=await portalScope(tx,tenantId,principalId);if(portal){for(const p of portal.permissions)permissions.add(p);entityIds.add(portal.entityId);}}
  // Delegated firm identities (P14): without a membership or portal scope, an active assignment under an approved mandate scopes the principal to the mandate's entities with the assigned subset; a direct member keeps its membership and is the same principal, so maker-checker holds either way.
  if(!memberships.rows.length&&!portal){const {firmScope}=await import('./firm.mjs');firm=await firmScope(tx,tenantId,principalId);if(firm){for(const p of firm.permissions)permissions.add(p);for(const e of firm.entityIds)entityIds.add(e);}}
- return {tenantId,principalId,permissions,entityIds,branchIds,revocationVersion:Number(principal.revocation_version),traceId,...(portal?{portal}:{}),...(firm?{firm}:{})};
+ // Client integrations (P18C): a principal without any other scope holds only tool.execute over the entities of its approved, unexpired grants.
+ let tool=null;
+ if(!memberships.rows.length&&!portal&&!firm){const {toolScope}=await import('./extensibility.mjs');tool=await toolScope(tx,tenantId,principalId);if(tool){permissions.add('tool.execute');for(const e of tool.entityIds)entityIds.add(e);}}
+ return {tenantId,principalId,permissions,entityIds,branchIds,revocationVersion:Number(principal.revocation_version),traceId,...(portal?{portal}:{}),...(firm?{firm}:{}),...(tool?{tool}:{})};
 }
 
 export function sessionContext(ctx){

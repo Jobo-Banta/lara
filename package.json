@@ -80,7 +80,10 @@
     "test:p16-api": "node scripts/test-p16-api.mjs",
     "test:p17-schema": "node scripts/test-p17-schema.mjs",
     "test:p17-domain": "node scripts/test-p17-domain.mjs",
-    "test:p17-api": "node scripts/test-p17-api.mjs"
+    "test:p17-api": "node scripts/test-p17-api.mjs",
+    "test:p18-schema": "node scripts/test-p18-schema.mjs",
+    "test:p18-domain": "node scripts/test-p18-domain.mjs",
+    "test:p18-api": "node scripts/test-p18-api.mjs"
   },
   "pnpm": {
     "overrides": {

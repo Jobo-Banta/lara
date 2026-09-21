@@ -174,7 +174,7 @@ try{
  r=await call(REV,'POST','/journals',{body:{bookId:S.book.id,accountingDate:'2026-10-05',documentDate:'2026-10-05',currency:'PHP',description:'x',lines:[{accountId:S.a.cash.id,branchId:S.branch.id,debit:'1.00',credit:'0',dimensions:{}},{accountId:S.a.revenue.id,branchId:S.branch.id,debit:'0',credit:'1.00',dimensions:{}}],evidenceIds:[]},headers:{...key(),...sh}});assert.equal(r.status,403,'the reviewer writes no subsidiary journal');
  r=await call(ACC,'GET','/consolidations/'+run2.id,{headers:sh});assert.equal(r.status,404,'runs live in the reporting entity');
  r=await call(ACC,'GET','/groups/'+randomUUID(),{headers:ph});assert.equal(r.status,404);
- r=await call(ACC,'POST','/packs/install',{body:{},headers:{...key(),...ph}});assert.ok([404,409].includes(r.status),'later-phase operations stay gated');
+ r=await call(ACC,'POST','/packs/install',{body:{},headers:{...key(),...ph}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
  pass('the reviewer holds no subsidiary authority; runs are read in the reporting entity only; unknown records answer 404 and later-phase operations stay gated');
  console.log('P15-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split(String.fromCharCode(10)).slice(-30).join(String.fromCharCode(10)));throw e;}

@@ -4174,5 +4174,104 @@
     "permission": "local_obligation.complete",
     "input": "ReasonAction",
     "response": "CommandResult"
+  },
+  {
+    "operationId": "get_report_catalog",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/report-catalog",
+    "permission": "report_definition.read",
+    "input": null,
+    "response": "ReportCatalog"
+  },
+  {
+    "operationId": "post_report_definitions_id_run",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/report-definitions/{id}/run",
+    "permission": "report_definition.run",
+    "input": "ReportRun",
+    "response": "ReportRunResult"
+  },
+  {
+    "operationId": "post_custom_fields",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/custom-fields",
+    "permission": "custom_field.create",
+    "input": "CustomFieldCreate",
+    "response": "CustomFieldResource"
+  },
+  {
+    "operationId": "get_custom_fields",
+    "phase": "P18A",
+    "method": "GET",
+    "path": "/custom-fields",
+    "permission": "custom_field.read",
+    "input": null,
+    "response": "CustomFieldResourceList"
+  },
+  {
+    "operationId": "post_custom_fields_id_publish",
+    "phase": "P18A",
+    "method": "POST",
+    "path": "/custom-fields/{id}/publish",
+    "permission": "custom_field.publish",
+    "input": "ReasonAction",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_rule_proposals_id_impact",
+    "phase": "P18B",
+    "method": "GET",
+    "path": "/rule-proposals/{id}/impact",
+    "permission": "rule_proposal.read",
+    "input": null,
+    "response": "RuleImpact"
+  },
+  {
+    "operationId": "post_tool_runs",
+    "phase": "P18C",
+    "method": "POST",
+    "path": "/tool-runs",
+    "permission": "tool.execute",
+    "input": "ToolRunRequest",
+    "response": "ToolRunResult"
+  },
+  {
+    "operationId": "get_tool_runs",
+    "phase": "P18C",
+    "method": "GET",
+    "path": "/tool-runs",
+    "permission": "tool_grant.read",
+    "input": null,
+    "response": "ToolRunList"
+  },
+  {
+    "operationId": "get_packs",
+    "phase": "P18D",
+    "method": "GET",
+    "path": "/packs",
+    "permission": "pack.read",
+    "input": null,
+    "response": "PackCatalog"
+  },
+  {
+    "operationId": "get_pack_installs",
+    "phase": "P18D",
+    "method": "GET",
+    "path": "/pack-installs",
+    "permission": "pack.read",
+    "input": null,
+    "response": "PackVersionList"
+  },
+  {
+    "operationId": "post_pack_installs_id_rollback",
+    "phase": "P18D",
+    "method": "POST",
+    "path": "/pack-installs/{id}/rollback",
+    "permission": "pack.install",
+    "input": "ReasonAction",
+    "response": "Job"
   }
 ]

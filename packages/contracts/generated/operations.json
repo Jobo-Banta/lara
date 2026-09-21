@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "001467e1f3e628e7f0feff49d21a460bd6c8c210a5c413c6c2193bf0de5c30ec",
+  "sha256": "20a23d9bf40aa3038a5dba03e9bf4ccc9c7e26da7b579d8f25684061aa7e42c6",
   "operations": [
     {
       "method": "POST",
@@ -1708,6 +1708,11 @@
       "operationId": "post_rule_proposals_id_impact"
     },
     {
+      "method": "GET",
+      "path": "/rule-proposals/{id}/impact",
+      "operationId": "get_rule_proposals_id_impact"
+    },
+    {
       "method": "POST",
       "path": "/rule-proposals/{id}/approve",
       "operationId": "post_rule_proposals_id_approve"
@@ -2321,6 +2326,56 @@
       "method": "POST",
       "path": "/local-obligations/{id}/waive",
       "operationId": "post_local_obligations_id_waive"
+    },
+    {
+      "method": "GET",
+      "path": "/report-catalog",
+      "operationId": "get_report_catalog"
+    },
+    {
+      "method": "POST",
+      "path": "/report-definitions/{id}/run",
+      "operationId": "post_report_definitions_id_run"
+    },
+    {
+      "method": "POST",
+      "path": "/custom-fields",
+      "operationId": "post_custom_fields"
+    },
+    {
+      "method": "GET",
+      "path": "/custom-fields",
+      "operationId": "get_custom_fields"
+    },
+    {
+      "method": "POST",
+      "path": "/custom-fields/{id}/publish",
+      "operationId": "post_custom_fields_id_publish"
+    },
+    {
+      "method": "POST",
+      "path": "/tool-runs",
+      "operationId": "post_tool_runs"
+    },
+    {
+      "method": "GET",
+      "path": "/tool-runs",
+      "operationId": "get_tool_runs"
+    },
+    {
+      "method": "GET",
+      "path": "/packs",
+      "operationId": "get_packs"
+    },
+    {
+      "method": "GET",
+      "path": "/pack-installs",
+      "operationId": "get_pack_installs"
+    },
+    {
+      "method": "POST",
+      "path": "/pack-installs/{id}/rollback",
+      "operationId": "post_pack_installs_id_rollback"
     }
   ]
 }

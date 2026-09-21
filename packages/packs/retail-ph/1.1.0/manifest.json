@@ -1,0 +1,38 @@
+{
+  "title": "Philippine retail pack",
+  "description": "Adds the branch dimension to the sales report and a weekly cash count. Upgrades from 1.0.0 only; the 1.0.0 profile snapshot is kept for rollback.",
+  "dependencies": [
+    "capability:general_ledger",
+    "capability:report_authoring"
+  ],
+  "upgradesFrom": [
+    "1.0.0"
+  ],
+  "settings": {
+    "retail_profile": {
+      "profileVersion": "retail-2",
+      "storeHours": "09:00-21:00",
+      "cashCountFrequency": "weekly",
+      "posRequired": true
+    }
+  },
+  "reportDefinitions": [
+    {
+      "name": "Retail sales by month and branch",
+      "metricIds": [
+        "revenue"
+      ],
+      "dimensionIds": [
+        "month",
+        "branch"
+      ],
+      "filters": [],
+      "sort": [
+        {
+          "field": "month",
+          "direction": "asc"
+        }
+      ]
+    }
+  ]
+}

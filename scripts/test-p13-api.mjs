@@ -146,7 +146,7 @@ try{
  r=await call('controller','POST','/portal-invites/'+invite.id+'/revoke',{body:{reason:'Contact left'},headers:{...key(),...eh,...im(current.version)}});const revoked=await must(r,200);contract('post_portal_invites_id_revoke',revoked);
  r=await call('x','GET','/invoices',{...alpha,headers:eh});assert.equal(r.status,404,'revoked member reads nothing: its entity is gone from its scope');
  r=await call('auditor','GET','/portal-invites/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
- r=await call('auditor','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([404,409].includes(r.status),'later-phase operations stay gated');
+ r=await call('auditor','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
  pass('the verification link shows minimal fields without a session and an unknown token 404s while every other route needs a session; revocation by the authorizer ends the member\'s access; unknown records answer 404 and later-phase operations stay gated');
  console.log('P13-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split(String.fromCharCode(10)).slice(-40).join(String.fromCharCode(10)));console.error(worker?.log().split(String.fromCharCode(10)).slice(-8).join(String.fromCharCode(10))||'');throw e;}

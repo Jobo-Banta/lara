@@ -2,8 +2,8 @@
 // actor is resolved from committed memberships, headers follow the mutation
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
-import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,planning,localops,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
+import {findOperation,operations,validateInput,accountingCases,accountingCaseDefinitions} from '@lara/contracts';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,planning,localops,extensibility,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -512,6 +512,36 @@ Object.assign(handlers,{
  patch_local_obligations_id:async(tx,ctx,{entityId,params,body,version})=>ok(await localops.updateObligation(tx,ctx,entityId,params.id,version,body)),
  post_local_obligations_id_complete:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.completeObligation(tx,ctx,entityId,params.id,body,version)),
  post_local_obligations_id_waive:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.waiveObligation(tx,ctx,entityId,params.id,body,version)),
+ // P18 controlled extensibility: report definitions and custom fields, rule proposals, client tool grants and runs, industry packs.
+ get_report_catalog:async(tx,ctx)=>({status:200,body:extensibility.catalog()}),
+ post_report_definitions:async(tx,ctx,{entityId,body})=>created(await extensibility.createDefinition(tx,ctx,entityId,body)),
+ get_report_definitions:async(tx,ctx,{entityId,query})=>list(await extensibility.listDefinitions(tx,ctx,entityId,query)),
+ get_report_definitions_id:async(tx,ctx,{entityId,params})=>ok(await extensibility.getDefinition(tx,ctx,entityId,params.id)),
+ patch_report_definitions_id:async(tx,ctx,{entityId,params,body,version})=>ok(await extensibility.updateDefinition(tx,ctx,entityId,params.id,version,body)),
+ post_report_definitions_id_publish:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.publishDefinition(tx,ctx,entityId,params.id,body,version)),
+ post_report_definitions_id_run:async(tx,ctx,{entityId,params,body})=>{const r=await extensibility.runDefinition(tx,ctx,entityId,params.id,body);return {status:200,body:r,resourceType:'report_run',resourceId:r.runId};},
+ post_custom_fields:async(tx,ctx,{entityId,body})=>created(await extensibility.createCustomField(tx,ctx,entityId,body)),
+ get_custom_fields:async(tx,ctx,{entityId,query})=>list(await extensibility.listCustomFields(tx,ctx,entityId,query)),
+ post_custom_fields_id_publish:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.publishCustomField(tx,ctx,entityId,params.id,body,version)),
+ post_rule_proposals:async(tx,ctx,{entityId,body})=>created(await extensibility.createProposal(tx,ctx,entityId,body,{cases:accountingCases})),
+ get_rule_proposals:async(tx,ctx,{entityId,query})=>list(await extensibility.listProposals(tx,ctx,entityId,query)),
+ get_rule_proposals_id:async(tx,ctx,{entityId,params})=>ok(await extensibility.getProposal(tx,ctx,entityId,params.id)),
+ patch_rule_proposals_id:async(tx,ctx,{entityId,params,body,version})=>ok(await extensibility.updateProposal(tx,ctx,entityId,params.id,version,body,{cases:accountingCases})),
+ post_rule_proposals_id_impact:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.assessProposal(tx,ctx,entityId,params.id,body,version,{caseDefinitions:accountingCaseDefinitions})),
+ get_rule_proposals_id_impact:async(tx,ctx,{entityId,params})=>({status:200,body:await extensibility.proposalImpact(tx,ctx,entityId,params.id)}),
+ post_rule_proposals_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.approveProposal(tx,ctx,entityId,params.id,body,version)),
+ post_tool_grants:async(tx,ctx,{entityId,body})=>created(await extensibility.createGrant(tx,ctx,entityId,body)),
+ get_tool_grants:async(tx,ctx,{entityId,query})=>list(await extensibility.listGrants(tx,ctx,entityId,query)),
+ get_tool_grants_id:async(tx,ctx,{entityId,params})=>ok(await extensibility.getGrant(tx,ctx,entityId,params.id)),
+ patch_tool_grants_id:async(tx,ctx,{entityId,params,body,version})=>ok(await extensibility.updateGrant(tx,ctx,entityId,params.id,version,body)),
+ post_tool_grants_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.approveGrant(tx,ctx,entityId,params.id,body,version)),
+ post_tool_grants_id_revoke:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await extensibility.revokeGrant(tx,ctx,entityId,params.id,body,version)),
+ post_tool_runs:async(tx,ctx,{entityId,body})=>{const r=await extensibility.runTool(tx,ctx,entityId,body);return {status:200,body:r,resourceType:'tool_run',resourceId:r.runId};},
+ get_tool_runs:async(tx,ctx,{entityId,query})=>list(await extensibility.listToolRuns(tx,ctx,entityId,query)),
+ get_packs:async(tx,ctx,{entityId})=>({status:200,body:await extensibility.listPacks(tx,ctx,entityId)}),
+ get_pack_installs:async(tx,ctx,{entityId,query})=>list(await extensibility.listInstalls(tx,ctx,entityId,query)),
+ post_packs_install:async(tx,ctx,{entityId,body})=>{const {job,packVersionId}=await extensibility.requestInstall(tx,ctx,entityId,body);return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:'pack_version',resultResourceId:packVersionId},resourceType:'pack_version',resourceId:packVersionId};},
+ post_pack_installs_id_rollback:async(tx,ctx,{entityId,params,body,version})=>{const job=await extensibility.requestRollback(tx,ctx,entityId,params.id,body,version);return {status:202,body:{id:job.id,state:job.state,statusUrl:'/v1/jobs/'+job.id,traceId:ctx.traceId,resultResourceType:'pack_version',resultResourceId:params.id},resourceType:'pack_version',resourceId:params.id};},
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),

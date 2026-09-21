@@ -22,3 +22,4 @@ export * as firm from './firm.mjs';
 export * as consolidation from './consolidation.mjs';
 export * as planning from './planning.mjs';
 export * as localops from './localops.mjs';
+export * as extensibility from './extensibility.mjs';

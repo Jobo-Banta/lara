@@ -159,7 +159,7 @@ try{
  pass('a local obligation recorded and edited by the officer, completed by the reviewer only with the payment and filing evidence the authority requires, and another waived with a reason');
  // Gates.
  r=await call(OPS,'GET','/leases/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
- r=await call(OPS,'POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([404,409].includes(r.status),'later-phase operations stay gated');
+ r=await call(OPS,'POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
  pass('unknown records answer 404 and later-phase operations stay gated');
  console.log('P17-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split(String.fromCharCode(10)).slice(-30).join(String.fromCharCode(10)));throw e;}
