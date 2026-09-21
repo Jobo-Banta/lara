@@ -3706,5 +3706,158 @@
     "permission": "consolidation.read",
     "input": null,
     "response": "ConsolidationWorksheet"
+  },
+  {
+    "operationId": "get_budgets_id_availability",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/budgets/{id}/availability",
+    "permission": "budget.read",
+    "input": null,
+    "response": "BudgetAvailability"
+  },
+  {
+    "operationId": "get_commitments",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/commitments",
+    "permission": "budget.read",
+    "input": null,
+    "response": "CommitmentList"
+  },
+  {
+    "operationId": "post_allocation_rules",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-rules",
+    "permission": "allocation_run.edit",
+    "input": "AllocationRuleCreate",
+    "response": "AllocationRuleResource"
+  },
+  {
+    "operationId": "get_allocation_rules",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-rules",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRuleResourceList"
+  },
+  {
+    "operationId": "post_allocation_rules_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/allocation-rules/{id}/approve",
+    "permission": "allocation_run.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_allocation_runs_id_lines",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/allocation-runs/{id}/lines",
+    "permission": "allocation_run.read",
+    "input": null,
+    "response": "AllocationRunLines"
+  },
+  {
+    "operationId": "post_projects_id_milestones",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/milestones",
+    "permission": "project.edit",
+    "input": "MilestoneCreate",
+    "response": "MilestoneResource"
+  },
+  {
+    "operationId": "get_projects_id_milestones",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/milestones",
+    "permission": "project.read",
+    "input": null,
+    "response": "MilestoneResourceList"
+  },
+  {
+    "operationId": "post_milestones_id_certify",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/milestones/{id}/certify",
+    "permission": "project.progress_billing",
+    "input": "MilestoneCertify",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_projects_id_change_orders",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/change-orders",
+    "permission": "project.edit",
+    "input": "ChangeOrderCreate",
+    "response": "ContractVersionResource"
+  },
+  {
+    "operationId": "get_projects_id_change_orders",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/change-orders",
+    "permission": "project.read",
+    "input": null,
+    "response": "ContractVersionResourceList"
+  },
+  {
+    "operationId": "post_change_orders_id_approve",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/change-orders/{id}/approve",
+    "permission": "project.progress_billing",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_projects_id_advances",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/projects/{id}/advances",
+    "permission": "project.edit",
+    "input": "ProjectAdvanceCreate",
+    "response": "ProjectAdvanceResource"
+  },
+  {
+    "operationId": "get_projects_id_advances",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/advances",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectAdvanceResourceList"
+  },
+  {
+    "operationId": "get_projects_id_retention",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/retention",
+    "permission": "project.read",
+    "input": null,
+    "response": "RetentionItemList"
+  },
+  {
+    "operationId": "post_retention_items_id_release",
+    "phase": "P16",
+    "method": "POST",
+    "path": "/retention-items/{id}/release",
+    "permission": "project.progress_billing",
+    "input": "RetentionRelease",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_projects_id_profitability",
+    "phase": "P16",
+    "method": "GET",
+    "path": "/projects/{id}/profitability",
+    "permission": "project.read",
+    "input": null,
+    "response": "ProjectProfitability"
   }
 ]

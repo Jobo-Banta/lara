@@ -365,6 +365,8 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  // Reporting-required profiles queue the e-invoice transmission with the issuance (P07); the job sends after commit.
  let jobId=null;
  if(profile.reportingRequired)jobId=(await queueTransmission(tx,ctx,entityId,id,{commandId})).jobId;
+ // Project billing (P16): a progress or release invoice posting holds its retention and recoups the documented advance.
+ if(row.kind==='invoice'){const planning=await import('./planning.mjs');if(await planning.isPlanningActive(tx,ctx,entityId))await planning.invoicePosted(tx,ctx,entityId,updated,{commandId});}
  return result(updated,{journalEntryIds,...(jobId?{jobId}:{})});
 }
 // Corrections never edit a posted document: a credit note (partial, within the

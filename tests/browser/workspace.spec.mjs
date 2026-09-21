@@ -1576,6 +1576,237 @@ test('group: capability activation, a group defined with a wholly-owned subsidia
  await expect(runRow(controller.page).getByRole('cell',{name:'published',exact:true})).toBeVisible({timeout:15000});
  await preparer.context.close();await controller.context.close();
 });
+// The planner and project manager roles have no reviewed template yet; the
+// retention receivable and overhead accounts, the project profile, a
+// November period and a posted customer collection with an unapplied
+// remainder (the advance) are seeded through the domain. The bill against
+// the order and the progress invoice's own review run through the domain
+// so the journey stays on the planning screens.
+async function seedPlanning(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {organization,identity,ledger,sales,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",['planning'])).rows[0].h;
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const planner=await role('planner',['budget.create','budget.edit','budget.read','allocation_run.create','allocation_run.edit','allocation_run.read','allocation_run.preview','project.create','project.edit','project.read']);
+  const pm=await role('project_manager',['budget.approve','budget.activate','budget.read','allocation_run.approve','allocation_run.post','allocation_run.read','project.read','project.progress_billing']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),planner,await principal('security'),await principal('controller'),pm]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const ctrlId=await principal('controller'),prepId=await principal('preparer'),billId=await principal('billing'),treId=await principal('treasury');
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-planning'});
+   const ctrl=await ctxOf(ctrlId),prep=await ctxOf(prepId),bill=await ctxOf(billId),tre=await ctxOf(treId);
+   const book=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+   const retention=await ledger.createAccount(tx,prep,entity,{bookId:book,code:'1250',name:'Retention receivable',category:'asset',controlType:'none',requiredDimensions:[]});
+   await ledger.createAccount(tx,prep,entity,{bookId:book,code:'5900',name:'Allocated overhead',category:'expense',controlType:'none',requiredDimensions:[]});
+   const revenue=(await tx.query("select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code='4000'",[tenantId,entity])).rows[0].id;
+   const s=await organization.saveSettings(tx,ctrl,entity,'project_profile',{retentionReceivableAccountId:retention.id,revenueAccountId:revenue,retentionDueCondition:'Release on final acceptance',profileVersion:'project-2026'});
+   await organization.approveSettings(tx,{...prep,permissions:new Set([...prep.permissions,'entity.activate'])},entity,s.id,{payloadHash:s.payloadHash});
+   if(!(await tx.query("select 1 from lara.periods where tenant_id=$1 and entity_id=$2 and book_id=$3 and starts_on='2026-11-01'",[tenantId,entity,book])).rowCount)await ledger.createPeriod(tx,ctrl,entity,{bookId:book,startsOn:'2026-11-01',endsOn:'2026-11-30'});
+   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name='Northwind Services'",[tenantId,entity])).rows[0].id;
+   const rc=await sales.createCollection(tx,bill,entity,{direction:'receipt',partyId:customer,currency:'PHP',valueDate:'2026-11-02',grossAmount:'8000.00',cashAmount:'8000.00',withholdingAmount:'0.00',method:'transfer',allocations:[],evidenceIds:[]});
+   await sales.submitCollection(tx,bill,entity,rc.id,{});await sales.approveCollection(tx,prep,entity,rc.id,{decision:'approve',contentVersion:1});await sales.postCollection(tx,prep,entity,rc.id,{});
+  });
+ }finally{await db.end();}
+}
+// The bill against the approved order (through the entity's own review) and the progress invoice's review are domain steps the earlier journeys already cover on screen.
+async function postBillAgainstOrder(orderNet){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,purchasing,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const clerkId=await principal('clerk'),ctrlId=await principal('controller'),prepId=await principal('preparer');
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-planning'});
+   const clerk=await ctxOf(clerkId),ctrl=await ctxOf(ctrlId),prep=await ctxOf(prepId);
+   const order=(await tx.query("select d.*,(select account_id from lara.document_lines l where l.tenant_id=d.tenant_id and l.document_id=d.id order by line_no limit 1) as account_id from lara.documents d where d.tenant_id=$1 and d.entity_id=$2 and d.kind='purchase_order' and d.state='approved' and d.net=$3 order by d.created_at desc limit 1",[tenantId,entity,orderNet])).rows[0];
+   const evidence=(await tx.query("select id from lara.evidence where tenant_id=$1 and entity_id=$2 and filename='registration.pdf'",[tenantId,entity])).rows[0].id;
+   const b=await purchasing.createDocument(tx,clerk,entity,{kind:'bill',branchId:order.branch_id,bookId:order.book_id,partyId:order.party_id,documentDate:'2026-11-06',accountingDate:'2026-11-06',currency:'PHP',ruleProfileVersion:'ph-2026',externalReference:'SI-BUDGET-1',sourceDocumentId:order.id,lines:[{description:'Audit services',quantity:'1',unitPrice:orderNet,discount:'0',priceBasis:'exclusive',accountId:order.account_id,dimensions:{}}],evidenceIds:[evidence]});
+   await purchasing.submitDocument(tx,clerk,entity,b.id,{});await purchasing.approveDocument(tx,ctrl,entity,b.id,{decision:'approve',contentVersion:1});await purchasing.postDocument(tx,prep,entity,b.id,{});
+  });
+ }finally{await db.end();}
+}
+async function reviewAndPostInvoice(invoiceId){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {identity,sales,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const billId=await principal('billing'),prepId=await principal('preparer');
+  await inTransaction(db,{tenantId,principalId:prepId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-planning'});
+   const bill=await ctxOf(billId),prep=await ctxOf(prepId);
+   const row=(await tx.query('select content_version from lara.documents where tenant_id=$1 and id=$2',[tenantId,invoiceId])).rows[0];
+   await sales.submitDocument(tx,bill,entity,invoiceId,{});await sales.approveDocument(tx,prep,entity,invoiceId,{decision:'approve',contentVersion:Number(row.content_version)});await sales.postDocument(tx,prep,entity,invoiceId,{});
+  });
+ }finally{await db.end();}
+}
+test('planning: capability activation, a budget version approved and activated with its availability, a purchase order blocked beyond the budget and approved with a recorded override, the commitment consumed by its bill, an allocation rule and run previewed, approved and posted once, a project with an approved contract, a certified milestone, an advance, progress billing with retention and recoupment, the retention released and a change order as the next version',async({browser})=>{
+ test.setTimeout(600000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer'),clerk=await as(browser,'clerk');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Budgets, cost allocation and project accounting'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Budget basis and project profile approved':'Drivers and retention profile reviewed');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ await seedPlanning();
+ // Budget version: drafted by the planner, approved and activated by the project manager.
+ await preparer.page.goto('/planning');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Period start'}).fill('2026-11-01');await preparer.page.getByRole('textbox',{name:'Period end'}).fill('2026-11-30');
+ await preparer.page.getByRole('combobox',{name:'Account 1'}).selectOption({label:'5000 Professional fees'});
+ await preparer.page.getByRole('textbox',{name:'Amount 1'}).fill('10000');
+ await preparer.page.getByRole('button',{name:'Save budget draft'}).click();
+ const budgetRow=page=>page.getByRole('row').filter({hasText:'2026-11-01 → 2026-11-30'});
+ await expect(budgetRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await expect(preparer.page.getByRole('button',{name:'Approve',exact:true})).toHaveCount(0);
+ await controller.page.goto('/planning');await settled(controller.page);
+ await budgetRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(budgetRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await budgetRow(controller.page).getByRole('textbox',{name:'Reason'}).fill('Board approved');
+ await budgetRow(controller.page).getByRole('button',{name:'Activate'}).click();
+ await expect(budgetRow(controller.page).getByRole('cell',{name:'active',exact:true})).toBeVisible({timeout:15000});
+ await budgetRow(controller.page).getByRole('button',{name:'Budget vs actual'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'5000 Professional fees'}).first()).toContainText('₱10,000.00',{timeout:15000});
+ await noSeriousViolations(controller.page,'planning /planning');
+ // A purchase order beyond the blocking budget: refused, then approved with the recorded override.
+ await clerk.page.goto('/purchases/orders');await settled(clerk.page);
+ await clerk.page.getByRole('combobox',{name:'Supplier'}).selectOption({label:'Supplies Inc'});
+ await clerk.page.getByLabel('Document date').fill('2026-11-05');await clerk.page.getByLabel('Accounting date').fill('2026-11-05');
+ await clerk.page.getByRole('textbox',{name:'Line 1 description'}).fill('Audit services');
+ await clerk.page.getByRole('textbox',{name:'Line 1 unit price'}).fill('12000');
+ await clerk.page.getByRole('combobox',{name:'Line 1 expense account'}).selectOption({label:'5000 Professional fees'});
+ await clerk.page.getByRole('button',{name:'Save draft'}).click();
+ const orderRow=page=>page.getByRole('row').filter({hasText:'Supplies Inc'}).filter({hasText:'₱12,000.00'});
+ await expect(orderRow(clerk.page)).toBeVisible();
+ await orderRow(clerk.page).getByRole('button',{name:'Submit'}).click();
+ await expect(orderRow(clerk.page).getByRole('cell',{name:'submitted',exact:true})).toBeVisible();
+ await controller.page.goto('/purchases/orders');await settled(controller.page);
+ await orderRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toContainText('Budget exceeded');
+ await orderRow(controller.page).getByRole('textbox',{name:/Disposition/}).fill('Board-approved overrun for the audit');
+ await orderRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(orderRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.goto('/planning');await settled(controller.page);
+ await expect(controller.page.getByRole('row').filter({hasText:'override: Board-approved overrun'})).toBeVisible();
+ await budgetRow(controller.page).getByRole('button',{name:'Budget vs actual'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'5000 Professional fees'}).first()).toContainText('-₱2,000.00',{timeout:15000});
+ // The bill against the order consumes the commitment: committed 0, actual 12,000.
+ await postBillAgainstOrder('12000');
+ await controller.page.goto('/planning');await settled(controller.page);
+ await expect(controller.page.getByRole('row').filter({hasText:'override: Board-approved overrun'}).getByRole('cell',{name:'consumed',exact:true})).toBeVisible();
+ // Allocation: rule drafted by the planner, approved; run previewed with its lines, approved and posted once.
+ await preparer.page.goto('/planning/allocations');await settled(preparer.page);
+ await preparer.page.getByRole('checkbox',{name:'5000 Professional fees'}).check();
+ await preparer.page.getByRole('combobox',{name:'Target account'}).selectOption({label:'5900 Allocated overhead'});
+ const cc=[crypto.randomUUID(),crypto.randomUUID()];
+ await preparer.page.getByRole('textbox',{name:'Driver 1 value id'}).fill(cc[0]);await preparer.page.getByRole('textbox',{name:'Driver 1 weight'}).fill('2');
+ await preparer.page.getByRole('textbox',{name:'Driver 2 value id'}).fill(cc[1]);await preparer.page.getByRole('textbox',{name:'Driver 2 weight'}).fill('1');
+ await preparer.page.getByRole('button',{name:'Save rule draft'}).click();
+ const ruleRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'OVH',exact:true})});
+ await expect(ruleRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.goto('/planning/allocations');await settled(controller.page);
+ await ruleRow(controller.page).getByRole('button',{name:'Approve rule'}).click();
+ await expect(ruleRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await preparer.page.goto('/planning/allocations');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Rule version'}).selectOption({label:'OVH v1'});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Period'}),/2026-11-01 → 2026-11-30/);
+ await preparer.page.getByRole('textbox',{name:'Source cutoff (postings up to end of day)'}).fill('2026-12-05');
+ await preparer.page.getByRole('combobox',{name:'Driver evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Create run'}).click();
+ const runRow=page=>page.getByRole('row').filter({hasText:'OVH v1'}).filter({has:page.getByRole('button',{name:'Lines'})});
+ await expect(runRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await runRow(preparer.page).getByRole('button',{name:'Preview'}).click();
+ await expect(runRow(preparer.page).getByRole('cell',{name:'previewed',exact:true})).toBeVisible({timeout:15000});
+ await runRow(preparer.page).getByRole('button',{name:'Lines'}).click();
+ await expect(preparer.page.getByRole('heading',{name:/Run lines · pool ₱12,000\.00/})).toBeVisible({timeout:15000});
+ await expect(preparer.page.getByRole('row').filter({hasText:'₱8,000.00'})).toBeVisible();await expect(preparer.page.getByRole('row').filter({hasText:'₱4,000.00'})).toBeVisible();
+ await noSeriousViolations(preparer.page,'planning /planning/allocations');
+ await controller.page.goto('/planning/allocations');await settled(controller.page);
+ await runRow(controller.page).getByRole('button',{name:'Approve',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await runRow(controller.page).getByRole('button',{name:'Post',exact:true}).click();
+ await expect(runRow(controller.page).getByRole('cell',{name:'posted',exact:true})).toBeVisible({timeout:15000});
+ // Project: contract approved, milestone certified, advance, progress billing, retention, release, change order.
+ await preparer.page.goto('/planning/projects');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Code',exact:true}).fill('TOWER');
+ await preparer.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await preparer.page.getByRole('textbox',{name:'Contract amount'}).fill('100000');
+ await preparer.page.getByRole('combobox',{name:'Contract evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Open project'}).click();
+ const projectRow=page=>page.getByRole('row').filter({has:page.getByRole('cell',{name:'TOWER',exact:true})});
+ await expect(projectRow(preparer.page)).toBeVisible({timeout:15000});
+ await projectRow(preparer.page).getByRole('button',{name:'Open'}).click();
+ await preparer.page.getByRole('textbox',{name:'Milestone'}).fill('Foundation');
+ const msForm=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Add milestone'})});
+ await msForm.getByRole('textbox',{name:'Amount',exact:true}).fill('40000');
+ await msForm.getByRole('button',{name:'Add milestone'}).click();
+ await expect(preparer.page.getByRole('row').filter({hasText:'Foundation'})).toBeVisible({timeout:15000});
+ await pickOption(preparer.page.getByRole('combobox',{name:'Posted collection'}),/2026-11-02 · PHP 8000\.00/);
+ const advForm=preparer.page.locator('form').filter({has:preparer.page.getByRole('button',{name:'Record advance'})});
+ await advForm.getByRole('textbox',{name:'Amount',exact:true}).fill('8000');
+ await advForm.getByRole('button',{name:'Record advance'}).click();
+ await expect(preparer.page.getByRole('row').filter({hasText:'₱8,000.00'}).first()).toBeVisible({timeout:15000});
+ await controller.page.goto('/planning/projects');await settled(controller.page);
+ await projectRow(controller.page).getByRole('button',{name:'Open'}).click();
+ await controller.page.getByRole('button',{name:'Approve version'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Original contract'}).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ const milestoneRow=controller.page.getByRole('row').filter({hasText:'Foundation'});
+ await milestoneRow.getByRole('textbox',{name:'Certified value'}).fill('30000');
+ await milestoneRow.getByRole('combobox',{name:'Certificate'}).selectOption({label:'registration.pdf'});
+ await milestoneRow.getByRole('button',{name:'Certify'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Foundation'}).getByRole('cell',{name:'certified',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.getByRole('combobox',{name:'Milestone',exact:true}).selectOption({index:1});
+ await controller.page.getByRole('textbox',{name:'Certified amount to bill'}).fill('30000');
+ await controller.page.getByRole('textbox',{name:'Retention held'}).fill('3000');
+ await controller.page.getByRole('textbox',{name:'Advance recoupment'}).fill('5000');
+ await controller.page.getByRole('textbox',{name:'Accounting date'}).first().fill('2026-11-20');
+ await controller.page.getByRole('combobox',{name:'Progress certificate'}).selectOption({label:'registration.pdf'});
+ await controller.page.getByRole('button',{name:'Draft progress invoice'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Foundation'}).getByRole('cell',{name:'billed',exact:true})).toBeVisible({timeout:20000});
+ await expect(controller.page.getByRole('row').filter({hasText:'Foundation'})).toContainText('₱30,000.00');
+ const invoiceId=await (async()=>{const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();try{const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);return (await db.query("select invoice_id from lara.project_billings where tenant_id=$1 order by created_at desc limit 1",[tenantId])).rows[0].invoice_id;}finally{await db.end();}})();
+ await reviewAndPostInvoice(invoiceId);
+ await controller.page.goto('/planning/projects');await settled(controller.page);
+ await projectRow(controller.page).getByRole('button',{name:'Open'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Release on final acceptance'})).toContainText('₱3,000.00',{timeout:15000});
+ await expect(controller.page.getByRole('status').filter({hasText:'Contract'})).toContainText('advances recouped ₱5,000.00');
+ await expect(controller.page.getByRole('status').filter({hasText:'Contract'})).toContainText('revenue posted ₱30,000.00');
+ const retentionRow=controller.page.getByRole('row').filter({hasText:'Release on final acceptance'});
+ await retentionRow.getByRole('textbox',{name:'Reason'}).fill('Final acceptance signed');
+ await retentionRow.getByRole('combobox',{name:'Acceptance evidence'}).selectOption({label:'registration.pdf'});
+ await retentionRow.getByRole('button',{name:'Release'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Release on final acceptance'})).toContainText('release invoice drafted',{timeout:15000});
+ await noSeriousViolations(controller.page,'planning /planning/projects');
+ // Change order: the next contract version, approved by the project manager; the earlier billing stands.
+ await preparer.page.goto('/planning/projects');await settled(preparer.page);
+ await projectRow(preparer.page).getByRole('button',{name:'Open'}).click();
+ await preparer.page.getByRole('textbox',{name:'New contract amount'}).fill('120000');
+ await preparer.page.getByRole('textbox',{name:'Reason'}).first().fill('Additional floor');
+ await preparer.page.getByRole('combobox',{name:'Change order evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Draft change order'}).click();
+ await expect(preparer.page.getByRole('row').filter({hasText:'Additional floor'}).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.goto('/planning/projects');await settled(controller.page);
+ await projectRow(controller.page).getByRole('button',{name:'Open'}).click();
+ await controller.page.getByRole('row').filter({hasText:'Additional floor'}).getByRole('button',{name:'Approve version'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'Additional floor'}).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await expect(controller.page.getByRole('status').filter({hasText:'Contract'})).toContainText('₱120,000.00 (v2)');
+ await expect(controller.page.getByRole('status').filter({hasText:'Contract'})).toContainText('billed ₱30,000.00');
+ await preparer.context.close();await controller.context.close();await clerk.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');

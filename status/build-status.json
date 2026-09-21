@@ -590,39 +590,39 @@
       "updated_at": "2026-09-20T17:32:30+00:00"
     },
     "P13-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate.",
-      "evidence": "Local: scripts/test-p13-schema.mjs passes (4 groups); migration applied on the dev database; validate_specifications PASS. CI run pending.",
-      "updated_at": "2026-09-20T19:53:47+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:14+00:00"
     },
     "P13-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters.",
-      "evidence": "Local: scripts/test-p13-domain.mjs passes (5 groups: P13-T01..T05). CI run pending.",
-      "updated_at": "2026-09-20T19:53:47+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P13-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry.",
-      "evidence": "Local: scripts/test-p13-api.mjs passes (4 groups, API and worker as processes); P02..P07 regressions pass. CI run pending.",
-      "updated_at": "2026-09-20T19:53:47+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P13-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: tsc --noEmit and pnpm build pass; browser suite (16 tests) run in progress. CI run pending.",
-      "updated_at": "2026-09-20T19:53:47+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P13-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written.",
-      "evidence": "Local: p13 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T19:53:47+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P13-06": {
       "status": "blocked",
@@ -632,39 +632,39 @@
       "updated_at": "2026-09-20T19:53:47+00:00"
     },
     "P14-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas).",
-      "evidence": "Local: scripts/test-p14-schema.mjs passes (4 groups); migration applied on the dev database. CI run pending.",
-      "updated_at": "2026-09-20T21:09:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P14-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints.",
-      "evidence": "Local: scripts/test-p14-domain.mjs passes (7 groups: P14-T01..T05). CI run pending.",
-      "updated_at": "2026-09-20T21:09:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P14-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates.",
-      "evidence": "Local: scripts/test-p14-api.mjs passes (4 groups, API and worker as processes). CI run pending.",
-      "updated_at": "2026-09-20T21:09:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P14-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: pnpm build (with type check) passes; browser suite (17 tests) run in progress. CI run pending.",
-      "updated_at": "2026-09-20T21:09:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P14-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables.",
-      "evidence": "Local: p14 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T21:09:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P14-06": {
       "status": "blocked",
@@ -674,39 +674,39 @@
       "updated_at": "2026-09-20T21:09:14+00:00"
     },
     "P15-01": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas).",
-      "evidence": "Local: scripts/test-p15-schema.mjs passes (5 groups); migration applied on the dev database. CI run pending.",
-      "updated_at": "2026-09-20T22:26:50+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:15+00:00"
     },
     "P15-02": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run.",
-      "evidence": "Local: scripts/test-p15-domain.mjs passes (7 groups: P15-T01..T05). CI run pending.",
-      "updated_at": "2026-09-20T22:26:50+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     "P15-03": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details.",
-      "evidence": "Local: scripts/test-p15-api.mjs passes (5 groups, API as a process). CI run pending.",
-      "updated_at": "2026-09-20T22:26:50+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     "P15-04": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs.",
-      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 18/18 passed (21.9 min, includes the P15 group journey: group setup, mapping approval, pair accept/post, consolidation run preview/approve/publish). CI run pending.",
-      "updated_at": "2026-09-20T23:57:20+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     "P15-05": {
-      "status": "in_review",
+      "status": "done",
       "owner": "Claude Code",
       "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables.",
-      "evidence": "Local: p15 schema/domain/api suites pass; CI run pending.",
-      "updated_at": "2026-09-20T22:26:50+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
+      "updated_at": "2026-09-21T00:35:16+00:00"
     },
     "P15-06": {
       "status": "blocked",
@@ -716,46 +716,46 @@
       "updated_at": "2026-09-20T22:26:50+00:00"
     },
     "P16-01": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0031_p16_planning.sql: budgets versioned per book and period with one active and buckets per account and dimension set; commitments one per order line with consumption never reduced, warnings and overrides; allocation rule versions and runs (posted once per rule version and period, inputs frozen once approved); projects, contract versions, milestones, advances, billings and retention items; contracts add availability, commitments, rule versions, run lines, milestones, change orders, advances, retention and profitability (429 operations).",
+      "evidence": "Local: scripts/test-p16-schema.mjs passes (5 groups); migration applied on the dev database. CI run pending.",
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     "P16-02": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts.",
+      "evidence": "Local: scripts/test-p16-domain.mjs passes (7 groups: P16-T01..T05, two connections approving concurrently). CI run pending.",
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     "P16-03": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P16 operations plus the seventeen additions; the P05 and P04 operations carry the reservation, consumption, release and billing hooks.",
+      "evidence": "Local: scripts/test-p16-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     "P16-04": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 19/19 passed (~23 min, includes the P16 planning journey: budget approval and availability, order blocked and overridden, bill consuming the commitment, allocation run previewed/approved/posted, project with milestone certification, advance, progress billing, retention release and change order). CI run pending.",
+      "updated_at": "2026-09-21T02:40:04+00:00"
     },
     "P16-05": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "status": "in_review",
+      "owner": "Claude Code",
+      "note": "P16-T01..T05 in scripts/test-p16-domain.mjs and scripts/test-p16-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P16-REVIEW.md and P16-RUNBOOK.md written; teardown and snapshot scripts cover the planning tables.",
+      "evidence": "Local: p16 schema/domain/api suites pass; CI run pending.",
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     "P16-06": {
-      "status": "not_started",
-      "owner": "",
-      "note": "",
+      "status": "blocked",
+      "owner": "Owner",
+      "note": "Release 0.16.0 drafted (docs/development/releases/0.16.0-draft.md). Blocked on the 0.10.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08).",
       "evidence": "",
-      "updated_at": null
+      "updated_at": "2026-09-21T00:35:56+00:00"
     },
     "P17A-01": {
       "status": "not_started",
@@ -1243,138 +1243,6 @@
     }
   },
   "history": [
-    {
-      "at": "2026-09-18T09:54:45+00:00",
-      "id": "P00-07",
-      "action": "in_progress",
-      "note": "Authenticated version API returns schema 0006; unsigned requests denied; readiness passes. Structured telemetry and alerts remain."
-    },
-    {
-      "at": "2026-09-18T09:54:45+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Demo API now requires verified signed BFF identity and subject-owned run. Existing shared fixtures are unassigned and hidden; operator provisioning creates empty isolated runs. Scenario seeding/reset remains."
-    },
-    {
-      "at": "2026-09-18T10:16:52+00:00",
-      "id": "P00-04",
-      "action": "in_review",
-      "note": "Real Supabase login and consent succeeded; user confirmed return to LARA. Dedicated demo identity provisioned; deployment gates still under review."
-    },
-    {
-      "at": "2026-09-18T11:22:27+00:00",
-      "id": "P00-01",
-      "action": "in_review",
-      "note": "Pinned toolchain, Supabase onboarding and full-stack dev launcher verified locally; clean-machine operator bootstrap review remains."
-    },
-    {
-      "at": "2026-09-18T11:22:27+00:00",
-      "id": "P00-03",
-      "action": "done",
-      "note": "Dedicated migrator owns LARA objects; PostgreSQL 18 fresh/upgrade migration, checksums, rollback and runtime denial passed in CI."
-    },
-    {
-      "at": "2026-09-18T11:22:28+00:00",
-      "id": "P00-04",
-      "action": "done",
-      "note": "Real Supabase login confirmed by owner. PKCE, encrypted session, signed BFF identity and forced runtime RLS verified."
-    },
-    {
-      "at": "2026-09-18T11:22:28+00:00",
-      "id": "P00-05",
-      "action": "in_progress",
-      "note": "Both CI jobs green. Generated-contract drift gate added; required branch checks and final CI rerun remain."
-    },
-    {
-      "at": "2026-09-18T11:22:29+00:00",
-      "id": "P00-06",
-      "action": "done",
-      "note": "Confirmed dedicated demo marker, production seed refusal and per-subject run entitlement. P01 reset remains disabled."
-    },
-    {
-      "at": "2026-09-18T11:22:29+00:00",
-      "id": "P00-07",
-      "action": "in_progress",
-      "note": "Live local stack healthy; worker heartbeat and safe request logs verified. Negative readiness recovery and alert-route verification remain."
-    },
-    {
-      "at": "2026-09-18T11:22:30+00:00",
-      "id": "P00-08",
-      "action": "in_progress",
-      "note": "12-table nonempty restore and corruption rejection passed. Accurate provenance manifest and setup guide added; signed release workflow and artifact attestation remain."
-    },
-    {
-      "at": "2026-09-18T11:22:39+00:00",
-      "id": "P00-02",
-      "action": "in_review",
-      "note": "Local-file configuration and startup rejection verified. Reopened completion pending the specified overlapping-key rotation and secret-reference review."
-    },
-    {
-      "at": "2026-09-18T14:36:45+00:00",
-      "id": "P00-02",
-      "action": "done",
-      "note": "Current/previous session keys with explicit expiry, mounted/environment references, safe startup failures and cookie/API tamper rejection verified."
-    },
-    {
-      "at": "2026-09-18T14:36:45+00:00",
-      "id": "P00-07",
-      "action": "done",
-      "note": "Bounded database timeouts; safe request/trace IDs; local stderr alert routing and OTLP export verified under failure and healthy replacement."
-    },
-    {
-      "at": "2026-09-18T14:36:46+00:00",
-      "id": "P00-08",
-      "action": "in_review",
-      "note": "Signed-tag workflow, verification key, tested-image archives/SBOMs and deployment runbook implemented. CI and actual signed artifact delivery still required."
-    },
-    {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-01",
-      "action": "done",
-      "note": "Clean CI web/API/worker and isolated seeded browser verified; bootstrap checks runtime DB and OIDC discovery; toolchain and memory observation documented."
-    },
-    {
-      "at": "2026-09-18T14:42:39+00:00",
-      "id": "P00-05",
-      "action": "done",
-      "note": "Four required CI checks enforced on main, strict up-to-date PR checks and admins enforcement; all scan/build/contract/browser/database gates passed."
-    },
-    {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00-08",
-      "action": "done",
-      "note": "Nonempty restore verified; signed v0.0.1 released with ten tested engineering/image/SBOM assets and exact-source CI provenance."
-    },
-    {
-      "at": "2026-09-18T14:51:41+00:00",
-      "id": "P00",
-      "action": "release",
-      "note": "v0.0.1 at f8f0f026f171364ae02120396b7c9a012efe1ccd; signed tag verified; CI 35358280423 and delivery 35358571786 passed; docs/development/releases/0.0.1.md; local/demo engineering activation only."
-    },
-    {
-      "at": "2026-09-18T15:55:28+00:00",
-      "id": "P01-02",
-      "action": "in_progress",
-      "note": "Session-isolated transactional aggregate added; real Supabase workflow and 100-retry checks pass. Full browser and release acceptance remain open."
-    },
-    {
-      "at": "2026-09-18T15:55:29+00:00",
-      "id": "P01-01",
-      "action": "in_progress",
-      "note": "Persistent responsive workspace shell and required detail routes implemented. Fixed stale API 404 by enabling development watch mode; full accessibility review remains open."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-03",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
-    {
-      "at": "2026-09-18T15:55:52+00:00",
-      "id": "P01-04",
-      "action": "in_progress",
-      "note": "Transactional synthetic workflow and screen implementation underway; database checks pass, full scenario/browser acceptance still open. See docs/development/P01-REVIEW.md."
-    },
     {
       "at": "2026-09-18T15:55:52+00:00",
       "id": "P01-05",
@@ -2442,7 +2310,139 @@
       "id": "P15-04",
       "action": "in_review",
       "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-21T00:35:14+00:00",
+      "id": "P13-01",
+      "action": "done",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P13-02",
+      "action": "done",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P13-03",
+      "action": "done",
+      "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P13-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P13-05",
+      "action": "done",
+      "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P14-01",
+      "action": "done",
+      "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas)."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P14-02",
+      "action": "done",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P14-03",
+      "action": "done",
+      "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P14-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P14-05",
+      "action": "done",
+      "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables."
+    },
+    {
+      "at": "2026-09-21T00:35:15+00:00",
+      "id": "P15-01",
+      "action": "done",
+      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas)."
+    },
+    {
+      "at": "2026-09-21T00:35:16+00:00",
+      "id": "P15-02",
+      "action": "done",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+    },
+    {
+      "at": "2026-09-21T00:35:16+00:00",
+      "id": "P15-03",
+      "action": "done",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details."
+    },
+    {
+      "at": "2026-09-21T00:35:16+00:00",
+      "id": "P15-04",
+      "action": "done",
+      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-21T00:35:16+00:00",
+      "id": "P15-05",
+      "action": "done",
+      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-01",
+      "action": "in_review",
+      "note": "packages/database/migrations/0031_p16_planning.sql: budgets versioned per book and period with one active and buckets per account and dimension set; commitments one per order line with consumption never reduced, warnings and overrides; allocation rule versions and runs (posted once per rule version and period, inputs frozen once approved); projects, contract versions, milestones, advances, billings and retention items; contracts add availability, commitments, rule versions, run lines, milestones, change orders, advances, retention and profitability (429 operations)."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-02",
+      "action": "in_review",
+      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-03",
+      "action": "in_review",
+      "note": "apps/api/src/workspace-api.mjs serves the 18 P16 operations plus the seventeen additions; the P05 and P04 operations carry the reservation, consumption, release and billing hooks."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-05",
+      "action": "in_review",
+      "note": "P16-T01..T05 in scripts/test-p16-domain.mjs and scripts/test-p16-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P16-REVIEW.md and P16-RUNBOOK.md written; teardown and snapshot scripts cover the planning tables."
+    },
+    {
+      "at": "2026-09-21T00:35:56+00:00",
+      "id": "P16-06",
+      "action": "blocked",
+      "note": "Release 0.16.0 drafted (docs/development/releases/0.16.0-draft.md). Blocked on the 0.10.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+    },
+    {
+      "at": "2026-09-21T02:40:04+00:00",
+      "id": "P16-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs."
     }
   ],
-  "updated_at": "2026-09-20T23:57:20+00:00"
+  "updated_at": "2026-09-21T02:40:04+00:00"
 }

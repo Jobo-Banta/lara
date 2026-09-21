@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "66fd27bd3f0066eb8f15d44e59b9d3994783302543253922d5a109054c785bf3",
+  "sha256": "665e5a4fd96711829fd8c54a4ad7ccde08b814867f4b79b5fed809a0a955e748",
   "operations": [
     {
       "method": "POST",
@@ -2061,6 +2061,91 @@
       "method": "GET",
       "path": "/consolidations/{id}/worksheet",
       "operationId": "get_consolidations_id_worksheet"
+    },
+    {
+      "method": "GET",
+      "path": "/budgets/{id}/availability",
+      "operationId": "get_budgets_id_availability"
+    },
+    {
+      "method": "GET",
+      "path": "/commitments",
+      "operationId": "get_commitments"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-rules",
+      "operationId": "post_allocation_rules"
+    },
+    {
+      "method": "GET",
+      "path": "/allocation-rules",
+      "operationId": "get_allocation_rules"
+    },
+    {
+      "method": "POST",
+      "path": "/allocation-rules/{id}/approve",
+      "operationId": "post_allocation_rules_id_approve"
+    },
+    {
+      "method": "GET",
+      "path": "/allocation-runs/{id}/lines",
+      "operationId": "get_allocation_runs_id_lines"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{id}/milestones",
+      "operationId": "post_projects_id_milestones"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}/milestones",
+      "operationId": "get_projects_id_milestones"
+    },
+    {
+      "method": "POST",
+      "path": "/milestones/{id}/certify",
+      "operationId": "post_milestones_id_certify"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{id}/change-orders",
+      "operationId": "post_projects_id_change_orders"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}/change-orders",
+      "operationId": "get_projects_id_change_orders"
+    },
+    {
+      "method": "POST",
+      "path": "/change-orders/{id}/approve",
+      "operationId": "post_change_orders_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{id}/advances",
+      "operationId": "post_projects_id_advances"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}/advances",
+      "operationId": "get_projects_id_advances"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}/retention",
+      "operationId": "get_projects_id_retention"
+    },
+    {
+      "method": "POST",
+      "path": "/retention-items/{id}/release",
+      "operationId": "post_retention_items_id_release"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{id}/profitability",
+      "operationId": "get_projects_id_profitability"
     }
   ]
 }

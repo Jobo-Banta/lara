@@ -12,6 +12,7 @@ import {linkEvidence} from './evidence.mjs';
 import {encryptField} from './parties.mjs';
 import * as fx from './fx.mjs';
 import * as inventory from './inventory.mjs';
+import * as planning from './planning.mjs';
 import {micros,decimal} from './ledger.mjs';
 import {money,bookFor,branchFor,resolveRules,computeLines,totals,rateScaled,documentMaterial,lineResource,lineRows,writeLines,allocateNumber,refreshSettlementState,settlementMaterial,settlementResource,applyAllocations,loadDocument,dueSchedule,documentResource,SUPPLIER_CREDIT} from './sales.mjs';
 
@@ -233,6 +234,8 @@ export async function approveDocument(tx,ctx,entityId,id,input,expectedVersion){
  const state=input.decision==='approve'?'approved':'changes_requested';
  const updated=(await tx.query('update lara.documents set state=$3,approved_by=$4,approved_version=$5 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,state,input.decision==='approve'?ctx.principalId:null,input.decision==='approve'?row.content_version:null])).rows[0];
  await audit(tx,ctx,{entityId,action:familyOf(row.kind)+'.'+input.decision,resourceType:'document',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason||null,afterRef:row.payload_hash});
+ // Budget control (P16): an approved order reserves a commitment per line inside the budget bucket lock; a blocking budget needs the approver's recorded override.
+ if(state==='approved'&&row.kind==='purchase_order')await planning.reserveCommitments(tx,ctx,entityId,updated,await lineRows(tx,ctx,id),{reason:input.reason||null});
  return result(updated);
 }
 async function optionalNumber(tx,ctx,entityId,row){
@@ -296,6 +299,8 @@ export async function postDocument(tx,ctx,entityId,id,input,expectedVersion,{com
  if(accrual)await tx.query("insert into lara.tax_events(tenant_id,entity_id,document_id,line_id,tax_rule_version_id,tax_point,recognition,basis,amount,recognition_entry_id) values($1,$2,$3,null,$4,$5,'accrual',$6,$7,$8)",[ctx.tenantId,entityId,id,row.withholding_rule_version_id,iso(row.accounting_date),row.net,row.withholding,entryId]);
  const updated=(await tx.query("update lara.documents set state='posted',posted_entry_id=$3,posted_by=$4,posted_at=now(),series_id=$5,official_number=$6,tax_date=document_date,withholding_recognition=$7 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,entryId,ctx.principalId,seriesId,officialNumber,recognition])).rows[0];
  const payable=micros(String(row.gross))-(accrual?micros(String(row.withholding)):0n);
+ // The bill takes over from the order's commitment (P16): consumed, never counted twice.
+ if(row.kind==='bill'&&row.source_document_id)await planning.consumeCommitments(tx,ctx,entityId,row.source_document_id,lines);
  if(row.kind==='bill'){
   if(payable>0n){const item=(await tx.query("insert into lara.open_items(tenant_id,entity_id,document_id,side,party_id,original_amount,currency,due_date) values($1,$2,$3,'AP',$4,$5,$6,$7) returning id",[ctx.tenantId,entityId,id,row.party_id,decimal(payable,6),row.currency,row.due_schedule[0]?.dueDate||iso(row.document_date)])).rows[0];if(fxRate)await fx.openLayer(tx,ctx,entityId,{openItemId:item.id,txn:payable,func:fx.controlFunc(journalLines,profile.apAccountId),rate:fxRate});}
   else await tx.query("update lara.documents set settlement_state='paid' where tenant_id=$1 and id=$2",[ctx.tenantId,id]);
@@ -378,6 +383,7 @@ export async function cancelDocument(tx,ctx,entityId,id,input,expectedVersion){
   if((await orderStatus(tx,ctx,id)).invoiced>0n)fail('STATE_CONFLICT','Bills are recorded against this order; it cannot be cancelled.');
  }else if(!['draft','submitted'].includes(row.state))fail('STATE_CONFLICT','Only drafts and submitted documents cancel; posted ones are corrected.');
  const updated=(await tx.query("update lara.documents set state='cancelled' where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id])).rows[0];
+ if(row.kind==='purchase_order')await planning.releaseCommitments(tx,ctx,entityId,id,input.reason);
  await audit(tx,ctx,{entityId,action:familyOf(row.kind)+'.cancel',resourceType:'document',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason});
  return result(updated);
 }

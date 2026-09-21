@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,planning,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -430,6 +430,42 @@ Object.assign(handlers,{
  get_groups_id_readiness:async(tx,ctx,{entityId,params,query})=>({status:200,body:await consolidation.readiness(tx,ctx,entityId,params.id,{periodEnd:query.periodEnd})}),
  post_consolidations_id_eliminations:async(tx,ctx,{entityId,params,body})=>({status:201,body:await consolidation.addElimination(tx,ctx,entityId,params.id,body)}),
  get_consolidations_id_worksheet:async(tx,ctx,{entityId,params})=>({status:200,body:await consolidation.worksheet(tx,ctx,entityId,params.id)}),
+ // P16 budgets, cost allocation and project accounting.
+ post_budgets:async(tx,ctx,{entityId,body})=>created(await planning.createBudget(tx,ctx,entityId,body)),
+ get_budgets:async(tx,ctx,{entityId,query})=>list(await planning.listBudgets(tx,ctx,entityId,query)),
+ get_budgets_id:async(tx,ctx,{entityId,params})=>ok(await planning.getBudget(tx,ctx,entityId,params.id)),
+ patch_budgets_id:async(tx,ctx,{entityId,params,body,version})=>ok(await planning.updateBudget(tx,ctx,entityId,params.id,version,body)),
+ post_budgets_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.approveBudget(tx,ctx,entityId,params.id,body,version)),
+ post_budgets_id_activate:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.activateBudget(tx,ctx,entityId,params.id,body,version)),
+ get_budgets_id_availability:async(tx,ctx,{entityId,params})=>({status:200,body:await planning.availability(tx,ctx,entityId,params.id)}),
+ get_commitments:async(tx,ctx,{entityId,query})=>list(await planning.listCommitments(tx,ctx,entityId,query)),
+ post_allocation_rules:async(tx,ctx,{entityId,body})=>created(await planning.createRule(tx,ctx,entityId,body)),
+ get_allocation_rules:async(tx,ctx,{entityId,query})=>list(await planning.listRules(tx,ctx,entityId,query)),
+ post_allocation_rules_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.approveRule(tx,ctx,entityId,params.id,body,version)),
+ post_allocation_runs:async(tx,ctx,{entityId,body})=>created(await planning.createRun(tx,ctx,entityId,body)),
+ get_allocation_runs:async(tx,ctx,{entityId,query})=>list(await planning.listRuns(tx,ctx,entityId,query)),
+ get_allocation_runs_id:async(tx,ctx,{entityId,params})=>ok(await planning.getRun(tx,ctx,entityId,params.id)),
+ patch_allocation_runs_id:async(tx,ctx,{entityId,params,body,version})=>ok(await planning.updateRun(tx,ctx,entityId,params.id,version,body)),
+ post_allocation_runs_id_preview:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.previewRun(tx,ctx,entityId,params.id,body,version)),
+ post_allocation_runs_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.approveRun(tx,ctx,entityId,params.id,body,version)),
+ post_allocation_runs_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await planning.postRun(tx,ctx,entityId,params.id,body,version)),
+ get_allocation_runs_id_lines:async(tx,ctx,{entityId,params})=>({status:200,body:await planning.runLines(tx,ctx,entityId,params.id)}),
+ post_projects:async(tx,ctx,{entityId,body})=>{const p=await planning.createProject(tx,ctx,entityId,body);const {contractVersionId,...body_}=p;return {status:201,body:body_,etag:p.version};},
+ get_projects:async(tx,ctx,{entityId,query})=>list(await planning.listProjects(tx,ctx,entityId,query)),
+ get_projects_id:async(tx,ctx,{entityId,params})=>ok(await planning.getProject(tx,ctx,entityId,params.id)),
+ patch_projects_id:async(tx,ctx,{entityId,params,body,version})=>ok(await planning.updateProject(tx,ctx,entityId,params.id,version,body)),
+ post_projects_id_progress_billing:async(tx,ctx,{entityId,params,body})=>result(ctx,await planning.progressBilling(tx,ctx,entityId,params.id,body)),
+ post_projects_id_milestones:async(tx,ctx,{entityId,params,body})=>created(await planning.createMilestone(tx,ctx,entityId,params.id,body)),
+ get_projects_id_milestones:async(tx,ctx,{entityId,params})=>list(await planning.listMilestones(tx,ctx,entityId,params.id)),
+ post_milestones_id_certify:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.certifyMilestone(tx,ctx,entityId,params.id,body,version)),
+ post_projects_id_change_orders:async(tx,ctx,{entityId,params,body})=>created(await planning.createChangeOrder(tx,ctx,entityId,params.id,body)),
+ get_projects_id_change_orders:async(tx,ctx,{entityId,params})=>list(await planning.listChangeOrders(tx,ctx,entityId,params.id)),
+ post_change_orders_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.approveChangeOrder(tx,ctx,entityId,params.id,body,version)),
+ post_projects_id_advances:async(tx,ctx,{entityId,params,body})=>created(await planning.createAdvance(tx,ctx,entityId,params.id,body)),
+ get_projects_id_advances:async(tx,ctx,{entityId,params})=>list(await planning.listAdvances(tx,ctx,entityId,params.id)),
+ get_projects_id_retention:async(tx,ctx,{entityId,params})=>list(await planning.listRetention(tx,ctx,entityId,params.id)),
+ post_retention_items_id_release:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.releaseRetention(tx,ctx,entityId,params.id,body,version)),
+ get_projects_id_profitability:async(tx,ctx,{entityId,params})=>({status:200,body:await planning.profitability(tx,ctx,entityId,params.id)}),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
