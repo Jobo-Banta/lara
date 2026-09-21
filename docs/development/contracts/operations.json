@@ -3859,5 +3859,320 @@
     "permission": "project.read",
     "input": null,
     "response": "ProjectProfitability"
+  },
+  {
+    "operationId": "get_leases_id_schedule",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases/{id}/schedule",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseSchedule"
+  },
+  {
+    "operationId": "post_leases_id_events",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases/{id}/events",
+    "permission": "lease.edit",
+    "input": "LeaseEventCreate",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_leases_id_events",
+    "phase": "P17A",
+    "method": "GET",
+    "path": "/leases/{id}/events",
+    "permission": "lease.read",
+    "input": null,
+    "response": "LeaseEventList"
+  },
+  {
+    "operationId": "post_leases_id_bill",
+    "phase": "P17A",
+    "method": "POST",
+    "path": "/leases/{id}/bill",
+    "permission": "lease.edit",
+    "input": "LeaseBilling",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_invoices_id_statutory_discount",
+    "phase": "P17B",
+    "method": "POST",
+    "path": "/invoices/{id}/statutory-discount",
+    "permission": "discount_eligibility.approve",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "get_invoices_id_statutory_discount",
+    "phase": "P17B",
+    "method": "GET",
+    "path": "/invoices/{id}/statutory-discount",
+    "permission": "discount_eligibility.read",
+    "input": null,
+    "response": "DiscountLineList"
+  },
+  {
+    "operationId": "post_channels",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/channels",
+    "permission": "channel.create",
+    "input": "ChannelCreate",
+    "response": "ChannelResource"
+  },
+  {
+    "operationId": "get_channels",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/channels",
+    "permission": "channel.read",
+    "input": null,
+    "response": "ChannelResourceList"
+  },
+  {
+    "operationId": "post_payouts",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts",
+    "permission": "payout.create",
+    "input": "PayoutCreate",
+    "response": "PayoutResource"
+  },
+  {
+    "operationId": "get_payouts",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/payouts",
+    "permission": "payout.read",
+    "input": null,
+    "response": "PayoutResourceList"
+  },
+  {
+    "operationId": "get_payouts_id",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/payouts/{id}",
+    "permission": "payout.read",
+    "input": null,
+    "response": "PayoutResource"
+  },
+  {
+    "operationId": "post_payouts_id_reconcile",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts/{id}/reconcile",
+    "permission": "payout.reconcile",
+    "input": "PayoutReconcile",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payouts_id_post",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/payouts/{id}/post",
+    "permission": "payout.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_pos_machines",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-machines",
+    "permission": "channel.create",
+    "input": "PosMachineCreate",
+    "response": "PosMachineResource"
+  },
+  {
+    "operationId": "get_pos_machines",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/pos-machines",
+    "permission": "channel.read",
+    "input": null,
+    "response": "PosMachineResourceList"
+  },
+  {
+    "operationId": "post_pos_closings",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings",
+    "permission": "pos_closing.create",
+    "input": "PosClosingCreate",
+    "response": "PosClosingResource"
+  },
+  {
+    "operationId": "get_pos_closings",
+    "phase": "P17C",
+    "method": "GET",
+    "path": "/pos-closings",
+    "permission": "pos_closing.read",
+    "input": null,
+    "response": "PosClosingResourceList"
+  },
+  {
+    "operationId": "post_pos_closings_id_approve",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings/{id}/approve",
+    "permission": "pos_closing.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_pos_closings_id_match",
+    "phase": "P17C",
+    "method": "POST",
+    "path": "/pos-closings/{id}/match",
+    "permission": "pos_closing.approve",
+    "input": "PosMatch",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payroll_batches",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches",
+    "permission": "payroll_batch.create",
+    "input": "PayrollBatchCreate",
+    "response": "PayrollBatchResource"
+  },
+  {
+    "operationId": "get_payroll_batches",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches",
+    "permission": "payroll_batch.read",
+    "input": null,
+    "response": "PayrollBatchResourceList"
+  },
+  {
+    "operationId": "get_payroll_batches_id",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches/{id}",
+    "permission": "payroll_batch.read",
+    "input": null,
+    "response": "PayrollBatchResource"
+  },
+  {
+    "operationId": "get_payroll_batches_id_records",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/payroll-batches/{id}/records",
+    "permission": "payroll_record.read",
+    "input": null,
+    "response": "PayrollRecordList"
+  },
+  {
+    "operationId": "post_payroll_batches_id_approve",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches/{id}/approve",
+    "permission": "payroll_batch.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_payroll_batches_id_post",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/payroll-batches/{id}/post",
+    "permission": "payroll_batch.post",
+    "input": "Action",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_remittances",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances",
+    "permission": "remittance.create",
+    "input": "RemittanceCreate",
+    "response": "RemittanceResource"
+  },
+  {
+    "operationId": "get_remittances",
+    "phase": "P17D",
+    "method": "GET",
+    "path": "/remittances",
+    "permission": "remittance.read",
+    "input": null,
+    "response": "RemittanceResourceList"
+  },
+  {
+    "operationId": "post_remittances_id_approve",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances/{id}/approve",
+    "permission": "remittance.approve",
+    "input": "ApprovalDecision",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_remittances_id_remit",
+    "phase": "P17D",
+    "method": "POST",
+    "path": "/remittances/{id}/remit",
+    "permission": "remittance.approve",
+    "input": "RemittanceRemit",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_local_obligations",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations",
+    "permission": "local_obligation.create",
+    "input": "LocalObligationCreate",
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "get_local_obligations",
+    "phase": "P17E",
+    "method": "GET",
+    "path": "/local-obligations",
+    "permission": "local_obligation.read",
+    "input": null,
+    "response": "LocalObligationResourceList"
+  },
+  {
+    "operationId": "get_local_obligations_id",
+    "phase": "P17E",
+    "method": "GET",
+    "path": "/local-obligations/{id}",
+    "permission": "local_obligation.read",
+    "input": null,
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "patch_local_obligations_id",
+    "phase": "P17E",
+    "method": "PATCH",
+    "path": "/local-obligations/{id}",
+    "permission": "local_obligation.edit",
+    "input": "LocalObligationCreate",
+    "response": "LocalObligationResource"
+  },
+  {
+    "operationId": "post_local_obligations_id_complete",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations/{id}/complete",
+    "permission": "local_obligation.complete",
+    "input": "LocalObligationComplete",
+    "response": "CommandResult"
+  },
+  {
+    "operationId": "post_local_obligations_id_waive",
+    "phase": "P17E",
+    "method": "POST",
+    "path": "/local-obligations/{id}/waive",
+    "permission": "local_obligation.complete",
+    "input": "ReasonAction",
+    "response": "CommandResult"
   }
 ]

@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "665e5a4fd96711829fd8c54a4ad7ccde08b814867f4b79b5fed809a0a955e748",
+  "sha256": "001467e1f3e628e7f0feff49d21a460bd6c8c210a5c413c6c2193bf0de5c30ec",
   "operations": [
     {
       "method": "POST",
@@ -2146,6 +2146,181 @@
       "method": "GET",
       "path": "/projects/{id}/profitability",
       "operationId": "get_projects_id_profitability"
+    },
+    {
+      "method": "GET",
+      "path": "/leases/{id}/schedule",
+      "operationId": "get_leases_id_schedule"
+    },
+    {
+      "method": "POST",
+      "path": "/leases/{id}/events",
+      "operationId": "post_leases_id_events"
+    },
+    {
+      "method": "GET",
+      "path": "/leases/{id}/events",
+      "operationId": "get_leases_id_events"
+    },
+    {
+      "method": "POST",
+      "path": "/leases/{id}/bill",
+      "operationId": "post_leases_id_bill"
+    },
+    {
+      "method": "POST",
+      "path": "/invoices/{id}/statutory-discount",
+      "operationId": "post_invoices_id_statutory_discount"
+    },
+    {
+      "method": "GET",
+      "path": "/invoices/{id}/statutory-discount",
+      "operationId": "get_invoices_id_statutory_discount"
+    },
+    {
+      "method": "POST",
+      "path": "/channels",
+      "operationId": "post_channels"
+    },
+    {
+      "method": "GET",
+      "path": "/channels",
+      "operationId": "get_channels"
+    },
+    {
+      "method": "POST",
+      "path": "/payouts",
+      "operationId": "post_payouts"
+    },
+    {
+      "method": "GET",
+      "path": "/payouts",
+      "operationId": "get_payouts"
+    },
+    {
+      "method": "GET",
+      "path": "/payouts/{id}",
+      "operationId": "get_payouts_id"
+    },
+    {
+      "method": "POST",
+      "path": "/payouts/{id}/reconcile",
+      "operationId": "post_payouts_id_reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/payouts/{id}/post",
+      "operationId": "post_payouts_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/pos-machines",
+      "operationId": "post_pos_machines"
+    },
+    {
+      "method": "GET",
+      "path": "/pos-machines",
+      "operationId": "get_pos_machines"
+    },
+    {
+      "method": "POST",
+      "path": "/pos-closings",
+      "operationId": "post_pos_closings"
+    },
+    {
+      "method": "GET",
+      "path": "/pos-closings",
+      "operationId": "get_pos_closings"
+    },
+    {
+      "method": "POST",
+      "path": "/pos-closings/{id}/approve",
+      "operationId": "post_pos_closings_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/pos-closings/{id}/match",
+      "operationId": "post_pos_closings_id_match"
+    },
+    {
+      "method": "POST",
+      "path": "/payroll-batches",
+      "operationId": "post_payroll_batches"
+    },
+    {
+      "method": "GET",
+      "path": "/payroll-batches",
+      "operationId": "get_payroll_batches"
+    },
+    {
+      "method": "GET",
+      "path": "/payroll-batches/{id}",
+      "operationId": "get_payroll_batches_id"
+    },
+    {
+      "method": "GET",
+      "path": "/payroll-batches/{id}/records",
+      "operationId": "get_payroll_batches_id_records"
+    },
+    {
+      "method": "POST",
+      "path": "/payroll-batches/{id}/approve",
+      "operationId": "post_payroll_batches_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/payroll-batches/{id}/post",
+      "operationId": "post_payroll_batches_id_post"
+    },
+    {
+      "method": "POST",
+      "path": "/remittances",
+      "operationId": "post_remittances"
+    },
+    {
+      "method": "GET",
+      "path": "/remittances",
+      "operationId": "get_remittances"
+    },
+    {
+      "method": "POST",
+      "path": "/remittances/{id}/approve",
+      "operationId": "post_remittances_id_approve"
+    },
+    {
+      "method": "POST",
+      "path": "/remittances/{id}/remit",
+      "operationId": "post_remittances_id_remit"
+    },
+    {
+      "method": "POST",
+      "path": "/local-obligations",
+      "operationId": "post_local_obligations"
+    },
+    {
+      "method": "GET",
+      "path": "/local-obligations",
+      "operationId": "get_local_obligations"
+    },
+    {
+      "method": "GET",
+      "path": "/local-obligations/{id}",
+      "operationId": "get_local_obligations_id"
+    },
+    {
+      "method": "PATCH",
+      "path": "/local-obligations/{id}",
+      "operationId": "patch_local_obligations_id"
+    },
+    {
+      "method": "POST",
+      "path": "/local-obligations/{id}/complete",
+      "operationId": "post_local_obligations_id_complete"
+    },
+    {
+      "method": "POST",
+      "path": "/local-obligations/{id}/waive",
+      "operationId": "post_local_obligations_id_waive"
     }
   ]
 }

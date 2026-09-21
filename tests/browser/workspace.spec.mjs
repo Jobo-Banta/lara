@@ -28,7 +28,8 @@ test.beforeAll(()=>{
 test.afterAll(async()=>{if(worker&&worker.exitCode===null&&!worker.signalCode){const exited=new Promise(r=>worker.once('exit',r));worker.kill();await Promise.race([exited,new Promise(r=>setTimeout(r,5000))]);}});
 
 async function as(browser,role){const context=await browser.newContext({baseURL:BASE});await context.addCookies([cookie(who(role))]);const page=await context.newPage();return {context,page};}
-const settled=async page=>{await expect(page.getByRole('status').filter({hasText:/Loading/})).toHaveCount(0);};
+// Lists over the shared database can take longer than the default expectation; settle within 15 s.
+const settled=async page=>{await expect(page.getByRole('status').filter({hasText:/Loading/})).toHaveCount(0,{timeout:15000});};
 // Selects the first option whose text matches; selectOption takes no regular expression.
 const pickOption=async(box,re)=>box.selectOption(await box.locator('option',{hasText:re}).first().getAttribute('value'));
 async function noSeriousViolations(page,label){const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();const serious=results.violations.filter(v=>['serious','critical'].includes(v.impact));expect(serious,label+' '+JSON.stringify(serious.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})))).toEqual([]);}
@@ -1807,14 +1808,211 @@ test('planning: capability activation, a budget version approved and activated w
  await expect(controller.page.getByRole('status').filter({hasText:'Contract'})).toContainText('billed ₱30,000.00');
  await preparer.context.close();await controller.context.close();await clerk.context.close();
 });
+// The local operations roles have no reviewed template yet; the profiles
+// each feature rests on (recurring billing policy, lease withholding and
+// lease profiles, the senior citizen discount profile, the payroll profile,
+// the authority profile), the accounts they name, the rent template and its
+// recurring schedule, the imported channel sales, a cash deposit and a
+// draft invoice for the discount are seeded through the domain. Four of the
+// five features are activated through the domain; lease billing on screen.
+async function seedLocalOps(){
+ const pg=createRequire(new URL('../../packages/database/package.json',import.meta.url))('pg');
+ const {organization,identity,ledger,sales,assets,inTransaction}=await import('../../packages/domain/src/index.mjs');
+ const db=new pg.Client(connectionOptions(process.env.LARA_E2E_DATABASE_URL));await db.connect();
+ try{
+  const tenantId=(await db.query('select tenant_id from lara.principal_directory where oidc_subject=$1',[who('controller')])).rows[0].tenant_id;
+  await db.query("select set_config('lara.tenant_id',$1,false)",[tenantId]);
+  const principal=async role=>(await db.query('select principal_id from lara.principal_directory where oidc_subject=$1 and tenant_id=$2',[who(role),tenantId])).rows[0].principal_id;
+  const hash=(await db.query("select encode(sha256(convert_to($1,'utf8')),'hex') as h",['local'])).rows[0].h;
+  const role=async(code,perms)=>(await db.query("insert into lara.roles(tenant_id,code,name,permissions,status,content_hash,created_by) values($1,$2,$2,$3,'approved',$4,$5) returning id",[tenantId,code,JSON.stringify(perms),hash,await principal('security')])).rows[0].id;
+  const ops=await role('local_ops',['lease.create','lease.edit','lease.read','discount_eligibility.create','discount_eligibility.edit','discount_eligibility.read','channel.create','channel.read','payout.create','payout.read','pos_closing.create','pos_closing.read','payroll_batch.create','payroll_batch.read','remittance.create','remittance.read','local_obligation.create','local_obligation.edit','local_obligation.read','schedule.create','schedule.read']);
+  const reviewer=await role('local_reviewer',['lease.approve','lease.edit','lease.read','discount_eligibility.approve','discount_eligibility.read','channel.read','payout.read','payout.reconcile','payout.post','pos_closing.read','pos_closing.approve','payroll_batch.read','payroll_batch.approve','payroll_batch.post','payroll_record.read','remittance.read','remittance.approve','local_obligation.read','local_obligation.complete','schedule.read']);
+  await db.query('insert into lara.memberships(tenant_id,principal_id,role_id,created_by) values($1,$2,$3,$4),($1,$5,$6,$4)',[tenantId,await principal('preparer'),ops,await principal('security'),await principal('controller'),reviewer]);
+  const entity=(await db.query('select id from lara.entities where tenant_id=$1 order by created_at limit 1',[tenantId])).rows[0].id;
+  const ctrlId=await principal('controller'),prepId=await principal('preparer'),billId=await principal('billing'),treId=await principal('treasury');
+  let salesEntry=null;
+  await inTransaction(db,{tenantId,principalId:ctrlId},async tx=>{
+   const ctxOf=async id=>({...await identity.actorContext(tx,tenantId,id),traceId:'seed-local'});
+   const ctrl=await ctxOf(ctrlId),prep=await ctxOf(prepId),bill=await ctxOf(billId),tre=await ctxOf(treId);
+   for(const cap of ['statutory_discounts','marketplace_pos','payroll_data','local_obligations'])await tx.query("insert into lara.capability_activations(tenant_id,entity_id,capability,status,profile_version,approved_by,activated_at,created_by) values($1,$2,$3,'active','p17.1',$4,now(),$5)",[tenantId,entity,cap,prepId,ctrlId]);
+   const book=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary'",[tenantId,entity])).rows[0].id;
+   const branch=(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and code='HQ'",[tenantId,entity])).rows[0].id;
+   const acctId=async code=>(await tx.query("select id from lara.accounts where tenant_id=$1 and entity_id=$2 and code=$3",[tenantId,entity,code])).rows[0]?.id;
+   const mk=async(code,name,category)=>(await acctId(code))||(await ledger.createAccount(tx,prep,entity,{bookId:book,code,name,category,controlType:'none',requiredDimensions:[]})).id;
+   const deposits=await mk('2400','Lease deposits held','liability'),advances=await mk('2410','Rent in advance','liability'),channelAr=await mk('1210','Marketplace receivable','asset'),cwt=await mk('1350','Creditable withholding','asset'),clearing=await mk('1025','Payout clearing','asset'),sss=await mk('2510','SSS payable','liability'),ph=await mk('2520','PhilHealth payable','liability'),pi=await mk('2530','Pag-IBIG payable','liability'),netPay=await mk('2540','Salaries payable','liability'),salaries=await mk('5150','Salaries','expense'),fees=await mk('5350','Platform fees','expense');
+   const revenue=await acctId('4000'),cash=await acctId('1010'),whtPay=(await acctId('2300'))||await mk('2300','Withholding payable','liability');
+   const settle=async(kind,payload)=>{const s=await organization.saveSettings(tx,ctrl,entity,kind,payload);await organization.approveSettings(tx,{...prep,permissions:new Set([...prep.permissions,'entity.activate'])},entity,s.id,{payloadHash:s.payloadHash});};
+   await settle('recognition_policy_monthly_billing',{code:'monthly_billing',kind:'recurring_invoice'});
+   await settle('lease_withholding_profile',{profileVersion:'lease-wht-2026',rates:{corporate:'0.05'}});
+   await settle('lease_profile',{depositLiabilityAccountId:deposits,advanceLiabilityAccountId:advances,cashAccountId:cash});
+   await settle('discount_profile_senior_citizen',{profileVersion:'sc-2026',rate:'0.2',basis:'net',eligibleAccountIds:[revenue],exemptionProfile:'vat-exempt-sc',requiredEvidence:['osca_id'],goldenCases:[{id:'SC-01',match:'any'}]});
+   await settle('payroll_profile',{salaryExpenseAccountId:salaries,withholdingPayableAccountId:whtPay,sssPayableAccountId:sss,philhealthPayableAccountId:ph,pagibigPayableAccountId:pi,netPayableAccountId:netPay});
+   await settle('local_authority_profile',{authority:'Makati City',profileVersion:'lgu-2026',kinds:['business_permit','local_business_tax','real_property_tax'],filingRequired:['business_permit']});
+   const customer=(await tx.query("select id from lara.party where tenant_id=$1 and entity_id=$2 and legal_name='Northwind Services'",[tenantId,entity])).rows[0].id;
+   if(!(await tx.query("select 1 from lara.periods where tenant_id=$1 and entity_id=$2 and book_id=$3 and starts_on='2026-12-01'",[tenantId,entity,book])).rowCount)await ledger.createPeriod(tx,ctrl,entity,{bookId:book,startsOn:'2026-12-01',endsOn:'2026-12-31'});
+   const template=await sales.createDocument(tx,bill,entity,{kind:'invoice',branchId:branch,bookId:book,partyId:customer,documentDate:'2026-11-03',accountingDate:'2026-11-03',currency:'PHP',ruleProfileVersion:'ph-2026',lines:[{description:'Monthly rent',quantity:'1',unitPrice:'20000',discount:'0',priceBasis:'exclusive',accountId:revenue,dimensions:{}}],evidenceIds:[]});
+   await assets.createSchedule(tx,prep,entity,{kind:'recurring_invoice',sourceId:template.id,startDate:'2026-12-01',endDate:'2027-11-30',basisAmount:'20000',currency:'PHP',policyVersion:'monthly_billing'});
+   await sales.createDocument(tx,bill,entity,{kind:'invoice',branchId:branch,bookId:book,partyId:customer,documentDate:'2026-11-04',accountingDate:'2026-11-04',currency:'PHP',ruleProfileVersion:'ph-2026',externalReference:'SC-DRAFT',lines:[{description:'Consultation',quantity:'1',unitPrice:'1000',discount:'0',priceBasis:'exclusive',accountId:revenue,dimensions:{}}],evidenceIds:[]});
+   const acc=await ctxOf(prepId);
+   const j=await ledger.createJournal(tx,acc,entity,{bookId:book,accountingDate:'2026-11-15',documentDate:'2026-11-15',currency:'PHP',description:'ShopCo sales 1–15 Nov',lines:[{accountId:channelAr,branchId:branch,debit:'10000.00',credit:'0',dimensions:{}},{accountId:revenue,branchId:branch,debit:'0',credit:'10000.00',dimensions:{}}],evidenceIds:[]});
+   await ledger.submitJournal(tx,acc,entity,j.id,{});await ledger.approveJournal(tx,ctrl,entity,j.id,{decision:'approve',contentVersion:1});salesEntry=(await ledger.postJournal(tx,ctrl,entity,j.id,{})).journalEntryIds[0];
+   const rc=await sales.createCollection(tx,bill,entity,{direction:'receipt',partyId:customer,currency:'PHP',valueDate:'2026-11-21',grossAmount:'3000.00',cashAmount:'3000.00',withholdingAmount:'0.00',method:'cash',allocations:[],evidenceIds:[]});
+   await sales.submitCollection(tx,bill,entity,rc.id,{});await sales.approveCollection(tx,prep,entity,rc.id,{decision:'approve',contentVersion:1});await sales.postCollection(tx,prep,entity,rc.id,{});
+  });
+  return salesEntry;
+ }finally{await db.end();}
+}
+test('local operations: lease billing activated on screen and the other four features seeded; a lease approved, scheduled, billed and its deposit received; an eligibility approved and the discount applied to a draft invoice; a channel payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; a local obligation completed on evidence',async({browser})=>{
+ test.setTimeout(600000);
+ const controller=await as(browser,'controller'),preparer=await as(browser,'preparer');
+ for(const who of [controller,preparer]){
+  await who.page.goto('/settings/capabilities');await settled(who.page);
+  const card=who.page.locator('section.demo-card').filter({hasText:'Lease billing'});
+  await card.getByRole('combobox',{name:'Activation evidence'}).selectOption({label:'registration.pdf'});
+  await card.getByLabel('Reason').fill(who===controller?'Lease accounting examples reviewed':'Withholding and deposit treatment reviewed');
+  await card.getByRole('button',{name:'Request or approve activation'}).click();
+  await expect(who.page.locator('section[role="alert"]')).toHaveCount(0);
+ }
+ const salesEntry=await seedLocalOps();
+ // Leases.
+ await preparer.page.goto('/local');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Lessee'}).selectOption({label:'Northwind Services'});
+ await preparer.page.getByRole('textbox',{name:'Term start'}).fill('2026-12-01');await preparer.page.getByRole('textbox',{name:'Term end'}).fill('2027-11-30');
+ await preparer.page.getByRole('textbox',{name:'Deposit',exact:true}).fill('40000');
+ await pickOption(preparer.page.getByRole('combobox',{name:/Billing schedule/}),/recurring_invoice PHP 20000/);
+ await preparer.page.getByRole('textbox',{name:'Escalation 1 from'}).fill('2027-06-01');await preparer.page.getByRole('textbox',{name:'Escalation 1 rate'}).fill('0.05');
+ await preparer.page.getByRole('combobox',{name:'Signed lease'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Save lease draft'}).click();
+ const leaseRow=page=>page.getByRole('row').filter({hasText:'Northwind Services'}).filter({hasText:'2026-12-01 → 2027-11-30'});
+ await expect(leaseRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.goto('/local');await settled(controller.page);
+ await leaseRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(leaseRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await leaseRow(controller.page).getByRole('button',{name:'Open'}).click();
+ await expect(controller.page.getByRole('heading',{name:/Rent schedule · total ₱246,000\.00/})).toBeVisible({timeout:15000});
+ await controller.page.getByRole('row').filter({hasText:'2026-12-01 → 2026-12-31'}).getByRole('button',{name:'Bill'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'2026-12-01 → 2026-12-31'}).getByRole('cell',{name:'yes',exact:true})).toBeVisible({timeout:15000});
+ await controller.page.getByRole('textbox',{name:'Amount',exact:true}).fill('40000');
+ await controller.page.getByRole('textbox',{name:'Date',exact:true}).fill('2026-12-02');
+ await controller.page.getByRole('combobox',{name:'Bank or cash evidence'}).selectOption({label:'registration.pdf'});
+ await controller.page.getByRole('button',{name:'Record event'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'deposit received'})).toContainText('₱40,000.00',{timeout:15000});
+ await noSeriousViolations(controller.page,'local /local');
+ // Statutory discounts.
+ await preparer.page.goto('/local/discounts');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Customer'}).selectOption({label:'Northwind Services'});
+ await preparer.page.getByRole('textbox',{name:'Valid until'}).fill('2027-12-31');
+ await preparer.page.getByRole('textbox',{name:'ID reference (stored masked)'}).fill('OSCA-123456');
+ await preparer.page.getByRole('combobox',{name:'Identity evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Save eligibility'}).click();
+ const eligRow=page=>page.getByRole('row').filter({hasText:'senior_citizen'});
+ await expect(eligRow(preparer.page).getByRole('cell',{name:'draft',exact:true})).toBeVisible({timeout:15000});
+ await expect(eligRow(preparer.page)).toContainText('*******3456');
+ await controller.page.goto('/local/discounts');await settled(controller.page);
+ await eligRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(eligRow(controller.page).getByRole('cell',{name:'approved',exact:true})).toBeVisible({timeout:15000});
+ await pickOption(controller.page.getByRole('combobox',{name:'Draft invoice'}),/1000\.00 · draft/);
+ await controller.page.getByRole('button',{name:'Apply statutory discount'}).click();
+ await expect(controller.page.getByRole('row').filter({hasText:'SC-01'})).toContainText('₱200.00',{timeout:15000});
+ await noSeriousViolations(controller.page,'local /local/discounts');
+ // Channels: payout and POS.
+ await preparer.page.goto('/local/channels');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Code',exact:true}).fill('SHOP');await preparer.page.getByRole('textbox',{name:'Name',exact:true}).fill('ShopCo');await preparer.page.getByRole('textbox',{name:'Provider'}).fill('ShopCo');
+ await preparer.page.getByRole('combobox',{name:/Channel receivable/}).selectOption({label:'1210 Marketplace receivable'});
+ await preparer.page.getByRole('combobox',{name:'Platform fees'}).selectOption({label:'5350 Platform fees'});
+ await preparer.page.getByRole('combobox',{name:/Tax withheld by the platform/}).selectOption({label:'1350 Creditable withholding'});
+ await preparer.page.getByRole('combobox',{name:/Payout clearing/}).selectOption({label:'1025 Payout clearing'});
+ await preparer.page.getByRole('button',{name:'Register channel'}).click();
+ await expect(preparer.page.getByRole('cell',{name:'SHOP',exact:true})).toBeVisible({timeout:15000});
+ await preparer.page.getByRole('textbox',{name:'Statement reference'}).fill('STM-2026-11-A');
+ await preparer.page.getByRole('textbox',{name:'Period start'}).fill('2026-11-01');await preparer.page.getByRole('textbox',{name:'Period end'}).fill('2026-11-15');
+ await preparer.page.getByRole('textbox',{name:'Gross sales'}).fill('10000');await preparer.page.getByRole('textbox',{name:'Platform fees'}).fill('500');await preparer.page.getByRole('textbox',{name:'Tax withheld'}).fill('100');await preparer.page.getByRole('textbox',{name:'Net payout'}).fill('9400');
+ await preparer.page.getByRole('combobox',{name:'Statement evidence'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Record payout'}).click();
+ const payoutRow=page=>page.getByRole('row').filter({hasText:'STM-2026-11-A'});
+ await expect(payoutRow(preparer.page)).toContainText('imported',{timeout:15000});
+ await controller.page.goto('/local/channels');await settled(controller.page);
+ await payoutRow(controller.page).getByRole('textbox',{name:/Imported sales ids/}).fill(salesEntry);
+ await payoutRow(controller.page).getByRole('button',{name:'Reconcile'}).click();
+ await expect(payoutRow(controller.page)).toContainText('reconciled',{timeout:15000});
+ await payoutRow(controller.page).getByRole('button',{name:'Post',exact:true}).click();
+ await expect(payoutRow(controller.page)).toContainText('posted',{timeout:15000});
+ await preparer.page.goto('/local/channels');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Brand'}).fill('Acme');await preparer.page.getByRole('textbox',{name:'Model'}).fill('X1');await preparer.page.getByRole('textbox',{name:'Serial number'}).fill('SN-001');await preparer.page.getByRole('textbox',{name:'MIN'}).fill('MIN-001');await preparer.page.getByRole('textbox',{name:'Permit number'}).fill('PTU-2026-1');
+ await expect(preparer.page.getByRole('combobox',{name:'Branch'})).toHaveValue(/./);
+ await preparer.page.getByRole('button',{name:'Register machine'}).click();
+ await expect(preparer.page.getByRole('cell',{name:'SN-001',exact:true})).toBeVisible({timeout:15000});
+ await preparer.page.getByRole('textbox',{name:'Shift date'}).fill('2026-11-20');
+ await preparer.page.getByRole('textbox',{name:'Beginning reading'}).fill('100000');await preparer.page.getByRole('textbox',{name:'Ending reading'}).fill('103500');await preparer.page.getByRole('textbox',{name:'Cash counted'}).fill('3000');
+ await preparer.page.getByRole('combobox',{name:'Reading tape'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Record closing'}).click();
+ const closingRow=page=>page.getByRole('row').filter({hasText:'2026-11-20 #1'});
+ await expect(closingRow(preparer.page)).toContainText('₱3,500.00',{timeout:15000});
+ await controller.page.goto('/local/channels');await settled(controller.page);
+ await closingRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(closingRow(controller.page)).toContainText('approved',{timeout:15000});
+ await pickOption(closingRow(controller.page).getByRole('combobox',{name:'Posted deposit'}),/2026-11-21 · 3000\.00/);
+ await closingRow(controller.page).getByRole('button',{name:'Match deposit'}).click();
+ await expect(closingRow(controller.page)).toContainText('matched',{timeout:15000});
+ await noSeriousViolations(controller.page,'local /local/channels');
+ // Payroll.
+ await preparer.page.goto('/local/payroll');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Source system'}).fill('PayrollCo');await preparer.page.getByRole('textbox',{name:'Period',exact:true}).first().fill('2026-11');
+ await preparer.page.getByRole('textbox',{name:'Gross total'}).fill('50000');await preparer.page.getByRole('textbox',{name:'Withholding total'}).fill('3500');await preparer.page.getByRole('textbox',{name:'SSS total'}).fill('2250');await preparer.page.getByRole('textbox',{name:'PhilHealth total'}).fill('1000');await preparer.page.getByRole('textbox',{name:'Pag-IBIG total'}).fill('400');await preparer.page.getByRole('textbox',{name:'Net total'}).fill('42850');
+ await preparer.page.getByRole('textbox',{name:/Records/}).fill('EMP-0001,30000,2500,1350,600,200,25350\nEMP-0002,20000,1000,900,400,200,17500');
+ await preparer.page.getByRole('combobox',{name:'Payroll register'}).selectOption({label:'registration.pdf'});
+ await preparer.page.getByRole('button',{name:'Import batch'}).click();
+ const batchRow=page=>page.getByRole('row').filter({hasText:'PayrollCo'}).filter({hasText:'2026-11'});
+ await expect(batchRow(preparer.page)).toContainText('reconciled',{timeout:15000});
+ await expect(preparer.page.getByRole('button',{name:'Records'})).toHaveCount(0);
+ await controller.page.goto('/local/payroll');await settled(controller.page);
+ await batchRow(controller.page).getByRole('button',{name:'Records'}).click();
+ await expect(controller.page.getByRole('cell',{name:'****0001',exact:true})).toBeVisible({timeout:15000});
+ await batchRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(batchRow(controller.page)).toContainText('approved',{timeout:15000});
+ await batchRow(controller.page).getByRole('button',{name:'Post journal'}).click();
+ await expect(batchRow(controller.page)).toContainText('posted',{timeout:15000});
+ await preparer.page.goto('/local/payroll');await settled(preparer.page);
+ await preparer.page.getByRole('combobox',{name:'Batch'}).selectOption({index:1});
+ await preparer.page.getByRole('textbox',{name:'Period',exact:true}).nth(1).fill('2026-11');
+ await preparer.page.getByRole('textbox',{name:'Amount',exact:true}).fill('2250');await preparer.page.getByRole('textbox',{name:'Due date'}).fill('2026-12-15');
+ await preparer.page.getByRole('button',{name:'Record remittance due'}).click();
+ const remitRow=page=>page.getByRole('row').filter({hasText:'SSS'}).filter({hasText:'2026-11'});
+ await expect(remitRow(preparer.page)).toContainText('due',{timeout:15000});
+ await controller.page.goto('/local/payroll');await settled(controller.page);
+ await remitRow(controller.page).getByRole('button',{name:'Approve'}).click();
+ await expect(remitRow(controller.page)).toContainText('approved',{timeout:15000});
+ await remitRow(controller.page).getByRole('textbox',{name:'Remittance reference'}).fill('SSS-PRN-2026-11');
+ await remitRow(controller.page).getByRole('combobox',{name:'Payment evidence'}).selectOption({label:'registration.pdf'});
+ await remitRow(controller.page).getByRole('button',{name:'Record remittance'}).click();
+ await expect(remitRow(controller.page)).toContainText('remitted',{timeout:15000});
+ await noSeriousViolations(controller.page,'local /local/payroll');
+ // Local obligations.
+ await preparer.page.goto('/local/obligations');await settled(preparer.page);
+ await preparer.page.getByRole('textbox',{name:'Authority',exact:true}).fill('Makati City');await preparer.page.getByRole('textbox',{name:'Authority profile version'}).fill('lgu-2026');
+ await preparer.page.getByRole('textbox',{name:'Period',exact:true}).fill('2027');await preparer.page.getByRole('textbox',{name:'Due date'}).fill('2027-01-20');await preparer.page.getByRole('textbox',{name:'Amount',exact:true}).fill('8000');
+ await preparer.page.getByRole('checkbox',{name:'Filing evidence required'}).check();
+ await preparer.page.getByRole('button',{name:'Record obligation'}).click();
+ const obRow=page=>page.getByRole('row').filter({hasText:'business permit'});
+ await expect(obRow(preparer.page)).toContainText('open',{timeout:15000});
+ await controller.page.goto('/local/obligations');await settled(controller.page);
+ await obRow(controller.page).getByRole('combobox',{name:'Payment evidence'}).selectOption({label:'registration.pdf'});
+ await obRow(controller.page).getByRole('button',{name:'Complete'}).click();
+ await expect(controller.page.locator('section[role="alert"]')).toContainText('filing evidence');
+ await obRow(controller.page).getByRole('combobox',{name:'Filing evidence'}).selectOption({label:'registration.pdf'});
+ await obRow(controller.page).getByRole('button',{name:'Complete'}).click();
+ await expect(obRow(controller.page)).toContainText('complete',{timeout:15000});
+ await noSeriousViolations(controller.page,'local /local/obligations');
+ await preparer.context.close();await controller.context.close();
+});
 test('forbidden, roadmap and unknown-account states are explicit; keyboard and mobile flows pass WCAG checks',async({browser})=>{
  test.setTimeout(240000);
  const clerk=await as(browser,'clerk');
  await clerk.page.goto('/settings/setup');await settled(clerk.page);
  await expect(clerk.page.getByRole('button',{name:'Create organization'})).toHaveCount(0);
  await expect(clerk.page.getByRole('button',{name:'Request activation'})).toHaveCount(0);
- await clerk.page.goto('/local');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
- await expect(clerk.page.getByText('with P17',{exact:false})).toBeVisible();
+ await clerk.page.goto('/extend');await expect(clerk.page.locator('h1')).toHaveText('Coming in a later release');
+ await expect(clerk.page.getByText('with P18',{exact:false})).toBeVisible();
  const stranger=await browser.newContext({baseURL:BASE});await stranger.addCookies([cookie('nobody-'+suffix)]);const sp=await stranger.newPage();
  await sp.goto('/work');await expect(sp.locator('section[role="alert"]')).toContainText('no workspace membership');
  await stranger.close();

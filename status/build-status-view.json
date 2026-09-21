@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-21T02:40:04+00:00",
+  "updated_at": "2026-09-21T05:55:38+00:00",
   "releases": [
     {
       "id": "P00",
@@ -4321,12 +4321,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/database/migrations/0032_p17_local_operations.sql (shared by P17A\u2013E): lease_contracts (one per billing schedule, evidence, approved by another principal, terms frozen once approved) and append-only lease_events; capabilities leases/statutory_discounts/marketplace_pos/payroll_data/local_obligations and 22 permissions. Lease operations (5 reviewed + schedule, events, billing) in the OpenAPI with escalation steps and base rent added to the lease schema.",
+      "evidence": "Local: scripts/test-p17-schema.mjs passes (7 groups); migration 0032 applied on the dev database; validate_specifications PASS (464 operations). CI run pending.",
+      "updated_at": "2026-09-21T02:55:14+00:00"
     },
     {
       "id": "P17A-02",
@@ -4342,12 +4342,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "packages/domain/src/localops.mjs leases: schedule from the base rent with escalation steps compounded from their boundary; billing one schedule month at the escalated rent from the recurring template; deposits and advances received into the profile's liabilities within the contract, applied by another principal as a non-cash settlement through the allocation model or refunded (P17-T01).",
+      "evidence": "Local: scripts/test-p17-domain.mjs passes (6 groups: P17-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T02:55:14+00:00"
     },
     {
       "id": "P17A-03",
@@ -4363,12 +4363,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/api/src/workspace-api.mjs serves the lease operations; FEATURE_NOT_ENABLED until the leases capability is active and RULE_PROFILE_NOT_APPROVED until lease_profile and lease_withholding_profile are approved; teardown and snapshot tooling cover the tables.",
+      "evidence": "Local: scripts/test-p17-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T02:55:14+00:00"
     },
     {
       "id": "P17A-04",
@@ -4384,12 +4384,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "apps/web/src/app/_components/workspace-localops.tsx /local: leases drafted with escalation steps and evidence, approved by another principal, the rent schedule with per-month billing, deposit and advance events with evidence; capabilities screen offers leases; browser local operations journey covers activation on screen, approval, schedule, billing and the deposit.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 20/20 passed (~25 min, includes the local operations journey: lease billing activated on screen, a lease approved, scheduled, billed and its deposit received; eligibility approved and the discount applied; a payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; an obligation completed on evidence). CI run pending.",
+      "updated_at": "2026-09-21T05:55:37+00:00"
     },
     {
       "id": "P17A-05",
@@ -4405,12 +4405,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T01 in scripts/test-p17-domain.mjs and the lease process in scripts/test-p17-api.mjs; negatives: escalation outside the term, deposit beyond the contract, self-application, application beyond what is held, second billing of a period. Runbook P17A section.",
+      "evidence": "Local: P17-T01..T05 pass in scripts/test-p17-domain.mjs and scripts/test-p17-api.mjs; ci-database.mjs runs the P17 suites on fresh and upgraded databases; docs/development/P17-RUNBOOK.md and P17-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17A-06",
@@ -4426,12 +4426,12 @@
         "FR-PH-027"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (docs/development/releases/0.17.0-draft.md, feature tag v0.17.0-a). Blocked on the owner: lease accounting examples and the withholding profile reviewed by the advisor, the hosted run and RG-06 task-based acceptance, RG-07 profile review, RG-08 manifest from the exact-source run.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-01",
@@ -4449,12 +4449,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: discount_eligibility (one live per customer and category, evidence, approved by another principal, immutable once approved, revoked final) and discount_lines (one per document line); eligibility operations (5 reviewed) with the masked identity reference plus the invoice discount application and its lines.",
+      "evidence": "Local: scripts/test-p17-schema.mjs passes (7 groups); migration 0032 applied on the dev database; validate_specifications PASS (464 operations). CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-02",
@@ -4471,12 +4471,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs discounts: eligibility validated against the approved discount profile (required identity evidence, expiry, one live per customer and category); application to a draft invoice discounts each line on an eligible account on the profile's basis and exempts it, records the golden case, refuses customers without approved eligibility, expired eligibility at the document date and posted invoices (P17-T02).",
+      "evidence": "Local: scripts/test-p17-domain.mjs passes (6 groups: P17-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-03",
@@ -4493,12 +4493,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves eligibility and discount operations behind the statutory_discounts capability and the discount_profile_<category> profile.",
+      "evidence": "Local: scripts/test-p17-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-04",
@@ -4515,12 +4515,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 20/20 passed (~25 min, includes the local operations journey: lease billing activated on screen, a lease approved, scheduled, billed and its deposit received; eligibility approved and the discount applied; a payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; an obligation completed on evidence). CI run pending.",
+      "updated_at": "2026-09-21T05:55:38+00:00"
     },
     {
       "id": "P17B-05",
@@ -4537,12 +4537,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T02 in the domain and API suites; negatives: ineligible and expired customers, self-approval, re-discounting a posted invoice. Runbook P17B section.",
+      "evidence": "Local: P17-T01..T05 pass in scripts/test-p17-domain.mjs and scripts/test-p17-api.mjs; ci-database.mjs runs the P17 suites on fresh and upgraded databases; docs/development/P17-RUNBOOK.md and P17-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17B-06",
@@ -4559,12 +4559,12 @@
         "FR-PH-028"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-b). Blocked on the owner: discount profiles per category reviewed by the advisor, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17C-01",
@@ -4584,12 +4584,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: channels, payout_batches (unique per channel and source; net = gross \u2212 fees \u2212 withholding \u2212 other deductions; posted only from reconciled; immutable once posted), pos_machines (unique per serial and MIN), pos_closings (unique per machine, shift and reading; gross = ending \u2212 beginning; approved by another principal; matched only with a deposit); channel, payout (reconcile, post), machine and closing (approve, match) operations.",
+      "evidence": "Local: scripts/test-p17-schema.mjs passes (7 groups); migration 0032 applied on the dev database; validate_specifications PASS (464 operations). CI run pending.",
+      "updated_at": "2026-09-21T02:55:15+00:00"
     },
     {
       "id": "P17C-02",
@@ -4608,12 +4608,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs channels: a payout's deductions must explain the net; reconciliation to posted invoices or entries whose total equals the gross, each sales reference once; posting once with the net to clearing, fees and withholding recognized and the channel receivable settled; replayed statements refused; closings validated and matched to a posted deposit with the difference as an exception (P17-T03).",
+      "evidence": "Local: scripts/test-p17-domain.mjs passes (6 groups: P17-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17C-03",
@@ -4632,12 +4632,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves channel, payout and POS operations behind the marketplace_pos capability; channel sales ride the existing journal and invoice imports.",
+      "evidence": "Local: scripts/test-p17-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17C-04",
@@ -4656,12 +4656,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 20/20 passed (~25 min, includes the local operations journey: lease billing activated on screen, a lease approved, scheduled, billed and its deposit received; eligibility approved and the discount applied; a payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; an obligation completed on evidence). CI run pending.",
+      "updated_at": "2026-09-21T05:55:38+00:00"
     },
     {
       "id": "P17C-05",
@@ -4680,12 +4680,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T03 in the domain and API suites; negatives: unexplained payout nets, replayed statements, posting before reconciliation, sales reconciled twice, closings with inconsistent readings. Runbook P17C section.",
+      "evidence": "Local: P17-T01..T05 pass in scripts/test-p17-domain.mjs and scripts/test-p17-api.mjs; ci-database.mjs runs the P17 suites on fresh and upgraded databases; docs/development/P17-RUNBOOK.md and P17-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17C-06",
@@ -4704,12 +4704,12 @@
         "FR-PL-010"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-c). Blocked on the owner: provider statement formats and channel accounting reviewed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-01",
@@ -4727,12 +4727,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: payroll_batches (unique per file; approved by another principal; posted once per source and period), append-only employee_tax_records (identifier encrypted and masked, payroll_record.read), remittance_records (unique per agency, period and batch; remitted only with reference and evidence); batch (records, approve, post) and remittance (approve, remit) operations.",
+      "evidence": "Local: scripts/test-p17-schema.mjs passes (7 groups); migration 0032 applied on the dev database; validate_specifications PASS (464 operations). CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-02",
@@ -4750,12 +4750,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs payroll: records validated line by line and against the totals (an untying file stays an exception), file hash refuses replays, records restricted and masked with an audit per read, the journal per the approved payroll profile once per source and period, remittances tied to the batch totals and remitted on evidence (P17-T04).",
+      "evidence": "Local: scripts/test-p17-domain.mjs passes (6 groups: P17-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-03",
@@ -4773,12 +4773,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves payroll and remittance operations behind the payroll_data capability and payroll_profile; encrypted identifiers under FIELD_ENCRYPTION_KEY.",
+      "evidence": "Local: scripts/test-p17-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-04",
@@ -4796,12 +4796,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 20/20 passed (~25 min, includes the local operations journey: lease billing activated on screen, a lease approved, scheduled, billed and its deposit received; eligibility approved and the discount applied; a payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; an obligation completed on evidence). CI run pending.",
+      "updated_at": "2026-09-21T05:55:38+00:00"
     },
     {
       "id": "P17D-05",
@@ -4819,12 +4819,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T04 in the domain and API suites; negatives: untying totals, replayed files, records without payroll_record.read, second posting of a period, remittance without evidence. Runbook P17D section.",
+      "evidence": "Local: P17-T01..T05 pass in scripts/test-p17-domain.mjs and scripts/test-p17-api.mjs; ci-database.mjs runs the P17 suites on fresh and upgraded databases; docs/development/P17-RUNBOOK.md and P17-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T02:55:16+00:00"
     },
     {
       "id": "P17D-06",
@@ -4842,12 +4842,12 @@
         "RPT-006"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-d). Blocked on the owner: payroll file format and profile reviewed, hosted run, RG-06/07/08; integrations beyond file import are Phase 3.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-01",
@@ -4864,12 +4864,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "0032: local_obligations (unique per authority, kind, period and property; complete only with payment evidence and, where required, filing evidence; complete and waived final); obligation operations (create, edit, list, read, complete, waive).",
+      "evidence": "Local: scripts/test-p17-schema.mjs passes (7 groups); migration 0032 applied on the dev database; validate_specifications PASS (464 operations). CI run pending.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-02",
@@ -4885,12 +4885,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "localops.mjs obligations: the approved authority profile decides kinds and filing requirements; completion needs payment evidence and, where required, filing evidence by the completing authority; waivers need a reason (P17-T05).",
+      "evidence": "Local: scripts/test-p17-domain.mjs passes (6 groups: P17-T01..T05). CI run pending.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-03",
@@ -4906,12 +4906,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "API serves local obligation operations behind the local_obligations capability and local_authority_profile.",
+      "evidence": "Local: scripts/test-p17-api.mjs passes (6 groups, API as a process). CI run pending.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-04",
@@ -4927,12 +4927,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks.",
+      "evidence": "Local: pnpm build (with type check) passes; browser suite tests/browser/workspace.spec.mjs 20/20 passed (~25 min, includes the local operations journey: lease billing activated on screen, a lease approved, scheduled, billed and its deposit received; eligibility approved and the discount applied; a payout reconciled and posted and a POS closing matched; a payroll batch approved and posted with its remittance; an obligation completed on evidence). CI run pending.",
+      "updated_at": "2026-09-21T05:55:38+00:00"
     },
     {
       "id": "P17E-05",
@@ -4948,12 +4948,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "in_review",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "P17-T05 in the domain and API suites; negatives: completion without the required filing evidence, kinds outside the profile, waiver without reason. Runbook P17E section.",
+      "evidence": "Local: P17-T01..T05 pass in scripts/test-p17-domain.mjs and scripts/test-p17-api.mjs; ci-database.mjs runs the P17 suites on fresh and upgraded databases; docs/development/P17-RUNBOOK.md and P17-REVIEW.md written. CI run pending.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P17E-06",
@@ -4969,12 +4969,12 @@
         "FR-PH-020"
       ],
       "acceptance": "P17 feature-specific tests in owning spec; RG-01..08",
-      "status": "not_started",
+      "status": "blocked",
       "spec_status": "specified_external_activation_gates_apply",
-      "owner": "",
-      "note": "",
-      "evidence": "",
-      "updated_at": null
+      "owner": "Claude Code",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-e). Blocked on the owner: authority profile reviewed, hosted run, RG-06/07/08.",
+      "evidence": "No deployment performed; feature stays disabled.",
+      "updated_at": "2026-09-21T02:55:17+00:00"
     },
     {
       "id": "P18A-01",
@@ -5521,184 +5521,184 @@
   ],
   "history": [
     {
-      "at": "2026-09-20T21:09:14+00:00",
-      "id": "P14-06",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17A-06",
       "action": "blocked",
-      "note": "Release 0.14.0 drafted (docs/development/releases/0.14.0-draft.md). Blocked on the 0.7.0 and 0.13.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+      "note": "Release 0.17.0 drafted (docs/development/releases/0.17.0-draft.md, feature tag v0.17.0-a). Blocked on the owner: lease accounting examples and the withholding profile reviewed by the advisor, the hosted run and RG-06 task-based acceptance, RG-07 profile review, RG-08 manifest from the exact-source run."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-01",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-01",
       "action": "in_review",
-      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas)."
+      "note": "0032: discount_eligibility (one live per customer and category, evidence, approved by another principal, immutable once approved, revoked final) and discount_lines (one per document line); eligibility operations (5 reviewed) with the masked identity reference plus the invoice discount application and its lines."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-02",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-02",
       "action": "in_review",
-      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+      "note": "localops.mjs discounts: eligibility validated against the approved discount profile (required identity evidence, expiry, one live per customer and category); application to a draft invoice discounts each line on an eligible account on the profile's basis and exempts it, records the golden case, refuses customers without approved eligibility, expired eligibility at the document date and posted invoices (P17-T02)."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-03",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-03",
       "action": "in_review",
-      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details."
+      "note": "API serves eligibility and discount operations behind the statutory_discounts capability and the discount_profile_<category> profile."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-04",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-04",
       "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-05",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-05",
       "action": "in_review",
-      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables."
+      "note": "P17-T02 in the domain and API suites; negatives: ineligible and expired customers, self-approval, re-discounting a posted invoice. Runbook P17B section."
     },
     {
-      "at": "2026-09-20T22:26:50+00:00",
-      "id": "P15-06",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17B-06",
       "action": "blocked",
-      "note": "Release 0.15.0 drafted (docs/development/releases/0.15.0-draft.md). Blocked on the 0.9.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-b). Blocked on the owner: discount profiles per category reviewed by the advisor, hosted run, RG-06/07/08."
     },
     {
-      "at": "2026-09-20T23:57:20+00:00",
-      "id": "P15-04",
+      "at": "2026-09-21T02:55:15+00:00",
+      "id": "P17C-01",
       "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
+      "note": "0032: channels, payout_batches (unique per channel and source; net = gross \u2212 fees \u2212 withholding \u2212 other deductions; posted only from reconciled; immutable once posted), pos_machines (unique per serial and MIN), pos_closings (unique per machine, shift and reading; gross = ending \u2212 beginning; approved by another principal; matched only with a deposit); channel, payout (reconcile, post), machine and closing (approve, match) operations."
     },
     {
-      "at": "2026-09-21T00:35:14+00:00",
-      "id": "P13-01",
-      "action": "done",
-      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P13-02",
-      "action": "done",
-      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P13-03",
-      "action": "done",
-      "note": "apps/api/src/workspace-api.mjs serves the 15 P13 operations plus the nine additions; public verification and webhook routes bypass the session with per-address rate limits; the accept route authenticates the invited identity without a membership; portal principals reach the portal allowlist only; apps/worker/src/main.mjs sends authorized messages once with a failed receipt recorded in its own transaction before a retry."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P13-04",
-      "action": "done",
-      "note": "apps/web/src/app/_components/workspace-portal.tsx: the team's /portal (invites and members, communication timeline with receipts, payment links, provider events), the member's /portal (own invoices or bills, statement, certificates, payment links with the claim apart from the provider receipt, submission upload) and /portal/accept outside the shell; portal members see the portal navigation only; capabilities screen offers portals; Firm placeholder for P14; browser portal journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P13-05",
-      "action": "done",
-      "note": "P13-T01..T05 in scripts/test-p13-domain.mjs and scripts/test-p13-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; teardown and snapshot tooling cover the portal tables; docs/development/P13-REVIEW.md, P13-RUNBOOK.md and releases/0.13.0-draft.md written."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P14-01",
-      "action": "done",
-      "note": "packages/database/migrations/0029_p14_firm_workspace.sql: firms (one per organization) with staff, client mandates inside the client tenant (firm, entities, permissions, expiry within a year, evidence, a second approver, one live per firm, never widened once approved, final once revoked), client assignments (one per mandate and principal, a non-empty subset), aggregate snapshots keyed by mandate, the global firm directory, and the restricted SECURITY DEFINER functions firm_scopes/firm_aggregate/firm_invalidate_snapshots/firm_identity/firm_lookup that scope themselves per tenant under forced row security; contracts add firms, staff, client list, roll-up, snapshots, bulk reminders, mandates and assignments (402 operations, 267 schemas)."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P14-02",
-      "action": "done",
-      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P14-03",
-      "action": "done",
-      "note": "apps/api/src/workspace-api.mjs serves the 16 P14 operations; the explicit client context comes from x-tenant-id bound to a committed mandate (refused when two client tenants apply without it); bulk reminders are idempotent receipts against the firm record; delegates cannot grant or approve mandates."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P14-04",
-      "action": "done",
-      "note": "apps/web/src/app/_components/workspace-firm.tsx: the firm's /firm (registration, staff, client list, labelled roll-up that never sums across currencies, open client in an explicit context with a persistent banner and Leave client) and the client's /firm/mandates (draft on engagement evidence, second-principal approval, revoke with reason, assignments); Group placeholder for P15; capabilities screen offers firm_workspace; browser firm journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P14-05",
-      "action": "done",
-      "note": "P14-T01..T05 in scripts/test-p14-domain.mjs and scripts/test-p14-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P14-REVIEW.md and P14-RUNBOOK.md written; teardown and snapshot scripts cover the firm tables."
-    },
-    {
-      "at": "2026-09-21T00:35:15+00:00",
-      "id": "P15-01",
-      "action": "done",
-      "note": "packages/database/migrations/0030_p15_intercompany_and_consolidation.sql: groups (one live per reporting entity with its own CONSOL management book), wholly-owned full-method members, mapping versions and account mappings with intercompany and reserve roles, rate sets (closing/average/historical per currency, source evidence), intercompany pairs (shared reference, target draft, posted sides never rolled back, exception and final states), consolidation runs versioned per group and period end (result hash, one published per period, inputs frozen once approved), elimination entries and translation adjustments; contracts add rate sets, mapping versions, readiness, manual eliminations and the worksheet (412 operations, 277 schemas)."
-    },
-    {
-      "at": "2026-09-21T00:35:16+00:00",
-      "id": "P15-02",
-      "action": "done",
-      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
-    },
-    {
-      "at": "2026-09-21T00:35:16+00:00",
-      "id": "P15-03",
-      "action": "done",
-      "note": "apps/api/src/workspace-api.mjs serves the 18 P15 operations plus the ten additions; pairs readable from either side, runs in the reporting entity; ?detail=1 for screen details."
-    },
-    {
-      "at": "2026-09-21T00:35:16+00:00",
-      "id": "P15-04",
-      "action": "done",
-      "note": "apps/web/src/app/_components/workspace-group.tsx: /group (group and members, mapping versions drafted from the member charts and approved, rate sets), /group/pairs (accept, refuse, post our side, exception reason; raise a pair against an invoice), /group/consolidations (member-close readiness, runs with preview/approve/publish, the worksheet with pair exceptions, unresolved differences, consolidated statements with member and elimination columns, translation rates, eliminations, manual elimination form, member balances); Planning placeholder for P16; capabilities screen offers group_accounting; browser group journey added to tests/browser/workspace.spec.mjs."
-    },
-    {
-      "at": "2026-09-21T00:35:16+00:00",
-      "id": "P15-05",
-      "action": "done",
-      "note": "P15-T01..T05 in scripts/test-p15-domain.mjs and scripts/test-p15-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P15-REVIEW.md and P15-RUNBOOK.md written; teardown and snapshot scripts cover the group tables."
-    },
-    {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-01",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17C-02",
       "action": "in_review",
-      "note": "packages/database/migrations/0031_p16_planning.sql: budgets versioned per book and period with one active and buckets per account and dimension set; commitments one per order line with consumption never reduced, warnings and overrides; allocation rule versions and runs (posted once per rule version and period, inputs frozen once approved); projects, contract versions, milestones, advances, billings and retention items; contracts add availability, commitments, rule versions, run lines, milestones, change orders, advances, retention and profitability (429 operations)."
+      "note": "localops.mjs channels: a payout's deductions must explain the net; reconciliation to posted invoices or entries whose total equals the gross, each sales reference once; posting once with the net to clearing, fees and withholding recognized and the channel receivable settled; replayed statements refused; closings validated and matched to a posted deposit with the difference as an exception (P17-T03)."
     },
     {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-02",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17C-03",
       "action": "in_review",
-      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts."
+      "note": "API serves channel, payout and POS operations behind the marketplace_pos capability; channel sales ride the existing journal and invoice imports."
     },
     {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-03",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17C-04",
       "action": "in_review",
-      "note": "apps/api/src/workspace-api.mjs serves the 18 P16 operations plus the seventeen additions; the P05 and P04 operations carry the reservation, consumption, release and billing hooks."
+      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched."
     },
     {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-04",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17C-05",
       "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs."
+      "note": "P17-T03 in the domain and API suites; negatives: unexplained payout nets, replayed statements, posting before reconciliation, sales reconciled twice, closings with inconsistent readings. Runbook P17C section."
     },
     {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-05",
-      "action": "in_review",
-      "note": "P16-T01..T05 in scripts/test-p16-domain.mjs and scripts/test-p16-api.mjs; schema, domain and API suites wired into scripts/ci-database.mjs; docs/development/P16-REVIEW.md and P16-RUNBOOK.md written; teardown and snapshot scripts cover the planning tables."
-    },
-    {
-      "at": "2026-09-21T00:35:56+00:00",
-      "id": "P16-06",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17C-06",
       "action": "blocked",
-      "note": "Release 0.16.0 drafted (docs/development/releases/0.16.0-draft.md). Blocked on the 0.10.0 and 0.11.0 releases (drafts), on owner acceptance (RG-04, RG-06, RG-07) and on the owner's exact-source manifest run (RG-08)."
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-c). Blocked on the owner: provider statement formats and channel accounting reviewed, hosted run, RG-06/07/08."
     },
     {
-      "at": "2026-09-21T02:40:04+00:00",
-      "id": "P16-04",
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17D-01",
       "action": "in_review",
-      "note": "apps/web/src/app/_components/workspace-planning.tsx: /planning (budget versions, approval and activation, budget vs actual and commitments with warnings and overrides), /planning/allocations (rule versions with drivers, runs with preview, lines, approval and posting), /planning/projects (contract versions and change orders, milestones with certification, advances, progress billing, retention with release, profitability); the order approval carries the override reason; Local operations placeholder for P17; capabilities screen offers planning; browser planning journey added to tests/browser/workspace.spec.mjs."
+      "note": "0032: payroll_batches (unique per file; approved by another principal; posted once per source and period), append-only employee_tax_records (identifier encrypted and masked, payroll_record.read), remittance_records (unique per agency, period and batch; remitted only with reference and evidence); batch (records, approve, post) and remittance (approve, remit) operations."
+    },
+    {
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17D-02",
+      "action": "in_review",
+      "note": "localops.mjs payroll: records validated line by line and against the totals (an untying file stays an exception), file hash refuses replays, records restricted and masked with an audit per read, the journal per the approved payroll profile once per source and period, remittances tied to the batch totals and remitted on evidence (P17-T04)."
+    },
+    {
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17D-03",
+      "action": "in_review",
+      "note": "API serves payroll and remittance operations behind the payroll_data capability and payroll_profile; encrypted identifiers under FIELD_ENCRYPTION_KEY."
+    },
+    {
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17D-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance."
+    },
+    {
+      "at": "2026-09-21T02:55:16+00:00",
+      "id": "P17D-05",
+      "action": "in_review",
+      "note": "P17-T04 in the domain and API suites; negatives: untying totals, replayed files, records without payroll_record.read, second posting of a period, remittance without evidence. Runbook P17D section."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17D-06",
+      "action": "blocked",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-d). Blocked on the owner: payroll file format and profile reviewed, hosted run, RG-06/07/08; integrations beyond file import are Phase 3."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-01",
+      "action": "in_review",
+      "note": "0032: local_obligations (unique per authority, kind, period and property; complete only with payment evidence and, where required, filing evidence; complete and waived final); obligation operations (create, edit, list, read, complete, waive)."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-02",
+      "action": "in_review",
+      "note": "localops.mjs obligations: the approved authority profile decides kinds and filing requirements; completion needs payment evidence and, where required, filing evidence by the completing authority; waivers need a reason (P17-T05)."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-03",
+      "action": "in_review",
+      "note": "API serves local obligation operations behind the local_obligations capability and local_authority_profile."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-05",
+      "action": "in_review",
+      "note": "P17-T05 in the domain and API suites; negatives: completion without the required filing evidence, kinds outside the profile, waiver without reason. Runbook P17E section."
+    },
+    {
+      "at": "2026-09-21T02:55:17+00:00",
+      "id": "P17E-06",
+      "action": "blocked",
+      "note": "Release 0.17.0 drafted (feature tag v0.17.0-e). Blocked on the owner: authority profile reviewed, hosted run, RG-06/07/08."
+    },
+    {
+      "at": "2026-09-21T05:55:37+00:00",
+      "id": "P17A-04",
+      "action": "in_review",
+      "note": "apps/web/src/app/_components/workspace-localops.tsx /local: leases drafted with escalation steps and evidence, approved by another principal, the rent schedule with per-month billing, deposit and advance events with evidence; capabilities screen offers leases; browser local operations journey covers activation on screen, approval, schedule, billing and the deposit."
+    },
+    {
+      "at": "2026-09-21T05:55:38+00:00",
+      "id": "P17B-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/discounts: eligibility with identity evidence and masked reference, approval by another principal, application to a draft invoice with the recorded discount lines; browser journey covers it."
+    },
+    {
+      "at": "2026-09-21T05:55:38+00:00",
+      "id": "P17C-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/channels: channels, payouts with reconciliation and posting, POS machines and closings with approval and matching; browser journey covers a payout reconciled and posted and a closing approved and matched."
+    },
+    {
+      "at": "2026-09-21T05:55:38+00:00",
+      "id": "P17D-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance."
+    },
+    {
+      "at": "2026-09-21T05:55:38+00:00",
+      "id": "P17E-04",
+      "action": "in_review",
+      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks."
     }
   ]
 }

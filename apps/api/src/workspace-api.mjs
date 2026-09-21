@@ -3,7 +3,7 @@
 // conventions, bodies are validated against the contract, and each command
 // runs in one tenant-bound transaction with its receipt, audit and outbox.
 import {findOperation,operations,validateInput,accountingCases} from '@lara/contracts';
-import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,planning,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
+import {DomainError,command,inTransaction,enqueueJob,fail,isUuid,identity,organization,parties,evidence,workflow,ledger,sales,purchasing,treasury,compliance,fi,fx,inventory,assets,assistant,portals,firm,consolidation,planning,localops,messagingProviderFromEnv,paymentProviderFromEnv} from '@lara/domain';
 // Bank statements validate and commit through the import pipeline with treasury's rules.
 const bankStatement={validate:treasury.validateStatement,commit:treasury.commitStatement};
 // Source feeds (P08) ride the same import pipeline; overdue feeds gate the close.
@@ -466,6 +466,52 @@ Object.assign(handlers,{
  get_projects_id_retention:async(tx,ctx,{entityId,params})=>list(await planning.listRetention(tx,ctx,entityId,params.id)),
  post_retention_items_id_release:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await planning.releaseRetention(tx,ctx,entityId,params.id,body,version)),
  get_projects_id_profitability:async(tx,ctx,{entityId,params})=>({status:200,body:await planning.profitability(tx,ctx,entityId,params.id)}),
+ // P17 local operations: leases, statutory discounts, marketplace and POS, payroll data, local obligations.
+ post_leases:async(tx,ctx,{entityId,body})=>created(await localops.createLease(tx,ctx,entityId,body)),
+ get_leases:async(tx,ctx,{entityId,query})=>list(await localops.listLeases(tx,ctx,entityId,query)),
+ get_leases_id:async(tx,ctx,{entityId,params})=>ok(await localops.getLease(tx,ctx,entityId,params.id)),
+ patch_leases_id:async(tx,ctx,{entityId,params,body,version})=>ok(await localops.updateLease(tx,ctx,entityId,params.id,version,body)),
+ post_leases_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.approveLease(tx,ctx,entityId,params.id,body,version)),
+ get_leases_id_schedule:async(tx,ctx,{entityId,params})=>({status:200,body:await localops.leaseScheduleFor(tx,ctx,entityId,params.id)}),
+ post_leases_id_events:async(tx,ctx,{entityId,params,body})=>posting(ctx,await localops.leaseEvent(tx,ctx,entityId,params.id,body)),
+ get_leases_id_events:async(tx,ctx,{entityId,params})=>list(await localops.listLeaseEvents(tx,ctx,entityId,params.id)),
+ post_leases_id_bill:async(tx,ctx,{entityId,params,body})=>result(ctx,await localops.billLease(tx,ctx,entityId,params.id,body)),
+ post_discount_eligibility:async(tx,ctx,{entityId,body})=>created(await localops.createEligibility(tx,ctx,entityId,body,process.env)),
+ get_discount_eligibility:async(tx,ctx,{entityId,query})=>list(await localops.listEligibility(tx,ctx,entityId,query)),
+ get_discount_eligibility_id:async(tx,ctx,{entityId,params})=>ok(await localops.getEligibility(tx,ctx,entityId,params.id)),
+ patch_discount_eligibility_id:async(tx,ctx,{entityId,params,body,version})=>ok(await localops.updateEligibility(tx,ctx,entityId,params.id,version,body)),
+ post_discount_eligibility_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.approveEligibility(tx,ctx,entityId,params.id,body,version)),
+ post_invoices_id_statutory_discount:async(tx,ctx,{entityId,params,body})=>result(ctx,await localops.applyDiscount(tx,ctx,entityId,params.id,body)),
+ get_invoices_id_statutory_discount:async(tx,ctx,{entityId,params})=>({status:200,body:await localops.discountLines(tx,ctx,entityId,params.id)}),
+ post_channels:async(tx,ctx,{entityId,body})=>created(await localops.createChannel(tx,ctx,entityId,body)),
+ get_channels:async(tx,ctx,{entityId,query})=>list(await localops.listChannels(tx,ctx,entityId,query)),
+ post_payouts:async(tx,ctx,{entityId,body})=>created(await localops.createPayout(tx,ctx,entityId,body)),
+ get_payouts:async(tx,ctx,{entityId,query})=>list(await localops.listPayouts(tx,ctx,entityId,query)),
+ get_payouts_id:async(tx,ctx,{entityId,params})=>ok(await localops.getPayout(tx,ctx,entityId,params.id)),
+ post_payouts_id_reconcile:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.reconcilePayout(tx,ctx,entityId,params.id,body,version)),
+ post_payouts_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await localops.postPayout(tx,ctx,entityId,params.id,body,version)),
+ post_pos_machines:async(tx,ctx,{entityId,body})=>created(await localops.createMachine(tx,ctx,entityId,body)),
+ get_pos_machines:async(tx,ctx,{entityId,query})=>list(await localops.listMachines(tx,ctx,entityId,query)),
+ post_pos_closings:async(tx,ctx,{entityId,body})=>created(await localops.createClosing(tx,ctx,entityId,body)),
+ get_pos_closings:async(tx,ctx,{entityId,query})=>list(await localops.listClosings(tx,ctx,entityId,query)),
+ post_pos_closings_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.approveClosing(tx,ctx,entityId,params.id,body,version)),
+ post_pos_closings_id_match:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.matchClosing(tx,ctx,entityId,params.id,body,version)),
+ post_payroll_batches:async(tx,ctx,{entityId,body})=>created(await localops.importPayroll(tx,ctx,entityId,body,process.env)),
+ get_payroll_batches:async(tx,ctx,{entityId,query})=>list(await localops.listBatches(tx,ctx,entityId,query)),
+ get_payroll_batches_id:async(tx,ctx,{entityId,params})=>ok(await localops.getBatch(tx,ctx,entityId,params.id)),
+ get_payroll_batches_id_records:async(tx,ctx,{entityId,params})=>list(await localops.batchRecords(tx,ctx,entityId,params.id)),
+ post_payroll_batches_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.approveBatch(tx,ctx,entityId,params.id,body,version)),
+ post_payroll_batches_id_post:async(tx,ctx,{entityId,params,body,version})=>posting(ctx,await localops.postBatch(tx,ctx,entityId,params.id,body,version)),
+ post_remittances:async(tx,ctx,{entityId,body})=>created(await localops.createRemittance(tx,ctx,entityId,body)),
+ get_remittances:async(tx,ctx,{entityId,query})=>list(await localops.listRemittances(tx,ctx,entityId,query)),
+ post_remittances_id_approve:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.approveRemittance(tx,ctx,entityId,params.id,body,version)),
+ post_remittances_id_remit:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.remit(tx,ctx,entityId,params.id,body,version)),
+ post_local_obligations:async(tx,ctx,{entityId,body})=>created(await localops.createObligation(tx,ctx,entityId,body)),
+ get_local_obligations:async(tx,ctx,{entityId,query})=>list(await localops.listObligations(tx,ctx,entityId,query)),
+ get_local_obligations_id:async(tx,ctx,{entityId,params})=>ok(await localops.getObligation(tx,ctx,entityId,params.id)),
+ patch_local_obligations_id:async(tx,ctx,{entityId,params,body,version})=>ok(await localops.updateObligation(tx,ctx,entityId,params.id,version,body)),
+ post_local_obligations_id_complete:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.completeObligation(tx,ctx,entityId,params.id,body,version)),
+ post_local_obligations_id_waive:async(tx,ctx,{entityId,params,body,version})=>result(ctx,await localops.waiveObligation(tx,ctx,entityId,params.id,body,version)),
  // P09 multiple currencies and separate books
  post_books:async(tx,ctx,{entityId,body})=>created(await ledger.createBook(tx,ctx,entityId,body)),
  get_books_id:async(tx,ctx,{entityId,params})=>ok(await ledger.getBook(tx,ctx,entityId,params.id)),
