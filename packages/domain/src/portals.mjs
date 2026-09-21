@@ -163,6 +163,15 @@ export async function createShare(tx,ctx,entityId,{resourceType,resourceId,recip
  await audit(tx,ctx,{entityId,action:'share.create',resourceType:'share_grant',resourceId:row.id,resourceVersion:1,reason:resourceType+' '+resourceId+' for '+validity+' days'});
  return {id:row.id,token,expiresAt:iso(row.expires_at)};
 }
+// The worker rotates the share token at every delivery, as it does the
+// invite token: only the hash is stored, so the link carries a token that
+// exists nowhere else, and an earlier link stops working.
+export async function rotateShareToken(tx,ctx,entityId,id){
+ const token=ctx.tenantId+'.'+randomBytes(24).toString('hex');
+ const row=(await tx.query("update lara.share_grants set token_hash=$3 where tenant_id=$1 and entity_id=$2 and id=$4 and state='active' and expires_at>now() returning *",[ctx.tenantId,entityId,sha(token),id])).rows[0];
+ if(!row)fail('STATE_CONFLICT','The share link is no longer active.');
+ return {token,link:'/portal/verify?token='+token};
+}
 export function tenantOfToken(token){const m=/^([0-9a-f-]{36})\.[a-f0-9]{48}$/.exec(String(token||''));return m?m[1]:null;}
 // Public verification: minimal approved fields behind a non-enumerable
 // token; no TIN, no address, no full document, no acceptance assertion.
@@ -250,13 +259,14 @@ export async function deliverMessage(tx,ctx,entityId,messageId,{provider,store})
  const invite=row.source_type==='portal_invite'?(await tx.query('select * from lara.portal_invites where tenant_id=$1 and id=$2',[ctx.tenantId,row.source_id])).rows[0]:null;
  const share=row.share_grant_id?(await tx.query('select * from lara.share_grants where tenant_id=$1 and id=$2',[ctx.tenantId,row.share_grant_id])).rows[0]:null;
  let link;
- if(invite){if(invite.state!=='pending'){await tx.query("update lara.message_requests set state='cancelled' where tenant_id=$1 and id=$2",[ctx.tenantId,messageId]);return messageResource({...row,state:'cancelled'});}link=profile.baseUrl+(await rotateInviteToken(tx,ctx,entityId,invite.id)).link;}
- else link=profile.baseUrl+'/portal?entity='+entityId+(share?'&share='+share.id:'');
+ if(invite&&invite.state!=='pending'){await tx.query("update lara.message_requests set state='cancelled' where tenant_id=$1 and id=$2",[ctx.tenantId,messageId]);return messageResource({...row,state:'cancelled'});}
  const to=invite?'invite:'+invite.email_masked:'party:'+row.recipient_party_id;
  const subject=row.template_version+' from '+(entity?.legal_name||'your finance team').slice(0,60);
  const attempt=Number(row.attempts)+1;
  await tx.query("update lara.message_requests set state='sending',attempts=$3 where tenant_id=$1 and id=$2",[ctx.tenantId,messageId,attempt]);
  try{
+  // The link is minted inside the attempt: a share that expired before delivery records a failed receipt like a relay failure.
+  link=profile.baseUrl+(invite?(await rotateInviteToken(tx,ctx,entityId,invite.id)).link:share?(await rotateShareToken(tx,ctx,entityId,share.id)).link:'/portal?entity='+entityId);
   const r=await provider.send({key:row.send_key,channel:row.channel,to,subject,link,body:'Open the authenticated link to review. No amounts, identifiers or attachments travel in this message.'});
   await tx.query("insert into lara.delivery_receipts(tenant_id,entity_id,message_request_id,attempt,provider,outcome,provider_reference) values($1,$2,$3,$4,$5,'sent',$6)",[ctx.tenantId,entityId,messageId,attempt,provider.name,r.reference]);
   const updated=(await tx.query("update lara.message_requests set state='sent',provider_reference=$3,last_error=null where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,messageId,r.reference])).rows[0];

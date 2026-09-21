@@ -55,7 +55,7 @@ export function findOperation(method,path){
   if(op.method!==upper)continue;
   const pattern=new RegExp('^'+op.path.replace(/\{[^}]+\}/g,'([^/]+)')+'$');
   const match=pattern.exec(path);
-  if(match){const params={};op.pathParams.forEach((name,i)=>{params[name]=decodeURIComponent(match[i+1]);});return {operation:op,params};}
+  if(match){const params={};try{op.pathParams.forEach((name,i)=>{params[name]=decodeURIComponent(match[i+1]);});}catch{return null;}return {operation:op,params};}
  }
  return null;
 }

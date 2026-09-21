@@ -159,6 +159,22 @@ try{
  assert.equal(revoked.permissions.size,0,'revocation ends the scope at once');assert.notEqual(revoked.revocationVersion,bot.revocationVersion,'queued work fails its recheck');
  pass('P18-T02: a client integration holds tool.execute alone over its granted entity; approve, post, payment, export and ungranted tools are denied and recorded despite injected instructions, reads stay scoped, proposals become open tasks, and revocation ends the scope at once');
 
+ // Review corrections: a grant covers several entities and a call on any of them is recorded; the grant that names the tool serves the call, not the oldest.
+ await activate(B.entityId,'client_tools');
+ const wide=await run(builder,tx=>extensibility.createGrant(tx,builder,A.entityId,{...grantBody,tools:['read_evidence'],entityIds:[A.entityId,B.entityId]}));
+ await run(reviewer,tx=>extensibility.approveGrant(tx,reviewer,A.entityId,wide.id,{decision:'approve',contentVersion:1}));
+ const narrow=await run(builder,tx=>extensibility.createGrant(tx,builder,A.entityId,{...grantBody,tools:['propose_task'],entityIds:[A.entityId]}));
+ await run(reviewer,tx=>extensibility.approveGrant(tx,reviewer,A.entityId,narrow.id,{decision:'approve',contentVersion:1}));
+ const bot2=await run({tenantId,principalId:principals.bot},tx=>identity.actorContext(tx,tenantId,principals.bot,{traceId:'bot'}));
+ assert.deepEqual([...bot2.entityIds].sort(),[A.entityId,B.entityId].sort(),'the wide grant covers both entities');
+ const onB=await run(bot2,tx=>extensibility.runTool(tx,bot2,B.entityId,{tool:'read_report',input:{definitionId:def.id,periodStart:'2026-10-01',periodEnd:'2026-10-31'}}));
+ assert.equal(onB.outcome,'denied');assert.equal(onB.grantId,wide.id,'a call on the second entity of the grant is recorded under it');
+ assert.equal((await run(reviewer,tx=>extensibility.listToolRuns(tx,reviewer,B.entityId,{grantId:wide.id}))).items.length,1,'the denial on the second entity leaves evidence');
+ const viaNarrow=await run(bot2,tx=>extensibility.runTool(tx,bot2,A.entityId,{tool:'propose_task',input:{reason:'Review the wide grant'}}));
+ assert.equal(viaNarrow.outcome,'proposed');assert.equal(viaNarrow.grantId,narrow.id,'the grant naming the tool serves the call although an older grant covers the entity');
+ for(const id of [wide.id,narrow.id])await run(reviewer,tx=>extensibility.revokeGrant(tx,reviewer,A.entityId,id,{reason:'Review finished'}));
+ pass('review: a grant over several entities records runs on each of them, and the grant that names the tool serves the call');
+
  // P18-T04: pack install, upgrade with snapshot, compatible rollback.
  const packEvidence=await upload(A.entityId,'pack-review.pdf');
  const catalog=extensibility.packCatalog();
@@ -195,6 +211,21 @@ try{
  assert.equal((await run(ctrl,tx=>tx.query("select count(*)::int n from lara.report_definitions where tenant_id=$1 and entity_id=$2 and id=any($3::uuid[]) and state='retired'",[tenantId,A.entityId,v11.applied.reportDefinitions]))).rows[0].n,1,'the upgrade\'s report is retired');
  assert.equal((await run(ctrl,tx=>tx.query("select count(*)::int n from lara.journal_entries where tenant_id=$1 and entity_id=$2",[tenantId,A.entityId]))).rows[0].n,2,'financial facts unchanged');
  pass('P18-T04: a pack installs only from the reviewed catalog with a matching manifest hash and a declared upgrade path, the upgrade keeps the profile snapshot, and rollback restores the snapshot as a new draft, retires the upgrade\'s reports, reinstates the previous version and changes no financial fact');
+
+ // Review corrections: a rolled-back version can be attempted again; an attempt whose job ended before applying is closed as failed instead of locking the pack; versions compare numerically.
+ assert.equal(extensibility.compareVersions('1.10.0','1.2.0'),1);assert.equal(extensibility.compareVersions('1.2.0','1.10.0'),-1);assert.equal(extensibility.compareVersions('2.0.0','2.0.0'),0);
+ const again=await run(builder,tx=>extensibility.requestInstall(tx,builder,A.entityId,{packId:'retail-ph',version:'1.1.0',manifestHash:retail11.manifestHash,evidenceIds:[packEvidence]}));
+ await rejects(run(builder,tx=>extensibility.requestInstall(tx,builder,A.entityId,{packId:'retail-ph',version:'1.1.0',manifestHash:retail11.manifestHash,evidenceIds:[packEvidence]})),'STATE_CONFLICT','a live install job still blocks');
+ await run(ctrl,async tx=>{await tx.query("update lara.jobs set state='running',lease_owner='test',lease_until=now()+interval '1 minute',attempt=1 where tenant_id=$1 and id=$2",[tenantId,again.job.id]);await tx.query("update lara.jobs set state='failed',error_code='FORBIDDEN',lease_owner=null,lease_until=null where tenant_id=$1 and id=$2",[tenantId,again.job.id]);});
+ const third=await run(builder,tx=>extensibility.requestInstall(tx,builder,A.entityId,{packId:'retail-ph',version:'1.1.0',manifestHash:retail11.manifestHash,evidenceIds:[packEvidence]}));
+ installs=await run(builder,tx=>extensibility.listInstalls(tx,builder,A.entityId,{}));
+ const stale=installs.items.find(i=>i.id===again.packVersionId);
+ assert.equal(stale.state,'failed');assert.match(stale.failureReason||'',/failed \(FORBIDDEN\)/,'the abandoned attempt records why');
+ assert.equal(installs.items.find(i=>i.id===third.packVersionId).state,'installing');
+ await run(workerCtx,tx=>extensibility.applyInstall(tx,workerCtx,third.packVersionId));
+ installs=await run(builder,tx=>extensibility.listInstalls(tx,builder,A.entityId,{}));
+ assert.equal(installs.items.find(i=>i.id===third.packVersionId).state,'installed');assert.equal(installs.items.filter(i=>i.version==='1.1.0').length,3,'every attempt stays as history');
+ pass('review: a rolled-back version installs again, an attempt whose job ended before applying is closed as failed, and manifest versions compare numerically');
  console.log('P18-02 domain acceptance passed ('+step+' groups)');
 }finally{
  await removeTenants(owner,[tenantId]);

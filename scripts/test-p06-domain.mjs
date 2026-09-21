@@ -233,7 +233,14 @@ try{
 
  // P06-T05: cash session with variance; the cashier cannot certify their own handover; variance stays visible.
  await approve('treasury_profile',{cashAccountId:petty.id,cashVarianceAccountId:cashVar.id,fileFormatVersion:'lara-csv-1',matchWindowDays:3});
- const session=await run(cashier,tx=>treasury.createCashSession(tx,cashier,entityId,{branchId:branch.id,cashierId:principals.cashier,businessDate:'2026-10-09',openingAmount:'5000.00'}));
+ // Review correction: the expected float counts the cash of the session's branch only; a receipt records the branch whose drawer took it, and cash taken elsewhere on the day is not this drawer's.
+ const cebu=await run(ctrl,tx=>organization.createBranch(tx,ctrl,entityId,{code:'CEBU',name:'Cebu office',address:'Cebu'}));
+ const cashHq=await receipt({valueDate:'2026-10-09',grossAmount:'300.00',cashAmount:'300.00',method:'cash',bankAccountId:undefined,branchId:branch.id,allocations:[]});
+ const cashCebu=await receipt({valueDate:'2026-10-09',grossAmount:'700.00',cashAmount:'700.00',method:'cash',bankAccountId:undefined,branchId:cebu.id,allocations:[]});
+ for(const r of [cashHq,cashCebu])await run(acc,tx=>sales.postCollection(tx,acc,entityId,r.id,{}));
+ assert.equal((await run(acc,tx=>sales.getCollection(tx,acc,entityId,cashCebu.id))).branchId,cebu.id,'the settlement keeps its branch');
+ assert.equal((await run(ctrl,tx=>tx.query('select branch_id from lara.journal_lines where tenant_id=$1 and entry_id=(select posted_entry_id from lara.settlements where id=$2) limit 1',[tenantId,cashCebu.id]))).rows[0].branch_id,cebu.id,'the receipt posts on its branch');
+ const session=await run(cashier,tx=>treasury.createCashSession(tx,cashier,entityId,{branchId:branch.id,cashierId:principals.cashier,businessDate:'2026-10-09',openingAmount:'4700.00'}));
  assert.equal(session.state,'open');
  await rejects(run(cashier,tx=>treasury.createCashSession(tx,cashier,entityId,{branchId:branch.id,cashierId:principals.cashier,businessDate:'2026-10-09',openingAmount:'1.00'})),'STATE_CONFLICT','second open session for the cashier and date');
  await rejects(run(cashier,tx=>treasury.closeCashSession(tx,cashier,entityId,session.id,{reason:'Done'})),'STATE_CONFLICT','close before counting');

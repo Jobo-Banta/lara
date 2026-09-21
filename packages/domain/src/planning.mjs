@@ -129,10 +129,11 @@ export async function activateBudget(tx,ctx,entityId,id,input,expectedVersion){
  return {resourceType:'budget',resourceId:id,version:Number(updated.version),state:'active'};
 }
 // Actual eligible spend on a bucket: posted journal lines on the account
-// in the budget period whose dimensions contain the bucket's, excluding
-// allocation and reversal purposes.
+// in the budget period whose dimensions contain the bucket's, with the
+// reversals of such postings netting them out; opening, closing and
+// adjustment entries are not spend.
 async function bucketActual(tx,ctx,entityId,budget,line){
- const rows=(await tx.query("select l.func_debit,l.func_credit,l.dimensions_json from lara.journal_lines l join lara.journal_entries e on e.tenant_id=l.tenant_id and e.id=l.entry_id where l.tenant_id=$1 and l.entity_id=$2 and l.book_id=$3 and l.account_id=$4 and e.accounting_date between $5 and $6 and e.purpose='posting'",[ctx.tenantId,entityId,budget.book_id,line.account_id,budget.period_start,budget.period_end])).rows;
+ const rows=(await tx.query("select l.func_debit,l.func_credit,l.dimensions_json from lara.journal_lines l join lara.journal_entries e on e.tenant_id=l.tenant_id and e.id=l.entry_id where l.tenant_id=$1 and l.entity_id=$2 and l.book_id=$3 and l.account_id=$4 and e.accounting_date between $5 and $6 and (e.purpose='posting' or (e.purpose='reversal' and exists (select 1 from lara.journal_entries o where o.tenant_id=e.tenant_id and o.id=e.reversal_of and o.purpose='posting')))",[ctx.tenantId,entityId,budget.book_id,line.account_id,budget.period_start,budget.period_end])).rows;
  return rows.filter(r=>dimsWithin(line.dimensions_json,r.dimensions_json)).reduce((s,r)=>s+micros(String(r.func_debit))-micros(String(r.func_credit)),0n);
 }
 async function bucketCommitted(tx,ctx,entityId,line){

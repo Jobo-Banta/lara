@@ -208,11 +208,17 @@ async function prepareDocument(tx,ctx,entityId,input,profile){
  const computed=computeLines(input.lines,rules,{scale:profile.scale});
  return {computed,total:totals(computed)};
 }
-export async function writeLines(tx,ctx,entityId,documentId,input,computed){
+// A converted line keeps the order line it bills (`source_line_no`); an edit
+// carries the link to the line with the same account, item and description,
+// so a dropped or renumbered line never shifts what the order counts as billed.
+export async function writeLines(tx,ctx,entityId,documentId,input,computed,{sourceLineNos=null}={}){
+ const prior=sourceLineNos?[]:(await tx.query('select source_line_no,account_id,item_id,description from lara.document_lines where tenant_id=$1 and document_id=$2 and source_line_no is not null order by line_no',[ctx.tenantId,documentId])).rows;
  await tx.query('delete from lara.document_lines where tenant_id=$1 and document_id=$2',[ctx.tenantId,documentId]);
  for(const [i,l] of input.lines.entries()){
   const c=computed[i];
-  await tx.query('insert into lara.document_lines(tenant_id,entity_id,document_id,line_no,item_id,description,quantity,unit_price,discount,price_basis,account_id,tax_code_id,tax_rule_version_id,tax_rate,net,tax,gross,dimensions_json) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)',[ctx.tenantId,entityId,documentId,i+1,l.itemId||null,l.description.trim(),decimal(micros(l.quantity),6),decimal(micros(l.unitPrice),6),decimal(micros(l.discount||'0'),6),l.priceBasis,l.accountId,l.taxCodeId||null,c.ruleVersionId,c.rate,decimal(c.net,6),decimal(c.tax,6),decimal(c.gross,6),JSON.stringify(l.dimensions||{})]);
+  let sourceLineNo=sourceLineNos?sourceLineNos[i]||null:null;
+  if(!sourceLineNos){const k=prior.findIndex(p=>p.account_id===l.accountId&&(p.item_id||null)===(l.itemId||null)&&p.description===l.description.trim());if(k>=0)sourceLineNo=prior.splice(k,1)[0].source_line_no;}
+  await tx.query('insert into lara.document_lines(tenant_id,entity_id,document_id,line_no,item_id,description,quantity,unit_price,discount,price_basis,account_id,tax_code_id,tax_rule_version_id,tax_rate,net,tax,gross,dimensions_json,source_line_no) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)',[ctx.tenantId,entityId,documentId,i+1,l.itemId||null,l.description.trim(),decimal(micros(l.quantity),6),decimal(micros(l.unitPrice),6),decimal(micros(l.discount||'0'),6),l.priceBasis,l.accountId,l.taxCodeId||null,c.ruleVersionId,c.rate,decimal(c.net,6),decimal(c.tax,6),decimal(c.gross,6),JSON.stringify(l.dimensions||{}),sourceLineNo]);
  }
 }
 export const dueSchedule=(input,total,profile)=>{const due=new Date(input.documentDate+'T00:00:00Z');due.setUTCDate(due.getUTCDate()+profile.dueDays);return [{amount:decimal(total.gross,6),dueDate:due.toISOString().slice(0,10)}];};
@@ -221,14 +227,14 @@ export async function createDocument(tx,ctx,entityId,input){
  return insertDocument(tx,ctx,entityId,input);
 }
 // Corrections and conversions derive documents under their own permission.
-async function insertDocument(tx,ctx,entityId,input,{sourceRelation=null}={}){
+async function insertDocument(tx,ctx,entityId,input,{sourceRelation=null,sourceLineNos=null}={}){
  assertInput('DocumentCreate',input);await requireSales(tx,ctx,entityId);
  const profile=await salesProfile(tx,ctx,entityId);
  if(input.sourceDocumentId){const src=(await tx.query('select * from lara.documents where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,input.sourceDocumentId])).rows[0];if(!src)fail('NOT_FOUND','Source document not found.');if(src.party_id!==input.partyId)fail('VALIDATION_FAILED','The source document belongs to another customer.',{fieldErrors:[{path:'partyId',message:'Differs from source'}]});}
  const {computed,total}=await prepareDocument(tx,ctx,entityId,input,profile);
  const m=documentMaterial(input),hash=contentHash(m);
  const row=(await tx.query("insert into lara.documents(tenant_id,entity_id,book_id,kind,branch_id,party_id,document_date,accounting_date,currency,net,tax,gross,rule_profile_version,external_reference,source_document_id,due_schedule,evidence_ids,payload_hash,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) returning *",[ctx.tenantId,entityId,input.bookId,input.kind,input.branchId,input.partyId,input.documentDate,input.accountingDate,input.currency,decimal(total.net,6),decimal(total.tax,6),decimal(total.gross,6),m.ruleProfileVersion,m.externalReference,m.sourceDocumentId,JSON.stringify(dueSchedule(input,total,profile)),JSON.stringify(m.evidenceIds),hash,ctx.principalId])).rows[0];
- await writeLines(tx,ctx,entityId,row.id,input,computed);
+ await writeLines(tx,ctx,entityId,row.id,input,computed,{sourceLineNos});
  if(input.sourceDocumentId&&sourceRelation)await tx.query('insert into lara.document_relations(tenant_id,entity_id,source_id,target_id,relation,amount,created_by) values($1,$2,$3,$4,$5,$6,$7)',[ctx.tenantId,entityId,row.id,input.sourceDocumentId,sourceRelation,decimal(total.gross,6),ctx.principalId]);
  await audit(tx,ctx,{entityId,action:input.kind+'.create',resourceType:'document',resourceId:row.id,resourceVersion:1,afterRef:hash});
  return documentResource(tx,ctx,row);
@@ -427,12 +433,13 @@ export async function convertDocument(tx,ctx,entityId,id,input,expectedVersion){
  if(!['quotation','sales_order'].includes(row.kind))fail('STATE_CONFLICT','Only quotations and sales orders convert.');
  if(row.state!=='approved')fail('STATE_CONFLICT','Only approved orders convert.');
  const lines=await lineRows(tx,ctx,id);
- const billed=(await tx.query("select l.line_no,coalesce(sum(l.quantity),0)::text as quantity from lara.document_relations r join lara.documents d on d.tenant_id=r.tenant_id and d.id=r.source_id join lara.document_lines l on l.tenant_id=d.tenant_id and l.document_id=d.id where r.tenant_id=$1 and r.target_id=$2 and r.relation='order' and d.state<>'cancelled' group by l.line_no",[ctx.tenantId,id])).rows;
- const used=new Map(billed.map(b=>[Number(b.line_no),micros(b.quantity)]));
- const remaining=lines.map(l=>({...lineResource(l),quantity:decimal(micros(String(l.quantity))-(used.get(l.line_no)||0n),6)})).filter(l=>micros(l.quantity)>0n);
+ // Billed quantity and discount per order line come from the linked invoices' lines by their source line; an invoice line that lost its link bills nothing here.
+ const billed=(await tx.query("select l.source_line_no as line_no,coalesce(sum(l.quantity),0)::text as quantity,coalesce(sum(l.discount),0)::text as discount from lara.document_relations r join lara.documents d on d.tenant_id=r.tenant_id and d.id=r.source_id join lara.document_lines l on l.tenant_id=d.tenant_id and l.document_id=d.id where r.tenant_id=$1 and r.target_id=$2 and r.relation='order' and d.state<>'cancelled' and l.source_line_no is not null group by l.source_line_no",[ctx.tenantId,id])).rows;
+ const used=new Map(billed.map(b=>[Number(b.line_no),{quantity:micros(b.quantity),discount:micros(b.discount)}]));
+ const remaining=lines.map(l=>{const u=used.get(l.line_no)||{quantity:0n,discount:0n};const left=micros(String(l.discount))-u.discount;return {...lineResource(l),sourceLineNo:l.line_no,quantity:decimal(micros(String(l.quantity))-u.quantity,6),discount:decimal(left>0n?left:0n)};}).filter(l=>micros(l.quantity)>0n);
  if(!remaining.length)fail('STATE_CONFLICT','The order is fully billed.');
  const today=new Date().toISOString().slice(0,10);
- const created=await insertDocument(tx,ctx,entityId,{kind:'invoice',branchId:row.branch_id,bookId:row.book_id,partyId:row.party_id,documentDate:today,accountingDate:today,currency:row.currency,ruleProfileVersion:row.rule_profile_version,sourceDocumentId:id,...(row.external_reference?{externalReference:row.external_reference}:{}),lines:remaining.map(l=>({...l,dimensions:l.dimensions||{}})),evidenceIds:[]},{sourceRelation:'order'});
+ const created=await insertDocument(tx,ctx,entityId,{kind:'invoice',branchId:row.branch_id,bookId:row.book_id,partyId:row.party_id,documentDate:today,accountingDate:today,currency:row.currency,ruleProfileVersion:row.rule_profile_version,sourceDocumentId:id,...(row.external_reference?{externalReference:row.external_reference}:{}),lines:remaining.map(({sourceLineNo,...l})=>({...l,dimensions:l.dimensions||{}})),evidenceIds:[]},{sourceRelation:'order',sourceLineNos:remaining.map(l=>l.sourceLineNo)});
  await audit(tx,ctx,{entityId,action:'sales_order.convert',resourceType:'document',resourceId:id,resourceVersion:Number(row.version),afterRef:created.id});
  return {resourceType:'document',resourceId:created.id,version:1,state:'draft'};
 }
@@ -462,11 +469,11 @@ export async function listDocuments(tx,ctx,entityId,query,{kinds}){
 // ---------------------------------------------------------------------------
 // Collections (receipts) and allocations
 // ---------------------------------------------------------------------------
-export const settlementMaterial=i=>({direction:i.direction,partyId:i.partyId,bankAccountId:i.bankAccountId||null,currency:i.currency,valueDate:i.valueDate,grossAmount:money(i.grossAmount),cashAmount:money(i.cashAmount),withholdingAmount:money(i.withholdingAmount),method:i.method,allocations:i.allocations.map(a=>({openItemId:a.openItemId,amount:money(a.amount)})),evidenceIds:[...i.evidenceIds].sort()});
+export const settlementMaterial=i=>({direction:i.direction,partyId:i.partyId,bankAccountId:i.bankAccountId||null,branchId:i.branchId||null,currency:i.currency,valueDate:i.valueDate,grossAmount:money(i.grossAmount),cashAmount:money(i.cashAmount),withholdingAmount:money(i.withholdingAmount),method:i.method,allocations:i.allocations.map(a=>({openItemId:a.openItemId,amount:money(a.amount)})),evidenceIds:[...i.evidenceIds].sort()});
 export async function settlementResource(tx,ctx,s){
  const allocations=(await tx.query("select open_item_id,sum(case when action='apply' then amount else -amount end)::text as amount from lara.allocation_events where tenant_id=$1 and settlement_id=$2 group by open_item_id having sum(case when action='apply' then amount else -amount end)>0 order by open_item_id",[ctx.tenantId,s.id])).rows;
  const intended=s.state==='posted'||s.state==='reversed'?allocations.map(a=>({openItemId:a.open_item_id,amount:money(a.amount)})):(s.allocation_intents||[]);
- return resource({...s,status:s.state},{direction:s.direction,partyId:s.party_id,...(s.bank_account_id?{bankAccountId:s.bank_account_id}:{}),currency:s.currency,valueDate:iso(s.value_date),grossAmount:money(s.gross_amount),cashAmount:money(s.cash_amount),withholdingAmount:money(s.withholding_amount),method:s.payment_method,allocations:intended,evidenceIds:s.evidence_ids});
+ return resource({...s,status:s.state},{direction:s.direction,partyId:s.party_id,...(s.bank_account_id?{bankAccountId:s.bank_account_id}:{}),...(s.branch_id?{branchId:s.branch_id}:{}),currency:s.currency,valueDate:iso(s.value_date),grossAmount:money(s.gross_amount),cashAmount:money(s.cash_amount),withholdingAmount:money(s.withholding_amount),method:s.payment_method,allocations:intended,evidenceIds:s.evidence_ids});
 }
 // A receipt from a party that is an employee but not a customer returns an
 // unliquidated advance (P05): no allocations, no withholding, and open
@@ -502,8 +509,9 @@ export async function createCollection(tx,ctx,entityId,input){
  const profile=await salesProfile(tx,ctx,entityId);await validateSettlement(tx,ctx,entityId,input,profile);
  const book=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary' and status='active'",[ctx.tenantId,entityId])).rows[0];
  if(!book)fail('FEATURE_NOT_ENABLED','No primary book.');
+ if(input.branchId)await branchFor(tx,ctx,entityId,input.branchId);
  const m=settlementMaterial(input),hash=contentHash(m);
- const row=(await tx.query("insert into lara.settlements(tenant_id,entity_id,book_id,direction,party_id,bank_account_id,payment_method,currency,gross_amount,cash_amount,withholding_amount,value_date,evidence_ids,payload_hash,allocation_intents,created_by) values($1,$2,$3,'receipt',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning *",[ctx.tenantId,entityId,book.id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),ctx.principalId])).rows[0];
+ const row=(await tx.query("insert into lara.settlements(tenant_id,entity_id,book_id,direction,party_id,bank_account_id,branch_id,payment_method,currency,gross_amount,cash_amount,withholding_amount,value_date,evidence_ids,payload_hash,allocation_intents,created_by) values($1,$2,$3,'receipt',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *",[ctx.tenantId,entityId,book.id,input.partyId,input.bankAccountId||null,m.branchId,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),ctx.principalId])).rows[0];
  await audit(tx,ctx,{entityId,action:'collection.create',resourceType:'collection',resourceId:row.id,resourceVersion:1,afterRef:hash});
  return settlementResource(tx,ctx,row);
 }
@@ -513,9 +521,10 @@ export async function updateCollection(tx,ctx,entityId,id,expectedVersion,input)
  const row=await loadSettlement(tx,ctx,entityId,id);expectVersion(row,expectedVersion);
  if(['posted','reversed','cancelled'].includes(row.state))fail('STATE_CONFLICT','Posted collections cannot change; reverse them.');
  const profile=await salesProfile(tx,ctx,entityId);await validateSettlement(tx,ctx,entityId,input,profile);
+ if(input.branchId)await branchFor(tx,ctx,entityId,input.branchId);
  const m=settlementMaterial(input),hash=contentHash(m),material=hash!==row.payload_hash;
  if(material&&row.state!=='draft')await tx.query("update lara.settlements set state='draft',approved_by=null,submitted_by=null where tenant_id=$1 and id=$2",[ctx.tenantId,id]);
- const updated=(await tx.query('update lara.settlements set party_id=$3,bank_account_id=$4,payment_method=$5,currency=$6,gross_amount=$7,cash_amount=$8,withholding_amount=$9,value_date=$10,evidence_ids=$11,payload_hash=$12,allocation_intents=$13,content_version=content_version+$14 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),material?1:0])).rows[0];
+ const updated=(await tx.query('update lara.settlements set party_id=$3,bank_account_id=$4,payment_method=$5,currency=$6,gross_amount=$7,cash_amount=$8,withholding_amount=$9,value_date=$10,evidence_ids=$11,payload_hash=$12,allocation_intents=$13,content_version=content_version+$14,branch_id=$15 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),material?1:0,m.branchId])).rows[0];
  await audit(tx,ctx,{entityId,action:'collection.edit',resourceType:'collection',resourceId:id,resourceVersion:Number(updated.version),afterRef:hash});
  return settlementResource(tx,ctx,updated);
 }
@@ -577,7 +586,7 @@ export async function postCollection(tx,ctx,entityId,id,input,expectedVersion,{c
  if(row.approved_by===ctx.principalId&&row.created_by===ctx.principalId)fail('SELF_APPROVAL','The preparer cannot both approve and post.');
  await checkGate(tx,ctx,id);
  const profile=await salesProfile(tx,ctx,entityId);
- const branch=(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and status='active' order by created_at limit 1",[ctx.tenantId,entityId])).rows[0];
+ const branch=row.branch_id?{id:row.branch_id}:(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and status='active' order by created_at limit 1",[ctx.tenantId,entityId])).rows[0];
  const party=(await tx.query('select legal_name from lara.party where tenant_id=$1 and id=$2',[ctx.tenantId,row.party_id])).rows[0];
  const advance=await advanceReturn(tx,ctx,entityId,row.party_id);
  const creditAccountId=advance?await recordAdvanceReturn(tx,ctx,entityId,row,{commandId}):profile.arAccountId;

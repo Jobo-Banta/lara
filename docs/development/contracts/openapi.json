@@ -73896,6 +73896,9 @@
           "bankAccountId": {
             "$ref": "#/components/schemas/Id"
           },
+          "branchId": {
+            "$ref": "#/components/schemas/Id"
+          },
           "currency": {
             "$ref": "#/components/schemas/Currency"
           },
@@ -77983,6 +77986,9 @@
             "$ref": "#/components/schemas/Id"
           },
           "bankAccountId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "branchId": {
             "$ref": "#/components/schemas/Id"
           },
           "currency": {

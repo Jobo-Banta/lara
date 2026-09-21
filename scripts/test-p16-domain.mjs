@@ -117,6 +117,12 @@ try{
  const bill2=await run(clerk,tx=>purchasing.createDocument(tx,clerk,entityId,doc('bill',supplier.id,[line(rent.id,'1500')],{externalReference:'SI-RENT',evidenceIds:[siRent]})));
  await run(clerk,tx=>purchasing.submitDocument(tx,clerk,entityId,bill2.id,{}));await run(ctrl,tx=>purchasing.approveDocument(tx,ctrl,entityId,bill2.id,{decision:'approve',contentVersion:1}));await run(acc,tx=>purchasing.postDocument(tx,acc,entityId,bill2.id,{}));
  avail=await run(plan,tx=>planning.availability(tx,plan,entityId,b1.id));assert.equal(avail.lines[1].available,'3500.00');
+ // Review correction: reversing a posting gives the budget back; the reversal nets the original instead of the original standing alone.
+ const wrongRent=await journal([[rent.id,'800.00','0'],[cash.id,'0','800.00']],'Rent posted twice','2026-10-06');
+ avail=await run(plan,tx=>planning.availability(tx,plan,entityId,b1.id));assert.equal(avail.lines[1].available,'2700.00');
+ const undo=await run(acc,tx=>ledger.reverseJournal(tx,acc,entityId,wrongRent.id,{accountingDate:'2026-10-07',reason:'Posted twice'}));
+ await run(acc,tx=>ledger.submitJournal(tx,acc,entityId,undo.resourceId,{}));await run(ctrl,tx=>ledger.approveJournal(tx,ctrl,entityId,undo.resourceId,{decision:'approve',contentVersion:1}));await run(ctrl,tx=>ledger.postJournal(tx,ctrl,entityId,undo.resourceId,{}));
+ avail=await run(plan,tx=>planning.availability(tx,plan,entityId,b1.id));assert.deepEqual([avail.lines[1].actual,avail.lines[1].available],['1500.00','3500.00'],'the reversed posting no longer consumes the budget');
  pass('P16-T02: the bill posting against the order consumes the commitment and becomes the actual once; a bill without an order is actual only');
 
  // P16-T03: allocation residual and no duplicate rerun.

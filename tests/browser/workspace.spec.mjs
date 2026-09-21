@@ -140,7 +140,8 @@ test('stale version is reported with a reload path and the draft is kept',async(
  await a.page.goto('/parties');await settled(a.page);await a.page.getByRole('link',{name:'Northwind Services'}).click();
  await b.page.goto(a.page.url());await settled(b.page);
  await b.page.getByLabel('Address',{exact:true}).fill('Cebu City, Lapu-Lapu');await b.page.getByRole('button',{name:'Save changes'}).click();
- await expect(b.page.getByLabel('Address',{exact:true})).toHaveValue('Cebu City, Lapu-Lapu');await expect(b.page.locator('section[role="alert"]')).toHaveCount(0);
+ // B's save must have landed before A saves, or A's write wins the race and no conflict exists: the editor reports 'Up to date.' only once its save returned.
+ await expect(b.page.getByRole('status').filter({hasText:/Saving|Unsaved|Up to date/})).toHaveText('Up to date.',{timeout:15000});await expect(b.page.locator('section[role="alert"]')).toHaveCount(0);
  await a.page.getByLabel('Legal name').fill('Northwind Services Inc');await a.page.getByRole('button',{name:'Save changes'}).click();
  await expect(a.page.locator('section[role="alert"]')).toContainText('Someone else changed this record');
  await expect(a.page.getByLabel('Legal name')).toHaveValue('Northwind Services Inc','draft retained');

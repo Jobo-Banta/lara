@@ -638,6 +638,8 @@ export function createWorkspaceApi({pool,issuer,store,mode}){
    const found=findOperation(method,path);
    if(!found)return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
    const {operation:op,params}=found;
+   // Resource ids are UUIDs; anything else names no resource (never a database type error).
+   if('id' in params&&!isUuid(params.id))return send(response,404,{code:'NOT_FOUND',message:'Resource not found.',traceId,fieldErrors:[],retryable:false});
    if(!handlers[op.operationId])return send(response,409,{code:'FEATURE_NOT_ENABLED',message:'This capability is not enabled in this release.',traceId,fieldErrors:[],retryable:false});
    if(op.path.startsWith('/demo/')&&mode!=='demo')return send(response,404,{code:'NOT_FOUND',message:'No such operation.',traceId,fieldErrors:[],retryable:false});
    const ctx=await resolveActor(db,identity_,{issuer,tenantHeader:request.headers['x-tenant-id'],traceId});
@@ -653,7 +655,7 @@ export function createWorkspaceApi({pool,issuer,store,mode}){
    if(write){
     body=parseJson(await readBody(request));
     if(op.input){const v=validateInput(op.operationId,body);if(!v.ok)fail('VALIDATION_FAILED','Request does not match the reviewed contract.',{fieldErrors:v.fieldErrors});}
-    else if(body!==undefined&&Object.keys(body).length)fail('VALIDATION_FAILED','This operation takes no body.',{fieldErrors:[{path:'',message:'No body'}]});
+    else if(body!=null&&(typeof body!=='object'||Object.keys(body).length))fail('VALIDATION_FAILED','This operation takes no body.',{fieldErrors:[{path:'',message:'No body'}]});
    }
    const parts={params,query,entityId,body,version,store,providers};
    let out;

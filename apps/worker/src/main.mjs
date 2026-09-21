@@ -109,9 +109,17 @@ async function claim(db){
   where id=(select id from lara.jobs where (state in ('queued','retry_wait') and run_after<=now()) or (state='running' and lease_until<now()) order by run_after,id for update skip locked limit 1) returning *`,[owner]);
  return r.rows[0];
 }
+// The lease renewal runs on its own connection: the job's connection holds the
+// handler's transaction, and a renewal inside it would be invisible to other
+// workers until commit, so a job over the lease would be claimed twice.
+function leaseHeartbeat(job){
+ let hb=null,ready=null;
+ const timer=setInterval(async()=>{try{if(!hb){hb=client();ready=hb.connect();}await ready;await hb.query("update lara.jobs set lease_until=now()+interval '60 seconds' where id=$1 and lease_owner=$2",[job.id,owner]);}catch{}},20000);
+ return {async stop(){clearInterval(timer);if(hb){await ready?.catch(()=>{});await hb.end().catch(()=>{});}}};
+}
 async function runJob(db,job){
  const ctx={tenantId:job.tenant_id,principalId:null,traceId:job.trace_id||'job-'+job.id};
- const heartbeat=setInterval(()=>db.query("update lara.jobs set lease_until=now()+interval '60 seconds' where id=$1 and lease_owner=$2",[job.id,owner]).catch(()=>{}),20000);
+ const heartbeat=leaseHeartbeat(job);
  try{
   const handler=handlers[job.kind];
   if(!handler)throw new DomainError('FEATURE_NOT_ENABLED','No handler for job kind '+job.kind);
@@ -134,7 +142,7 @@ async function runJob(db,job){
      on conflict (tenant_id,entity_id,source_type,source_id,kind,cause_key) where status not in ('resolved','cancelled') do nothing`,[job.tenant_id,job.entity_id,job.id,'Job '+job.kind+' exhausted retries: '+code,job.requested_by||'00000000-0000-0000-0000-000000000000'])).catch(e=>warn('dead_letter_task_failed',{message:e.message}));
    warn('job_dead_letter',{job_id:job.id,kind:job.kind,code,trace_id:ctx.traceId});
   }
- }finally{clearInterval(heartbeat);}
+ }finally{await heartbeat.stop();}
 }
 
 let lastHeartbeat=0;

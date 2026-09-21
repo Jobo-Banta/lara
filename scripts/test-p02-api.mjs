@@ -68,6 +68,8 @@ try{
  r=await fetch(BASE+'/v1/me',{headers:{authorization:'Bearer '+signIdentity('nobody-'+suffix,'GET','/v1/me',process.env.SESSION_SECRET)}});assert.equal(r.status,403);errorShape(await json(r));
  r=await fetch(BASE+'/v1/me');assert.equal(r.status,401);
  r=await call(A,'preparer','GET','/nothing/here');assert.equal(r.status,404);
+ // Review correction: a resource id that is not a UUID, or a path that does not decode, names nothing (404), never a database type error (500).
+ for(const p of ['/roles/not-a-uuid','/roles/%zz','/tasks/12345','/jobs/x'])for(const r2 of [await call(A,'preparer','GET',p)])assert.equal(r2.status,404,p+' answers 404, got '+r2.status);
  r=await call(A,'preparer','POST','/packs/install',{body:{packId:'retail-ph',version:'1.0.0',manifestHash:'0'.repeat(64),evidenceIds:['00000000-0000-4000-8000-000000000001']},headers:key()});assert.ok([403,409,422].includes(r.status),'a module operation before any entity exists answers a typed refusal: '+r.status);assert.ok(['FORBIDDEN','FEATURE_NOT_ENABLED','VALIDATION_FAILED'].includes((await json(r)).code));
  pass('session context comes from membership; unknown accounts, missing tokens, unknown routes and later-phase operations answer with typed errors');
 

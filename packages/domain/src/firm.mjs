@@ -70,8 +70,10 @@ export async function rollup(tx,ctx){
  const items=[];
  for(const s of scopes){
   let counts;
-  try{counts=(await tx.query('select lara.firm_aggregate($1,$2,$3,$4) as c',[me.oidc_issuer,me.oidc_subject,s.tenantId,s.entityId])).rows[0].c;}
-  catch(e){items.push({...s,counts:null,error:'not available'});continue;}
+  // A scope whose aggregate fails (mandate revoked between the listing and the read) is reported as unavailable without aborting the transaction for the others.
+  await tx.query('savepoint firm_scope');
+  try{counts=(await tx.query('select lara.firm_aggregate($1,$2,$3,$4) as c',[me.oidc_issuer,me.oidc_subject,s.tenantId,s.entityId])).rows[0].c;await tx.query('release savepoint firm_scope');}
+  catch(e){await tx.query('rollback to savepoint firm_scope');items.push({...s,counts:null,error:'not available'});continue;}
   if(firm){const scopeHash=sha(s.tenantId+'|'+s.entityId);await tx.query('delete from lara.aggregate_snapshots where tenant_id=$1 and actor_principal_id=$2 and scope_hash=$3',[ctx.tenantId,ctx.principalId,scopeHash]);await tx.query('insert into lara.aggregate_snapshots(tenant_id,firm_id,actor_principal_id,mandate_id,client_tenant_id,client_entity_id,scope_hash,counts) values($1,$2,$3,$4,$5,$6,$7,$8)',[ctx.tenantId,firm.id,ctx.principalId,s.mandateId,s.tenantId,s.entityId,scopeHash,JSON.stringify(counts)]);}
   items.push({...s,counts:{openTasks:counts.openTasks??null,openObligations:counts.openObligations??null,overdueObligations:counts.overdueObligations??null,openPeriods:counts.openPeriods??null,openItems:counts.openItems||[]},error:null});
  }

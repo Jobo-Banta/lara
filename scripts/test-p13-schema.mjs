@@ -18,7 +18,8 @@ const pg=createRequire(new URL('../packages/database/package.json',import.meta.u
 const client=url=>new pg.Client({...connectionOptions(url),connectionTimeoutMillis:15000,query_timeout:30000});
 const owner=client(process.env.LARA_MIGRATOR_DATABASE_URL||process.env.SUPABASE_LARA_MIGRATOR_DATABASE_URL||process.env.MIGRATION_DATABASE_URL||process.env.SUPABASE_OWNER_DATABASE_URL);
 const api=client(process.env.DATABASE_URL);
-await Promise.all([owner.connect(),api.connect()]);
+const workerURL=process.env.WORKER_DATABASE_URL||process.env.SUPABASE_LARA_WORKER_DATABASE_URL;const worker=workerURL?client(workerURL):null;
+await Promise.all([owner.connect(),api.connect(),worker?.connect()]);
 const hash=v=>createHash('sha256').update(v).digest('hex');
 const suffix=randomBytes(4).toString('hex');
 const T={id:randomUUID(),slug:'p02-test-portal-'+suffix};
@@ -55,8 +56,10 @@ try{
  pass('invites carry a unique token hash, an enumerated role, need a principal to accept and a reason to revoke and are final once accepted; memberships are one per principal and party with at least one allowed kind');
 
  const shareSql="insert into lara.share_grants(tenant_id,entity_id,resource_type,resource_id,recipient_party_id,token_hash,expires_at,created_by) values($1,$2,'document',$3,$4,$5,$6,$7) returning id";
- await run(api,T.id,shareSql,[T.id,entity,doc,party,hash('s1'),soon,principal]);
+ const shareId=(await run(api,T.id,shareSql,[T.id,entity,doc,party,hash('s1'),soon,principal])).rows[0].id;
  await rejects(run(api,T.id,shareSql,[T.id,entity,doc,party,hash('s1'),soon,principal]),/duplicate key/,'same share token twice');
+ // The worker rotates the token it delivers (0034) and nothing else on a share.
+ if(worker){await run(worker,T.id,'update lara.share_grants set token_hash=$2 where tenant_id=$1 and id=$3',[T.id,hash('s1-rotated'),shareId]);await rejects(run(worker,T.id,shareSql,[T.id,entity,doc,party,hash('s9'),soon,principal]),/permission denied/,'worker creating a share');}
  await rejects(run(api,T.id,"insert into lara.share_grants(tenant_id,entity_id,resource_type,resource_id,token_hash,expires_at,created_by) values($1,$2,'ledger',$3,$4,$5,$6)",[T.id,entity,doc,hash('s3'),soon,principal]),/check constraint|violates/,'unknown resource type');
  const msgSql="insert into lara.message_requests(tenant_id,entity_id,source_type,source_id,recipient_party_id,channel,template_version,content_hash,created_by) values($1,$2,'document',$3,$4,'email','invoice-2026',$5,$6) returning id";
  const msg=(await run(api,T.id,msgSql,[T.id,entity,doc,party,hash('m1'),principal])).rows[0].id;
@@ -104,5 +107,5 @@ try{
  console.log('P13-01 schema acceptance passed ('+step+' groups)');
 }finally{
  await removeTenants(owner,[T.id,other.id]);
- await Promise.all([owner.end(),api.end()]);
+ await Promise.all([owner.end(),api.end(),worker?.end()]);
 }

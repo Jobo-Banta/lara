@@ -30,7 +30,7 @@ async function query(sql, params = []) {
 }
 async function body(request) { let text = ""; for await (const chunk of request) {text += chunk;if(Buffer.byteLength(text)>65536)throw new DemoError(413,"Command is too large.");} try{return text ? JSON.parse(text) : {};}catch{throw new DemoError(400,"Invalid JSON.");} }
 function send(response, status, value) { response.statusCode = status; response.end(JSON.stringify(value)); }
-async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0010_p02_principal_directory")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
+async function ready() { try { const config = loadConfig(); const schema = await query("select version from schema_migrations order by version"); if (!schema.rows.some(row => row.version === "0034_review_corrections")) throw new Error("Schema incompatible"); return { ok: true, mode: config.mode }; } catch (error) { return { ok: false, error: safeConfigError(error) }; } }
 const server = http.createServer((request, response) => scope.run({}, async () => {
   const started=performance.now();
   const trace=requestTrace();response.setHeader("x-trace-id",trace.traceId);

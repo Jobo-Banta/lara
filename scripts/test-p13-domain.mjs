@@ -127,6 +127,17 @@ try{
  await run(ctrl,tx=>tx.query("update lara.portal_invites set expires_at=now()-interval '1 minute' where tenant_id=$1 and id=$2",[tenantId,inviteC.id]));
  await rejects(run({tenantId,principalId:null},tx=>portals.acceptInvite(tx,{tenantId,inviteId:inviteC.id,token:tokenC,issuer:ISSUER,subject:'late@beta.invalid',email:'late@beta.invalid'})),'STATE_CONFLICT','expired invite');
  assert.equal((await run(rel,tx=>portals.getInvite(tx,rel,entityId,inviteC.id))).state,'expired');
+ // Review correction: a delivered document message carries a verify link whose token was minted at delivery (the share id alone opens nothing); the token verifies once delivered and an earlier token no longer does.
+ const msgDoc=await run(rel,tx=>portals.createMessage(tx,rel,entityId,{sourceType:'document',sourceId:invA.id,recipientPartyId:customerA.id,channel:'email',templateVersion:'invoice-2026'}));
+ await run(ctrl,tx=>portals.sendMessage(tx,ctrl,entityId,msgDoc.id,{reason:'Send the invoice'}));
+ assert.equal((await deliver(msgDoc.id)).state,'sent');
+ const keyDoc=(await run(acc,tx=>tx.query('select send_key,share_grant_id from lara.message_requests where tenant_id=$1 and id=$2',[tenantId,msgDoc.id]))).rows[0];
+ const mailDoc=JSON.parse((await store.get('messages/'+keyDoc.send_key+'.json')).toString('utf8'));
+ const docUrl=new URL(mailDoc.link);assert.equal(docUrl.pathname,'/portal/verify');
+ const docToken=docUrl.searchParams.get('token');assert.equal(portals.tenantOfToken(docToken),tenantId,'the link carries an opaque verify token');
+ assert.equal((await run({tenantId,principalId:null},tx=>portals.verifyShare(tx,tenantId,docToken))).gross,'5000.00','the delivered token verifies the invoice');
+ assert.equal((await run(rel,tx=>portals.rotateShareToken(tx,rel,entityId,keyDoc.share_grant_id))).link.split('token=')[0],'/portal/verify?');
+ await rejects(run({tenantId,principalId:null},tx=>portals.verifyShare(tx,tenantId,docToken)),'NOT_FOUND','a rotated token retires the delivered one');
  const share=await run(rel,tx=>portals.createShare(tx,rel,entityId,{resourceType:'document',resourceId:invA.id}));
  const view=await run({tenantId,principalId:null},tx=>portals.verifyShare(tx,portals.tenantOfToken(share.token),share.token));
  assert.equal(view.gross,'5000.00');assert.equal(view.partyDisplay,'A***');assert.ok(!('tin' in view)&&!('address' in view));

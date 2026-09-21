@@ -153,10 +153,11 @@ async function insertDocument(tx,ctx,entityId,input,{sourceRelation=null}={}){
  if(input.sourceDocumentId){
   source=(await tx.query('select * from lara.documents where tenant_id=$1 and entity_id=$2 and id=$3',[ctx.tenantId,entityId,input.sourceDocumentId])).rows[0];
   if(!source)fail('NOT_FOUND','Source document not found.');
-  if(input.kind==='bill'&&source.kind!=='purchase_order')fail('VALIDATION_FAILED','Bills link to purchase orders.',{fieldErrors:[{path:'sourceDocumentId',message:'Not a purchase order'}]});
+  // A bill links to its purchase order; an additional invoice (a correction) links to the posted bill it supplements and matches no order itself.
+  if(input.kind==='bill'&&source.kind!=='purchase_order'&&!(sourceRelation==='correction'&&source.kind==='bill'))fail('VALIDATION_FAILED','Bills link to purchase orders.',{fieldErrors:[{path:'sourceDocumentId',message:'Not a purchase order'}]});
   if(input.kind!=='bill'&&!sourceRelation)fail('VALIDATION_FAILED','Only bills link to a source document.',{fieldErrors:[{path:'sourceDocumentId',message:'Not allowed'}]});
  }
- const {computed,total,withholding}=await prepare(tx,ctx,entityId,input,profile,{source:input.kind==='bill'?source:null});
+ const {computed,total,withholding}=await prepare(tx,ctx,entityId,input,profile,{source:input.kind==='bill'&&source?.kind==='purchase_order'?source:null});
  const dup=input.kind==='bill'?await duplicateCheck(tx,ctx,entityId,input,total,profile):null;
  const m=documentMaterial(input),hash=contentHash(m);
  const row=(await tx.query('insert into lara.documents(tenant_id,entity_id,book_id,kind,branch_id,party_id,document_date,accounting_date,currency,net,tax,gross,withholding,withholding_rule_version_id,supplier_reference_normalized,rule_profile_version,external_reference,source_document_id,due_schedule,evidence_ids,payload_hash,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) returning *',[ctx.tenantId,entityId,input.bookId,input.kind,input.branchId,input.partyId,input.documentDate,input.accountingDate,input.currency,decimal(total.net,6),decimal(total.tax,6),decimal(total.gross,6),decimal(withholding.amount,6),withholding.ruleVersionId,dup?.normalized||null,m.ruleProfileVersion,m.externalReference,m.sourceDocumentId,JSON.stringify(dueSchedule(input,total,profile)),JSON.stringify(m.evidenceIds),hash,ctx.principalId])).rows[0];
@@ -358,7 +359,11 @@ export async function correctDocument(tx,ctx,entityId,id,input,expectedVersion){
  const original=await lineRows(tx,ctx,id);
  const base={branchId:row.branch_id,bookId:row.book_id,partyId:row.party_id,documentDate:input.accountingDate,accountingDate:input.accountingDate,currency:row.currency,ruleProfileVersion:row.rule_profile_version,sourceDocumentId:id,evidenceIds:input.evidenceIds||[]};
  let created;
- if(input.kind==='additional_invoice')created=await insertDocument(tx,ctx,entityId,{...base,kind:'bill',externalReference:(row.external_reference||'')+'/ADD-'+String(Number(row.content_version)),lines:input.lines},{sourceRelation:'correction'});
+ if(input.kind==='additional_invoice'){
+  // Each additional invoice against the bill carries its own reference: the bill's plus its ordinal among the corrections already raised.
+  const ordinal=(await tx.query("select count(*)::int n from lara.document_relations r join lara.documents d on d.tenant_id=r.tenant_id and d.id=r.source_id where r.tenant_id=$1 and r.target_id=$2 and r.relation='correction' and d.kind='bill'",[ctx.tenantId,id])).rows[0].n+1;
+  created=await insertDocument(tx,ctx,entityId,{...base,kind:'bill',externalReference:(row.external_reference||'')+'/ADD-'+ordinal,lines:input.lines},{sourceRelation:'correction'});
+ }
  else{
   const lines=input.kind==='reversal'?original.map(lineResource):input.lines;
   const credited=(await tx.query("select l.account_id,coalesce(sum(l.net),0)::text as net from lara.document_relations r join lara.documents d on d.tenant_id=r.tenant_id and d.id=r.source_id join lara.document_lines l on l.tenant_id=d.tenant_id and l.document_id=d.id where r.tenant_id=$1 and r.target_id=$2 and r.relation in ('credit','reversal') and d.state<>'cancelled' group by l.account_id",[ctx.tenantId,id])).rows;
@@ -488,8 +493,9 @@ export async function createSettlement(tx,ctx,entityId,input){
  const profile=await purchasingProfile(tx,ctx,entityId);await validatePayment(tx,ctx,entityId,input,profile);
  const book=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary' and status='active'",[ctx.tenantId,entityId])).rows[0];
  if(!book)fail('FEATURE_NOT_ENABLED','No primary book.');
+ if(input.branchId)await branchFor(tx,ctx,entityId,input.branchId);
  const m=settlementMaterial(input),hash=contentHash(m);
- const row=(await tx.query("insert into lara.settlements(tenant_id,entity_id,book_id,direction,party_id,bank_account_id,payment_method,currency,gross_amount,cash_amount,withholding_amount,value_date,evidence_ids,payload_hash,allocation_intents,created_by) values($1,$2,$3,'payment',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning *",[ctx.tenantId,entityId,book.id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),ctx.principalId])).rows[0];
+ const row=(await tx.query("insert into lara.settlements(tenant_id,entity_id,book_id,direction,party_id,bank_account_id,branch_id,payment_method,currency,gross_amount,cash_amount,withholding_amount,value_date,evidence_ids,payload_hash,allocation_intents,created_by) values($1,$2,$3,'payment',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *",[ctx.tenantId,entityId,book.id,input.partyId,input.bankAccountId||null,m.branchId,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),ctx.principalId])).rows[0];
  await audit(tx,ctx,{entityId,action:'settlements.create',resourceType:'settlement',resourceId:row.id,resourceVersion:1,afterRef:hash});
  return settlementResource(tx,ctx,row);
 }
@@ -508,9 +514,10 @@ export async function updateSettlement(tx,ctx,entityId,id,expectedVersion,input)
  const row=await loadSettlement(tx,ctx,entityId,id);expectVersion(row,expectedVersion);
  if(['posted','reversed','cancelled'].includes(row.state))fail('STATE_CONFLICT','Posted settlements cannot change; return the payment.');
  const profile=await purchasingProfile(tx,ctx,entityId);await validatePayment(tx,ctx,entityId,input,profile);
+ if(input.branchId)await branchFor(tx,ctx,entityId,input.branchId);
  const m=settlementMaterial(input),hash=contentHash(m),material=hash!==row.payload_hash;
  if(material&&row.state!=='draft'){await withdrawAuthority(tx,ctx,entityId,{settlementId:id},'Settlement content changed');await tx.query("update lara.settlements set state='draft',approved_by=null,submitted_by=null where tenant_id=$1 and id=$2",[ctx.tenantId,id]);}
- const updated=(await tx.query('update lara.settlements set party_id=$3,bank_account_id=$4,payment_method=$5,currency=$6,gross_amount=$7,cash_amount=$8,withholding_amount=$9,value_date=$10,evidence_ids=$11,payload_hash=$12,allocation_intents=$13,content_version=content_version+$14 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),material?1:0])).rows[0];
+ const updated=(await tx.query('update lara.settlements set party_id=$3,bank_account_id=$4,payment_method=$5,currency=$6,gross_amount=$7,cash_amount=$8,withholding_amount=$9,value_date=$10,evidence_ids=$11,payload_hash=$12,allocation_intents=$13,content_version=content_version+$14,branch_id=$15 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,input.partyId,input.bankAccountId||null,input.method,input.currency,m.grossAmount,m.cashAmount,m.withholdingAmount,input.valueDate,JSON.stringify(m.evidenceIds),hash,JSON.stringify(m.allocations),material?1:0,m.branchId])).rows[0];
  await audit(tx,ctx,{entityId,action:'settlements.edit',resourceType:'settlement',resourceId:id,resourceVersion:Number(updated.version),afterRef:hash});
  return settlementResource(tx,ctx,updated);
 }
@@ -683,7 +690,7 @@ export async function settlePayment(tx,ctx,entityId,id,input,expectedVersion,{co
  const allocations=settlementRow.allocation_intents||[];
  const {advance,expected}=await validatePayment(tx,ctx,entityId,{direction:'payment',partyId:settlementRow.party_id,currency:settlementRow.currency,grossAmount:String(settlementRow.gross_amount),cashAmount:String(settlementRow.cash_amount),withholdingAmount:String(settlementRow.withholding_amount),allocations:allocations.map(a=>({openItemId:a.openItemId,amount:a.amount}))},profile);
  await linkEvidence(tx,ctx,entityId,input.evidenceIds,'payment',id,Number(row.version)+1);
- const branch=(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and status='active' order by created_at limit 1",[ctx.tenantId,entityId])).rows[0];
+ const branch=settlementRow.branch_id?{id:settlementRow.branch_id}:(await tx.query("select id from lara.branches where tenant_id=$1 and entity_id=$2 and status='active' order by created_at limit 1",[ctx.tenantId,entityId])).rows[0];
  const party=(await tx.query('select legal_name from lara.party where tenant_id=$1 and id=$2',[ctx.tenantId,settlementRow.party_id])).rows[0];
  const gross=micros(String(settlementRow.gross_amount)),cash=micros(String(settlementRow.cash_amount)),wht=micros(String(settlementRow.withholding_amount));
  let lines=[{accountId:advance?profile.advanceAccountId:profile.apAccountId,branchId:branch.id,dimensions:{},debit:decimal(gross,6),credit:'0'},{accountId:profile.cashAccountId,branchId:branch.id,dimensions:{},debit:'0',credit:decimal(cash,6)}];

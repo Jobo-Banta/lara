@@ -444,17 +444,23 @@ export async function validateImport(tx,ctx,entityId,id,input,expectedVersion,{s
   if(!error){debit+=d;credit+=c;if(a.control_type!=='none')control.set(a.id,(control.get(a.id)||0n)+d-c);}
   else errors++;
   const status=error?'error':'valid';
-  const prior=existing.find(e=>e.source_key===r.source_key);
-  if(prior)await tx.query('update lara.opening_rows set row_no=$3,account_code=$4,account_id=$5,branch_code=$6,branch_id=$7,accounting_date=$8,debit=$9,credit=$10,dimensions_json=$11,status=$12,error=$13 where tenant_id=$1 and id=$2',[ctx.tenantId,prior.id,r.rowNo,r.account_code,accountId,r.branch_code,branchId,error&&!/^\d{4}-\d{2}-\d{2}$/.test(r.accounting_date)?iso(batch.cutoff):r.accounting_date,decimal(d),decimal(c),JSON.stringify(r.dimensions),status,error]);
-  else await tx.query('insert into lara.opening_rows(tenant_id,entity_id,batch_id,row_no,source_key,account_code,account_id,branch_code,branch_id,accounting_date,debit,credit,dimensions_json,status,error) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)',[ctx.tenantId,entityId,id,r.rowNo,r.source_key||('row-'+r.rowNo),r.account_code,accountId,r.branch_code,branchId,/^\d{4}-\d{2}-\d{2}$/.test(r.accounting_date)?r.accounting_date:iso(batch.cutoff),decimal(d>0n?d:c>0n?0n:1n),decimal(c>0n?c:d>0n?0n:0n),JSON.stringify(r.dimensions),status,error]);
+  // A staged row always satisfies the row rules so the error reaches the workbench: an error row without a usable amount carries the smallest debit, one with both sides keeps its debit, and a repeated key stages under its row number.
+  const staged=d>0n&&c===0n?[d,0n]:c>0n&&d===0n?[0n,c]:d>0n?[d,0n]:[1n,0n];
+  const stagedKey=error==='duplicate source key'?r.source_key+'#'+r.rowNo:(r.source_key||('row-'+r.rowNo));
+  const stagedDate=/^\d{4}-\d{2}-\d{2}$/.test(r.accounting_date)?r.accounting_date:iso(batch.cutoff);
+  const prior=existing.find(e=>e.source_key===stagedKey);
+  if(prior)await tx.query('update lara.opening_rows set row_no=$3,account_code=$4,account_id=$5,branch_code=$6,branch_id=$7,accounting_date=$8,debit=$9,credit=$10,dimensions_json=$11,status=$12,error=$13 where tenant_id=$1 and id=$2',[ctx.tenantId,prior.id,r.rowNo,r.account_code,accountId,r.branch_code,branchId,stagedDate,decimal(staged[0],6),decimal(staged[1],6),JSON.stringify(r.dimensions),status,error]);
+  else await tx.query('insert into lara.opening_rows(tenant_id,entity_id,batch_id,row_no,source_key,account_code,account_id,branch_code,branch_id,accounting_date,debit,credit,dimensions_json,status,error) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)',[ctx.tenantId,entityId,id,r.rowNo,stagedKey,r.account_code,accountId,r.branch_code,branchId,stagedDate,decimal(staged[0],6),decimal(staged[1],6),JSON.stringify(r.dimensions),status,error]);
  }
  // Control totals derive from the checksummed evidence, so a re-validation reproduces them; the first record stands.
  for(const [accountId,total] of control)await tx.query('insert into lara.source_control_balances(tenant_id,entity_id,batch_id,control_account_id,detail_total) values($1,$2,$3,$4,$5) on conflict do nothing',[ctx.tenantId,entityId,id,accountId,decimal(total)]);
+ const rowErrors=errors;
  if(debit!==credit)errors++;
  const state=errors?'staged':'validated';
  const updated=(await tx.query('update lara.opening_batches set state=$3,row_count=$4,error_count=$5,debit_total=$6,credit_total=$7 where tenant_id=$1 and id=$2 returning *',[ctx.tenantId,id,state,rows.length,errors,decimal(debit),decimal(credit)])).rows[0];
  await audit(tx,ctx,{entityId,action:'import.validate',resourceType:'import',resourceId:id,resourceVersion:Number(updated.version),reason:errors?errors+' error(s)':'valid'});
- if(debit!==credit)fail('UNBALANCED_ENTRY','Opening debits '+decimal(debit)+' differ from credits '+decimal(credit)+'.',{fieldErrors:[{path:'rows',message:'Difference '+decimal(debit-credit)}]});
+ // Row errors stay staged for the workbench (the totals are meaningless until they are fixed); a file whose rows are all valid but do not balance is refused with the difference.
+ if(debit!==credit&&!rowErrors)fail('UNBALANCED_ENTRY','Opening debits '+decimal(debit)+' differ from credits '+decimal(credit)+'.',{fieldErrors:[{path:'rows',message:'Difference '+decimal(debit-credit)}]});
  return {resourceType:'import',resourceId:id,version:Number(updated.version),state,rows:rows.length,errors};
 }
 export async function approveImport(tx,ctx,entityId,id,input,expectedVersion,{sourceFeed=null}={}){
@@ -546,9 +552,12 @@ export async function closeFiscalYear(tx,ctx,entityId,{bookId,fiscalYear,retaine
  if(prior){const re_line=(await tx.query('select func_debit,func_credit from lara.journal_lines where entry_id=$1 and account_id=$2',[prior.id,retainedEarningsAccountId])).rows[0];return {resourceType:'book',resourceId:bookId,version:Number(book.version),state:'closed_'+fiscalYear,journalEntryIds:[prior.id],netIncome:re_line?decimal(signedMicros(re_line.func_credit)-signedMicros(re_line.func_debit)):'0.00',replayed:true};}
  const balances=(await tx.query("select * from lara.account_balances($1,$2,$3,$4,$5,now()) where category in ('income','expense') and balance<>0",[ctx.tenantId,entityId,bookId,from,to])).rows;
  if(!balances.length)fail('STATE_CONFLICT','No income or expense balances to close for '+fiscalYear+'.');
+ // Each account closes on the side opposite its net movement (credits minus
+ // debits), so contra-income and credit-balance expense accounts close too;
+ // net income is the sum of those movements and moves to retained earnings.
  let net=0n;const lines=[];
- for(const b of balances){const bal=signedMicros(b.balance);if(b.category==='income'){lines.push({accountId:b.account_id,branchId,debit:decimal(bal),credit:'0.00',dimensions:{}});net+=bal;}else{lines.push({accountId:b.account_id,branchId,debit:'0.00',credit:decimal(bal),dimensions:{}});net-=bal;}}
- lines.push(net>=0n?{accountId:retainedEarningsAccountId,branchId,debit:'0.00',credit:decimal(net),dimensions:{}}:{accountId:retainedEarningsAccountId,branchId,debit:decimal(-net),credit:'0.00',dimensions:{}});
+ for(const b of balances){const bal=signedMicros(b.credit)-signedMicros(b.debit);if(bal>0n)lines.push({accountId:b.account_id,branchId,debit:decimal(bal),credit:'0.00',dimensions:{}});else lines.push({accountId:b.account_id,branchId,debit:'0.00',credit:decimal(-bal),dimensions:{}});net+=bal;}
+ if(net!==0n)lines.push(net>0n?{accountId:retainedEarningsAccountId,branchId,debit:'0.00',credit:decimal(net),dimensions:{}}:{accountId:retainedEarningsAccountId,branchId,debit:decimal(-net),credit:'0.00',dimensions:{}});
  // The closing entry is the one posting a locked year-end period accepts; the
  // stable source id makes a repeated close return the same entry.
  const entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId,sourceType:'fiscal_year_close',sourceId:stableUuid(bookId,fiscalYear),sourceVersion:1,purpose:'closing',accountingDate:to,documentDate:to,description:'Fiscal year '+fiscalYear+' close to retained earnings',currency:book.functional_currency,manual:false,postingActor:ctx.principalId,commandId,lines})])).rows[0].id;

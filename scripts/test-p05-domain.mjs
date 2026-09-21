@@ -113,6 +113,10 @@ try{
  const cnDoc=await run(clerk,tx=>purchasing.getDocument(tx,clerk,entityId,cn.resourceId,{kinds:['bill','credit_note']}));
  assert.deepEqual([cnDoc.kind,cnDoc.net,cnDoc.tax,cnDoc.gross,cnDoc.sourceDocumentId],['credit_note','2000.00','240.00','2240.00',bill.id]);
  assert.equal((await run(clerk,tx=>sales.listDocuments(tx,clerk,entityId,{},{kinds:['invoice','credit_note']}))).items.length,0,'supplier credits never appear under invoices');
+ // Review correction: each additional invoice against the bill takes its own reference, so a second one is not a duplicate of the first.
+ const addRefs=[];
+ for(const n of [1,2]){const add=await run(acc,tx=>purchasing.correctDocument(tx,acc,entityId,bill.id,{kind:'additional_invoice',accountingDate:'2026-09-20',reason:'Late charge '+n,lines:[line(expense.id,'100',{taxCodeId:vat.id})],evidenceIds:[billEvidence]}));addRefs.push((await run(clerk,tx=>purchasing.getDocument(tx,clerk,entityId,add.resourceId,{kinds:['bill']}))).externalReference);}
+ assert.deepEqual(addRefs,[addRefs[0],addRefs[0].replace(/ADD-1$/,'ADD-2')]);assert.match(addRefs[0],/\/ADD-1$/);
  await run(clerk,tx=>purchasing.submitDocument(tx,clerk,entityId,cn.resourceId,{}));
  await rejects(run(acc,tx=>purchasing.approveDocument(tx,acc,entityId,cn.resourceId,{decision:'approve',contentVersion:1})),'SELF_APPROVAL','the accountant who raised the credit cannot approve it');
  await run(ctrl,tx=>purchasing.approveDocument(tx,ctrl,entityId,cn.resourceId,{decision:'approve',contentVersion:1}));

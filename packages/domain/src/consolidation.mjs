@@ -11,7 +11,7 @@
 // result whose hash is stable for the same inputs. Publishing writes a
 // report snapshot in the group's book; subsidiary ledgers are never written.
 import {createHash} from 'node:crypto';
-import {assertInput,audit,canonical,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,iso,page,pageArgs,requirePermission,requireEntity,resource,DomainError} from './core.mjs';
+import {assertInput,audit,canonical,contentHash,cursorClause,cursorScope,emit,expectVersion,fail,isUuid,iso,page,pageArgs,requirePermission,requireEntity,resource,translate,DomainError} from './core.mjs';
 import {micros,signedMicros,decimal} from './ledger.mjs';
 import {rateScaled,convert} from './fx.mjs';
 import * as sales from './sales.mjs';
@@ -315,8 +315,10 @@ export async function postPair(tx,ctx,entityId,id,input,expectedVersion,{command
   outcome={ok:true,journalEntryIds:r.journalEntryIds||[]};
  }catch(e){
   await tx.query('rollback to savepoint icp_side');
-  if(!(e instanceof DomainError))throw e;
-  outcome={ok:false,reason:e.code+': '+e.message};
+  // Rule refusals raised by the database (locked period, frozen account, duplicate) are pair exceptions like domain refusals; outages still fail the command.
+  const err=translate(e);
+  if(!(err instanceof DomainError)||err.code==='DEPENDENCY_UNAVAILABLE')throw e;
+  outcome={ok:false,reason:err.code+': '+err.message};
  }
  let updated;
  if(outcome.ok){

@@ -532,15 +532,17 @@ export async function updateCashSession(tx,ctx,entityId,id,expectedVersion,input
 }
 const sresult=(row,extra={})=>({resourceType:'cash_session',resourceId:row.id,version:Number(row.version),state:row.state,...extra});
 // Expected cash is the opening float plus posted cash receipts less posted
-// cash payments of the business date; variance is counted minus expected and
-// needs a reason. Counted values are recorded as they are, never adjusted.
+// cash payments of the business date at the session's branch (a settlement
+// without a branch belongs to the entity's first active branch); variance is
+// counted minus expected and needs a reason. Counted values are recorded as
+// they are, never adjusted.
 export async function countCashSession(tx,ctx,entityId,id,input,expectedVersion){
  requirePermission(ctx,'cash_session.count');requireEntity(ctx,entityId);assertInput('CashCount',input);
  const row=await loadSession(tx,ctx,entityId,id);if(expectedVersion!==undefined)expectVersion(row,expectedVersion);
  if(!['open','counted'].includes(row.state))fail('STATE_CONFLICT','Session is '+row.state+'; counted values are never overwritten.');
  let counted=0n;
  for(const [i,l] of input.lines.entries()){const d=micros(l.denomination);if(d<=0n)fail('VALIDATION_FAILED','Denominations are positive.',{fieldErrors:[{path:'lines.'+i+'.denomination',message:'Positive'}]});counted+=d*BigInt(l.quantity);}
- const moves=(await tx.query("select coalesce(sum(case when direction='receipt' then cash_amount else -cash_amount end),0)::text as net from lara.settlements where tenant_id=$1 and entity_id=$2 and state='posted' and payment_method='cash' and value_date=$3",[ctx.tenantId,entityId,iso(row.business_date)])).rows[0];
+ const moves=(await tx.query("select coalesce(sum(case when direction='receipt' then cash_amount else -cash_amount end),0)::text as net from lara.settlements s where s.tenant_id=$1 and s.entity_id=$2 and s.state='posted' and s.payment_method='cash' and s.value_date=$3 and coalesce(s.branch_id,(select b.id from lara.branches b where b.tenant_id=s.tenant_id and b.entity_id=s.entity_id and b.status='active' order by b.created_at limit 1))=$4",[ctx.tenantId,entityId,iso(row.business_date),row.branch_id])).rows[0];
  const expected=micros(String(row.opening_amount))+signedMicros(moves.net);
  const variance=counted-expected;
  if(variance!==0n&&!input.reason?.trim())fail('VALIDATION_FAILED','A variance of '+decimal(variance)+' needs a reason.',{fieldErrors:[{path:'reason',message:'Required for variance'}]});
@@ -563,10 +565,10 @@ export async function closeCashSession(tx,ctx,entityId,id,input,expectedVersion,
  if(variance!==0n){
   const profile=await treasuryProfile(tx,ctx,entityId);
   if(!profile.cashAccountId||!profile.cashVarianceAccountId)fail('RULE_PROFILE_NOT_APPROVED','A cash variance posts only under the approved treasury profile (cash and variance accounts).');
-  const book=(await tx.query("select id from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary' and status='active'",[ctx.tenantId,entityId])).rows[0];
+  const book=(await tx.query("select id,functional_currency from lara.books where tenant_id=$1 and entity_id=$2 and kind='primary' and status='active'",[ctx.tenantId,entityId])).rows[0];
   const amount=decimal(abs(variance),6);
   const lines=variance<0n?[{accountId:profile.cashVarianceAccountId,branchId:row.branch_id,dimensions:{},debit:amount,credit:'0'},{accountId:profile.cashAccountId,branchId:row.branch_id,dimensions:{},debit:'0',credit:amount}]:[{accountId:profile.cashAccountId,branchId:row.branch_id,dimensions:{},debit:amount,credit:'0'},{accountId:profile.cashVarianceAccountId,branchId:row.branch_id,dimensions:{},debit:'0',credit:amount}];
-  entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:book.id,sourceType:'cash_session',sourceId:id,sourceVersion:Number(row.content_version),purpose:'posting',accountingDate:iso(row.business_date),documentDate:iso(row.business_date),description:'Cash '+(variance<0n?'shortage':'overage')+' '+iso(row.business_date)+': '+(row.variance_reason||input.reason),currency:'PHP',manual:false,postingActor:ctx.principalId,commandId,lines})])).rows[0].id;
+  entryId=(await tx.query('select lara.post_journal_entry($1::jsonb) as id',[JSON.stringify({tenantId:ctx.tenantId,entityId,bookId:book.id,sourceType:'cash_session',sourceId:id,sourceVersion:Number(row.content_version),purpose:'posting',accountingDate:iso(row.business_date),documentDate:iso(row.business_date),description:'Cash '+(variance<0n?'shortage':'overage')+' '+iso(row.business_date)+': '+(row.variance_reason||input.reason),currency:book.functional_currency,manual:false,postingActor:ctx.principalId,commandId,lines})])).rows[0].id;
  }
  const updated=(await tx.query("update lara.cash_sessions set state='closed',closed_at=now(),variance_entry_id=$3 where tenant_id=$1 and id=$2 returning *",[ctx.tenantId,id,entryId])).rows[0];
  await audit(tx,ctx,{entityId,action:'cash_session.close',resourceType:'cash_session',resourceId:id,resourceVersion:Number(updated.version),reason:input.reason,afterRef:entryId});

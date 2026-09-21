@@ -125,3 +125,19 @@ export function PortalAccept(){
   </>}
  </main>;
 }
+
+// Public verification of a delivered share link: the minimal approved fields
+// behind the opaque token, no sign-in, no full document, no acceptance claim.
+export function PortalVerify(){
+ const [view,setView]=useState<Row|null>(null),[error,setError]=useState<ApiError|null>(null),[token,setToken]=useState<string|null>(null);
+ useEffect(()=>{const t=new URLSearchParams(window.location.search).get('token')||'';setToken(t);if(!t)return;
+  fetch('/api/verify/'+encodeURIComponent(t),{cache:'no-store'}).then(async r=>{const data=await r.json().catch(()=>null);if(!r.ok)throw data||{code:'DEPENDENCY_UNAVAILABLE',message:'Unexpected response.',fieldErrors:[],retryable:true};setView(data);}).catch(e=>setError(asError(e)));},[]);
+ return <main className="workspace-page"><h1>Verify a shared record</h1>
+  {token===''&&<p role="alert">This link is incomplete; ask the issuer for a new one.</p>}
+  {error&&<ErrorPanel error={error}/>}
+  {token&&!view&&!error&&<Loading/>}
+  {view&&<section className="demo-card" role="status"><h2>{view.resourceType==='document'?String(view.kind||'document').replace(/_/g,' ')+(view.number?' '+view.number:''):String(view.resourceType||'record').replace(/_/g,' ')}</h2>
+   {view.resourceType==='document'&&table(['Date','Amount','State','Party'],[[view.date,money(view.gross,view.currency),view.state,view.partyDisplay||'—']],'')}
+   <p>{view.note} This link expires {when(view.expiresAt)}.</p></section>}
+ </main>;
+}

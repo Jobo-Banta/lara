@@ -187,7 +187,9 @@ try{
  assert.equal(disposal.state,'disposed');
  assert.equal((await run(fixed,tx=>assets.getSchedule(tx,fixed,entityId,dep4.id))).state,'completed','the schedule ends with the disposal');
  await rejects(run(acc,tx=>assets.recordAssetEvent(tx,acc,entityId,eq4.id,{kind:'transfer',effectiveDate:'2027-02-01',targetLocationId:branch2.id,reason:'x',evidenceIds:[doc2]})),'STATE_CONFLICT','a disposed asset has no further events');
- const scrap=await run(acc,tx=>assets.recordAssetEvent(tx,acc,entityId,eq2.id,{kind:'disposal',effectiveDate:'2027-01-15',proceeds:'0',reason:'Scrapped',evidenceIds:[doc2]}));
+ // Review correction: a scrapping names no proceeds; an impairment without an amount is refused as input, never as a type error.
+ await rejects(run(acc,tx=>assets.recordAssetEvent(tx,acc,entityId,eq1.id,{kind:'impairment',effectiveDate:'2027-01-01',reason:'No amount',evidenceIds:[doc2]})),'VALIDATION_FAILED','impairment without an amount');
+ const scrap=await run(acc,tx=>assets.recordAssetEvent(tx,acc,entityId,eq2.id,{kind:'disposal',effectiveDate:'2027-01-15',reason:'Scrapped',evidenceIds:[doc2]}));
  assert.deepEqual(await entryLines(scrap.journalEntryIds[0]),['1700 0.00 1000.00','6300 1000.00 0.00'],'disposal at a loss');
  // Impairment reduces the carrying amount and the open lines; transfer changes the location only.
  const imp=await run(acc,tx=>assets.recordAssetEvent(tx,acc,entityId,eq1.id,{kind:'impairment',effectiveDate:'2027-01-01',amount:'18000',reason:'Damage assessed',evidenceIds:[doc2]}));

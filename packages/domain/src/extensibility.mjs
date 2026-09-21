@@ -351,7 +351,9 @@ export async function toolScope(tx,tenantId,principalId){
 // recorded with the reason so an injected instruction leaves evidence.
 export async function runTool(tx,ctx,entityId,input,{caseDefinitions=null,commandId=null}={}){
  requirePermission(ctx,'tool.execute');requireEntity(ctx,entityId);assertInput('ToolRunRequest',input);
- const grant=ctx.tool?.grants.find(g=>g.entityIds.includes(entityId));
+ // The grant that covers the entity and names the tool serves the call; when no grant names the tool, the first covering grant records the denial.
+ const covering=(ctx.tool?.grants||[]).filter(g=>g.entityIds.includes(entityId));
+ const grant=covering.find(g=>g.tools.includes(input.tool))||covering[0];
  if(!grant)fail('FORBIDDEN','No approved grant covers this entity.');
  const requestHash=sha(canonical({tool:input.tool,input:input.input}));
  const record=async(outcome,reason,resultType=null,resultId=null)=>(await tx.query('insert into lara.tool_runs(tenant_id,entity_id,grant_id,tool,request_hash,outcome,reason,result_resource_type,result_resource_id,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning id',[ctx.tenantId,entityId,grant.id,String(input.tool).slice(0,64),requestHash,outcome,reason,resultType,resultId,ctx.principalId])).rows[0].id;
@@ -433,6 +435,8 @@ export async function listInstalls(tx,ctx,entityId,query){
 // Install: the manifest hash must match the reviewed catalog, dependencies
 // (capabilities and packs) must be satisfied, an upgrade must name a
 // supported path; the row is created and a job applies it.
+// Manifest versions compare numerically per component ('1.10.0' is later than '1.2.0').
+export function compareVersions(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)<(y[i]||0)?-1:1;}return 0;}
 export async function requestInstall(tx,ctx,entityId,input,{catalog=null}={}){
  requirePermission(ctx,'pack.install');requireEntity(ctx,entityId);assertInput('PackInstall',input);await requireCapability(tx,ctx,entityId,'industry_packs','industry packs');
  const entry=(catalog||packCatalog()).find(p=>p.packId===input.packId&&p.version===input.version);
@@ -444,10 +448,15 @@ export async function requestInstall(tx,ctx,entityId,input,{catalog=null}={}){
  for(const dep of entry.dependencies){
   const [kind,name,minVersion]=dep.split(':');
   if(kind==='capability'){if(!(await tx.query("select 1 from lara.capability_activations where tenant_id=$1 and entity_id=$2 and capability=$3 and status='active'",[ctx.tenantId,entityId,name])).rowCount)fail('FEATURE_NOT_ENABLED','The pack needs the '+name+' capability active.');}
-  else if(kind==='pack'){const p=(await tx.query("select version from lara.pack_versions where tenant_id=$1 and entity_id=$2 and pack_id=$3 and state='installed'",[ctx.tenantId,entityId,name])).rows[0];if(!p||(minVersion&&p.version<minVersion))fail('STATE_CONFLICT','The pack needs '+name+(minVersion?' '+minVersion+' or later':'')+' installed.');}
+  else if(kind==='pack'){const p=(await tx.query("select version from lara.pack_versions where tenant_id=$1 and entity_id=$2 and pack_id=$3 and state='installed'",[ctx.tenantId,entityId,name])).rows[0];if(!p||(minVersion&&compareVersions(p.version,minVersion)<0))fail('STATE_CONFLICT','The pack needs '+name+(minVersion?' '+minVersion+' or later':'')+' installed.');}
   else fail('VALIDATION_FAILED','Unknown dependency kind in the manifest: '+kind+'.');
  }
- if((await tx.query("select 1 from lara.pack_versions where tenant_id=$1 and entity_id=$2 and pack_id=$3 and state='installing'",[ctx.tenantId,entityId,input.packId])).rowCount)fail('STATE_CONFLICT','An installation of this pack is in progress.');
+ // An attempt whose job ended without applying (refused authority, dead letter) is closed as failed here so the pack is not locked forever; a live job still blocks.
+ for(const p of (await tx.query("select p.id,j.state as job_state,j.error_code from lara.pack_versions p left join lara.jobs j on j.tenant_id=p.tenant_id and j.id=p.job_id where p.tenant_id=$1 and p.entity_id=$2 and p.pack_id=$3 and p.state='installing' for update of p",[ctx.tenantId,entityId,input.packId])).rows){
+  if(p.job_state&&!['failed','dead_letter','cancelled','succeeded'].includes(p.job_state))fail('STATE_CONFLICT','An installation of this pack is in progress.');
+  if(!p.job_state)fail('STATE_CONFLICT','An installation of this pack is in progress.');
+  await tx.query("update lara.pack_versions set state='failed',failure_reason=$3 where tenant_id=$1 and id=$2",[ctx.tenantId,p.id,'Install job '+p.job_state+(p.error_code?' ('+p.error_code+')':'')+' before the manifest was applied.']);
+ }
  const row=(await tx.query('insert into lara.pack_versions(tenant_id,entity_id,pack_id,version,manifest,manifest_hash,dependencies,evidence_ids,previous_id,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning *',[ctx.tenantId,entityId,input.packId,input.version,JSON.stringify(entry.manifest),entry.manifestHash,JSON.stringify(entry.dependencies),JSON.stringify(input.evidenceIds),installed?.id||null,ctx.principalId])).rows[0];
  await linkEvidence(tx,ctx,entityId,input.evidenceIds,'pack_version',row.id,1);
  const job=await enqueueJob(tx,ctx,{entityId,kind:'pack.install',payload:{packVersionId:row.id}});

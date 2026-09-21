@@ -24,7 +24,7 @@ Transfers move money between two approved bank accounts of one book and post bot
 
 ## Cash sessions
 
-One open session per branch, cashier and business date. Count by denomination; the expected cash is the float plus posted cash receipts less posted cash payments of the date; a difference needs a reason and, at close, posts under the profile's variance account (shortage `Dr cash over and short / Cr cash`, overage the reverse). Without a variance policy a non-zero variance cannot close. Counted values are never overwritten after close; a recount before close is a new numbered count. The handover is attested by an incoming principal other than the cashier (`SELF_APPROVAL` otherwise) and records the counted value and the variance.
+One open session per branch, cashier and business date. Count by denomination; the expected cash is the float plus posted cash receipts less posted cash payments of the date at the session's branch (a settlement names its `branchId`; one without a branch belongs to the entity's first active branch, and posts on it); a difference needs a reason and, at close, posts under the profile's variance account (shortage `Dr cash over and short / Cr cash`, overage the reverse). Without a variance policy a non-zero variance cannot close. Counted values are never overwritten after close; a recount before close is a new numbered count. The handover is attested by an incoming principal other than the cashier (`SELF_APPROVAL` otherwise) and records the counted value and the variance.
 
 ## Bank files and payment custody
 

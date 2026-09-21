@@ -1,6 +1,6 @@
 {
   "source": "docs/development/contracts/openapi.json",
-  "sha256": "20a23d9bf40aa3038a5dba03e9bf4ccc9c7e26da7b579d8f25684061aa7e42c6",
+  "sha256": "64b970fdc76a890e6d8321a31bbe2d0a5e84776a101163a6554a9f53ae6e158f",
   "operations": [
     {
       "method": "POST",

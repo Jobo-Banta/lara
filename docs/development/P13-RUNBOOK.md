@@ -24,7 +24,7 @@ Issue a payment link on a posted invoice for at most the outstanding amount (`/p
 
 ## Verification links
 
-A share grant exposes minimal fields of a posted document (kind, number, date, gross, currency, state, a masked party display) behind a non-enumerable token until it expires; no TIN, address, full document or tax-authority acceptance assertion. Revoking an invite revokes the party's grants.
+A share grant exposes minimal fields of a posted document (kind, number, date, gross, currency, state, a masked party display) behind a non-enumerable token until it expires; the worker mints the token at every delivery (the delivered link is `/portal/verify?token=…`, served without a session through `/api/verify/{token}`), so an earlier link stops working when a message is re-sent; no TIN, address, full document or tax-authority acceptance assertion. Revoking an invite revokes the party's grants.
 
 ## Rollback
 

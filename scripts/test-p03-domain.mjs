@@ -55,11 +55,12 @@ try{
  const expense=await mk('5000','Rent expense','expense',{requiredDimensions:['cost_center']});
  assert.deepEqual(expense.requiredDimensions,['cost_center']);
  await rejects(mk('4100','Bad parent','income',{parentId:assets.id}),'VALIDATION_FAILED','parent category mismatch');
+ const returns=await mk('4100','Sales returns','income');
  const frozen=await mk('1300','Old deposits','asset',{parentId:assets.id});
  await run(acc,tx=>ledger.freezeAccount(tx,acc,entityId,frozen.id,'frozen','Dormant'));
  const cc=(await run(ctrl,tx=>tx.query("insert into lara.dimensions(tenant_id,entity_id,type,code,name,created_by) values($1,$2,'cost_center','OPS','Operations',$3) returning id",[tenantId,entityId,principals.controller]))).rows[0].id;
  const list=await run(acc,tx=>ledger.listAccounts(tx,acc,entityId,{bookId:book.id}));
- assert.equal(list.items.length,8);
+ assert.equal(list.items.length,9);
  pass('chart of accounts with hierarchy, control type, required dimensions and a frozen account');
 
  // Periods
@@ -154,6 +155,17 @@ try{
  assert.equal(committed.state,'committed');
  const committedAgain=await run(ctrl,tx=>ledger.commitImport(tx,ctrl,entityId,imp.id,{}));
  assert.deepEqual(committedAgain.journalEntryIds,committed.journalEntryIds,'second commit returns the prior result');
+ // Review correction: rows the file gets wrong (both sides filled, a repeated key, no amount) stage with their error instead of aborting the validation on a row rule.
+ const csvBad=Buffer.from('source_key,account_code,branch_code,accounting_date,debit,credit\nOB-1,1010,HQ,2025-12-31,100.00,100.00\nOB-1,3000,HQ,2025-12-31,0,100.00\nOB-3,3000,HQ,2025-12-31,,\nOB-4,1010,HQ,2025-12-31,100.00,0\n');
+ const regBad=await run(acc,tx=>evidence.registerUpload(tx,acc,entityId,{filename:'openings-bad.csv',mime:'text/csv',byteCount:csvBad.length,sha256:sha(csvBad),classification:'confidential'}));
+ await run(acc,tx=>evidence.completeUpload(tx,acc,entityId,regBad.evidenceId,csvBad,store));await run({tenantId,principalId:null},tx=>evidence.recordScan(tx,{tenantId,principalId:null},entityId,regBad.evidenceId,new FixtureScanner(),store));
+ const impBad=await run(acc,tx=>ledger.createImport(tx,acc,entityId,{kind:'openings',evidenceId:regBad.evidenceId,mappingVersion:'v1',sourceId:'legacy-gl',externalBatchId:'B-2025-BAD',cutoffDate:'2025-12-31'}));
+ for(let i=0;i<2;i++){
+  const bad=await run(acc,tx=>ledger.validateImport(tx,acc,entityId,impBad.id,{},undefined,{store}));
+  assert.equal(bad.state,'staged');assert.equal(bad.errors,4,'three row errors and the imbalance of the valid rows');
+  const staged=await run(acc,tx=>ledger.importRows(tx,acc,entityId,impBad.id));
+  assert.deepEqual(staged.map(r=>[r.rowNo,r.status,r.error]),[[1,'error','exactly one of debit or credit'],[2,'error','duplicate source key'],[3,'error','exactly one of debit or credit'],[4,'valid',null]],'validation '+(i+1)+' stages every row with its error');
+ }
  const csv2=Buffer.from('source_key,account_code,branch_code,accounting_date,debit,credit\nOB-1,1010,HQ,2025-12-31,6000.00,0\nOB-2,3000,HQ,2025-12-31,0,6000.00\n');
  const reg2=await run(acc,tx=>evidence.registerUpload(tx,acc,entityId,{filename:'openings-v2.csv',mime:'text/csv',byteCount:csv2.length,sha256:sha(csv2),classification:'confidential'}));
  await run(acc,tx=>evidence.completeUpload(tx,acc,entityId,reg2.evidenceId,csv2,store));await run({tenantId,principalId:null},tx=>evidence.recordScan(tx,{tenantId,principalId:null},entityId,reg2.evidenceId,new FixtureScanner(),store));
@@ -178,20 +190,23 @@ try{
  const reopened=await run(ctrl,tx=>ledger.reopenPeriod(tx,ctrl,entityId,sep.id,{reason:'Audit adjustment'}));
  assert.equal(reopened.state,'open');
  assert.equal((await run(ctrl,tx=>tx.query('select close_version from lara.periods where id=$1',[sep.id]))).rows[0].close_version,1);
+ // Review correction: a net-debit income account (sales returns) and the retained-earnings line close on the right sides.
+ const ret=await run(acc,tx=>ledger.createJournal(tx,acc,entityId,{...jbody,accountingDate:'2026-10-05',documentDate:'2026-10-05',description:'Returned service',lines:lines(returns.id,cash.id,'50.00')}));
+ await run(acc,tx=>ledger.submitJournal(tx,acc,entityId,ret.id,{}));await run(ctrl,tx=>ledger.approveJournal(tx,ctrl,entityId,ret.id,{decision:'approve',contentVersion:1}));await run(acc,tx=>ledger.postJournal(tx,acc,entityId,ret.id,{}));
  // Year-end: lock every 2026 period, then close to retained earnings once.
  const periods=(await run(ctrl,tx=>tx.query("select id,status from lara.periods where tenant_id=$1 and book_id=$2 and starts_on>='2026-01-01' order by starts_on",[tenantId,book.id]))).rows;
  for(const p of periods){if(p.status==='open')await run(ctrl,tx=>ledger.softClosePeriod(tx,ctrl,entityId,p.id,{reason:'Year end'}));await run(ctrl,tx=>ledger.lockPeriod(tx,ctrl,entityId,p.id,{reason:'Year end'}));}
  const close1=await run(ctrl,tx=>ledger.closeFiscalYear(tx,ctrl,entityId,{bookId:book.id,fiscalYear:2026,retainedEarningsAccountId:retained.id,branchId:branch.id,reason:'FY2026 close'}));
- assert.equal(close1.netIncome,'-200.00');
+ assert.equal(close1.netIncome,'-250.00','the loss includes the returns');
  const close2=await run(ctrl,tx=>ledger.closeFiscalYear(tx,ctrl,entityId,{bookId:book.id,fiscalYear:2026,retainedEarningsAccountId:retained.id,branchId:branch.id,reason:'FY2026 close again'}));
  assert.deepEqual(close2.journalEntryIds,close1.journalEntryIds,'closing twice yields one retained-earnings effect');
  assert.equal((await run(ctrl,tx=>tx.query("select count(*)::int n from lara.journal_entries where book_id=$1 and purpose='closing'",[book.id]))).rows[0].n,1);
  const dec=(await run(ctrl,tx=>tx.query("select status from lara.periods where tenant_id=$1 and book_id=$2 and starts_on='2026-12-01'",[tenantId,book.id]))).rows[0];
  assert.equal(dec.status,'locked','year-end period is locked again after the close');
  const fy=await run(ctrl,tx=>ledger.trialBalance(tx,ctrl,entityId,{bookId:book.id,periodStart:'2026-01-01',periodEnd:'2026-12-31',asOf:new Date().toISOString()}));
- assert.equal(fy.lines.find(l=>l.code==='4000').balance,'0.00');assert.equal(fy.lines.find(l=>l.code==='5000').balance,'0.00');assert.equal(fy.lines.find(l=>l.code==='3100').balance,'-200.00');
+ assert.equal(fy.lines.find(l=>l.code==='4000').balance,'0.00');assert.equal(fy.lines.find(l=>l.code==='4100').balance,'0.00','the contra-income account is closed');assert.equal(fy.lines.find(l=>l.code==='5000').balance,'0.00');assert.equal(fy.lines.find(l=>l.code==='3100').balance,'-250.00');
  const bs=await run(ctrl,tx=>ledger.statements(tx,ctrl,entityId,{bookId:book.id,periodStart:'2026-01-01',periodEnd:'2026-12-31',asOf:new Date().toISOString()}));
- assert.equal(bs.balanceSheet.balanced,true);assert.equal(bs.balanceSheet.equity,'4800.00');
+ assert.equal(bs.balanceSheet.balanced,true);assert.equal(bs.balanceSheet.equity,'4750.00');
  pass('periods soft close, lock only with required close tasks complete, refuse late postings, reopen with a new close version; the fiscal year closes to retained earnings exactly once and the new-year balance sheet balances (P03-T05)');
  console.log('PASS P03-02 ledger domain: '+step+' groups');
 }finally{

@@ -140,6 +140,12 @@ try{
 
  // Second side approved and posted: the pair completes.
  await run(clerk,tx=>purchasing.submitDocument(tx,clerk,S.entityId,targetBill.id,{}));await rejects(run(acc,tx=>purchasing.approveDocument(tx,acc,S.entityId,targetBill.id,{decision:'approve',contentVersion:1})),'SELF_APPROVAL','the accepter prepared the bill and cannot approve it');await run(ctrl,tx=>purchasing.approveDocument(tx,ctrl,S.entityId,targetBill.id,{decision:'approve',contentVersion:1}));
+ // Review correction: a refusal raised by the database (the subsidiary's period soft closed) is a pair exception with its reason, not a failed command; reopening lets the side post.
+ await run(ctrl,tx=>ledger.softClosePeriod(tx,ctrl,S.entityId,S.period.id,{reason:'Month end early'}));
+ const closedTry=await run(acc,tx=>consolidation.postPair(tx,acc,S.entityId,pair.id,{}));
+ assert.equal(closedTry.state,'exception');assert.match(closedTry.exceptionReason,/PERIOD_LOCKED/,'the database refusal is recorded on the pair');
+ assert.equal(await subEntries(),1,'nothing posted in the soft-closed period');
+ await run(ctrl,tx=>ledger.reopenPeriod(tx,ctrl,S.entityId,S.period.id,{reason:'Intercompany bill pending'}));
  const targetPosted=await run(acc,tx=>consolidation.postPair(tx,acc,S.entityId,pair.id,{}));
  assert.equal(targetPosted.state,'posted');assert.equal(await subEntries(),2);
  await rejects(run(acc,tx=>consolidation.updatePair(tx,acc,P.entityId,pair.id,undefined,{sourceEntityId:P.entityId,targetEntityId:S.entityId,sourceDocumentId:invoice.id,targetDraft:draftFor('1')})),'STATE_CONFLICT','a posted pair is final');

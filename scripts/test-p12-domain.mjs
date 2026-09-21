@@ -174,6 +174,10 @@ try{
  while(spent<5){const more=await exec(clerk,{feature:'capture',evidenceIds:[scan],resourceIds:[]});assert.equal(more.run.state,'succeeded');spent=(await cfg('capture')).spentMinor;}
  await rejects(run(clerk,tx=>assistant.requestRun(tx,clerk,entityId,{feature:'capture',evidenceIds:[scan],resourceIds:[]})),'STATE_CONFLICT','budget spent: refused at request');
  assert.equal((await postBill('CL-6','Cleaning services manual 2',fees.id)).state,'posted','manual work after the budget is spent');
+ // Review correction: the budget is monthly; once the spend belongs to an earlier month a run is accepted again and the month starts at the new run's cost.
+ await run(ctrl,tx=>tx.query("update lara.model_feature_configs set budget_month=(date_trunc('month',now())-interval '1 month')::date where tenant_id=$1 and feature='capture'",[tenantId]));
+ const rolled=await exec(clerk,{feature:'capture',evidenceIds:[scan],resourceIds:[]});assert.equal(rolled.run.state,'succeeded','a new month accepts runs again');
+ assert.equal((await cfg('capture')).spentMinor,1,'the new month counts its own spend');
  // Feature opt-out per company.
  await toggle(dir,'ask_books',false,'Owner opted out');
  await rejects(run(clerk,tx=>assistant.requestRun(tx,clerk,entityId,{feature:'ask_books',evidenceIds:[],resourceIds:[],question:'total debits',reportRequest:rr})),'FEATURE_NOT_ENABLED','opted out');

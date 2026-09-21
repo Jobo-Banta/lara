@@ -260,7 +260,10 @@ export async function recordAssetEvent(tx,ctx,entityId,id,input,expectedVersion,
  const eventMonth=monthStart(ym(input.effectiveDate));
  if(postedThrough&&dayNumber(eventMonth)<=dayNumber(postedThrough)&&input.kind!=='transfer')fail('STATE_CONFLICT','Depreciation is posted through '+postedThrough.slice(0,7)+'; posted periods are never rewritten. Date the event in the first open period.',{fieldErrors:[{path:'effectiveDate',message:'After '+postedThrough.slice(0,7)}]});
  let costAfter=cost,accAfter=accumulated,entryId=null,lines=[],description='',extra={};
- const amount=input.amount?micros(input.amount):null,proceeds=input.proceeds?micros(input.proceeds):null;
+ // Impairment, revaluation and split carry a positive amount; a disposal without proceeds is a scrapping (proceeds zero).
+ const amount=input.amount!=null?micros(input.amount):null,proceeds=input.proceeds!=null?micros(input.proceeds):0n;
+ if(['impairment','revaluation','split'].includes(input.kind)&&!(amount>0n))fail('VALIDATION_FAILED','A '+input.kind+' names a positive amount.',{fieldErrors:[{path:'amount',message:'Positive amount required'}]});
+ if(proceeds<0n)fail('VALIDATION_FAILED','Proceeds are not negative.',{fieldErrors:[{path:'proceeds',message:'Not negative'}]});
  switch(input.kind){
   case 'transfer':{if(!input.targetLocationId)fail('VALIDATION_FAILED','A transfer names the target location.',{fieldErrors:[{path:'targetLocationId',message:'Required'}]});const b=(await tx.query("select 1 from lara.branches where tenant_id=$1 and entity_id=$2 and id=$3 and status='active'",[ctx.tenantId,entityId,input.targetLocationId])).rowCount;if(!b)fail('NOT_FOUND','Target location not found.');extra.location_id=input.targetLocationId;break;}
   case 'capitalize_cip':{if(row.stage!=='cip')fail('STATE_CONFLICT','Only construction in progress is capitalized into service.');description='Transfer of '+row.tag+' from construction in progress into service';lines=[line(klass.asset_account_id,branchId,cost,0n),line(klass.cip_account_id,branchId,0n,cost)];extra.stage='in_service';extra.in_service_date=input.effectiveDate;break;}

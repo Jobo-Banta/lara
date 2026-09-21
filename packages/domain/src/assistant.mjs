@@ -43,6 +43,8 @@ async function entityDisabled(tx,ctx,entityId,feature){
  return Array.isArray(row?.payload?.disabledFeatures)&&row.payload.disabledFeatures.includes(feature);
 }
 const evalSummary=r=>r?{passed:r.passed,itemCount:r.item_count,metrics:r.metrics,acceptedBy:r.accepted_by,evaluatedAt:iso(r.evaluated_at)}:null;
+// The recorded spend counts only while its month is the current one; a new month starts at zero before `finish` rolls the row.
+const spentThisMonth=c=>iso(c.budget_month)?.slice(0,7)===new Date().toISOString().slice(0,7)?BigInt(c.spent_minor):0n;
 const featureResource=(r,ev)=>({id:r.id,version:Number(r.version),feature:r.feature,enabled:r.enabled,budgetMinor:Number(r.budget_minor),spentMinor:Number(r.spent_minor),budgetMonth:iso(r.budget_month),providerPolicy:r.provider_policy,modelVersion:r.model_version,promptVersion:r.prompt_version,toolSchemaVersion:r.tool_schema_version,evaluationResultId:r.evaluation_result_id,evaluation:evalSummary(ev),approvedBy:r.approved_by,reason:r.reason,createdAt:iso(r.created_at),updatedAt:iso(r.updated_at),simulation:false});
 async function evaluationFor(tx,ctx,id){return id?(await tx.query('select * from lara.evaluation_results where tenant_id=$1 and id=$2',[ctx.tenantId,id])).rows[0]||null:null;}
 // Configuration (no reviewed operation yet): the reviewer records the model,
@@ -141,7 +143,7 @@ async function checkInputs(tx,ctx,entityId,input){
 export async function requestRun(tx,ctx,entityId,input){
  requirePermission(ctx,'assistant.suggest');requireEntity(ctx,entityId);assertInput('AiRequest',input);await requireAssistance(tx,ctx,entityId);
  const config=await enabledConfig(tx,ctx,entityId,input.feature);
- if(Number(config.budget_minor)>0&&Number(config.spent_minor)>=Number(config.budget_minor))fail('STATE_CONFLICT','BUDGET_EXCEEDED: the monthly budget for '+input.feature+' is spent; manual entry continues unchanged.');
+ if(Number(config.budget_minor)>0&&spentThisMonth(config)>=BigInt(config.budget_minor))fail('STATE_CONFLICT','BUDGET_EXCEEDED: the monthly budget for '+input.feature+' is spent; manual entry continues unchanged.');
  await checkInputs(tx,ctx,entityId,input);
  const scope={entityId,...(input.reportRequest?{bookId:input.reportRequest.bookId,periodStart:input.reportRequest.periodStart,periodEnd:input.reportRequest.periodEnd,currency:input.reportRequest.currency||null,asOf:input.reportRequest.asOf}:{})};
  const inputRefs={evidenceIds:input.evidenceIds,resourceIds:input.resourceIds,...(input.question?{question:String(input.question).slice(0,2000)}:{}),...(input.reportRequest?{reportRequest:input.reportRequest}:{})};
@@ -296,7 +298,7 @@ export async function executeRun(tx,ctx,entityId,runId,{provider,store,ledger}){
    if(r.abstain)abstainReason=r.reason;else{answer=r.answer;sources=r.sources;fields=r.fields;}
   }else{
    const resources=run.feature==='coding'?await codingResources(tx,actor,entityId,run,calls):run.feature==='matching'?await matchingResources(tx,actor,entityId,run,calls):[];
-   const budgetLeft=Number(config.budget_minor)>0?BigInt(config.budget_minor)-BigInt(config.spent_minor):null;
+   const budgetLeft=Number(config.budget_minor)>0?BigInt(config.budget_minor)-spentThisMonth(config):null;
    if(budgetLeft!==null&&budgetLeft<=0n)throw new DomainError('STATE_CONFLICT','BUDGET_EXCEEDED');
    const timeout=Number(config.provider_policy?.timeoutMs||PROVIDER_TIMEOUT_MS);
    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeout);

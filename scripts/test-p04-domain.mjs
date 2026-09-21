@@ -232,6 +232,22 @@ try{
  const convInv=await run(bill,tx=>sales.getDocument(tx,bill,entityId,conv.resourceId,{kinds:['invoice']}));
  assert.deepEqual([convInv.kind,convInv.sourceDocumentId,convInv.lines[0].quantity,convInv.gross],['invoice',order.id,'4','11200.00']);
  await rejects(run(dir,tx=>sales.convertDocument(tx,dir,entityId,order.id,{})),'STATE_CONFLICT','order already fully billed');
+ // Review correction: what an order counts as billed follows each invoice line's source line, not its position, so a draft edited to drop or renumber lines never double-bills or under-bills; the order line's discount is carried once.
+ const order2=await run(bill,tx=>sales.createDocument(tx,bill,entityId,invoiceBody([line(revenue.id,'100',{taxCodeId:vat.id,quantity:'10',discount:'50',description:'Line A'}),line(revenue.id,'200',{taxCodeId:vat.id,quantity:'5',description:'Line B'})],{kind:'sales_order'})));
+ await run(bill,tx=>sales.submitDocument(tx,bill,entityId,order2.id,{}));await run(dir,tx=>sales.approveDocument(tx,dir,entityId,order2.id,{decision:'approve',contentVersion:1}));
+ const conv2=await run(dir,tx=>sales.convertDocument(tx,dir,entityId,order2.id,{}));
+ const draft2=await run(bill,tx=>sales.getDocument(tx,bill,entityId,conv2.resourceId,{kinds:['invoice']}));
+ assert.deepEqual(draft2.lines.map(l=>[l.description,l.quantity,l.discount]),[['Line A','10','50.00'],['Line B','5','0.00']]);
+ const body2={kind:'invoice',branchId:draft2.branchId,bookId:draft2.bookId,partyId:draft2.partyId,documentDate:draft2.documentDate,accountingDate:draft2.accountingDate,currency:draft2.currency,ruleProfileVersion:draft2.ruleProfileVersion,sourceDocumentId:order2.id,evidenceIds:[]};
+ await run(bill,tx=>sales.updateDocument(tx,bill,entityId,draft2.id,draft2.version,{...body2,lines:[draft2.lines[1]]}));
+ const conv3=await run(dir,tx=>sales.convertDocument(tx,dir,entityId,order2.id,{}));
+ const draft3=await run(bill,tx=>sales.getDocument(tx,bill,entityId,conv3.resourceId,{kinds:['invoice']}));
+ assert.deepEqual(draft3.lines.map(l=>[l.description,l.quantity,l.discount]),[['Line A','10','50.00']],'dropping line A from the first draft leaves A unbilled and B (now first) billed');
+ await run(bill,tx=>sales.updateDocument(tx,bill,entityId,draft3.id,draft3.version,{...body2,lines:[{...draft3.lines[0],quantity:'4'}]}));
+ const conv4=await run(dir,tx=>sales.convertDocument(tx,dir,entityId,order2.id,{}));
+ const draft4=await run(bill,tx=>sales.getDocument(tx,bill,entityId,conv4.resourceId,{kinds:['invoice']}));
+ assert.deepEqual(draft4.lines.map(l=>[l.description,l.quantity,l.discount]),[['Line A','6','0.00']],'the remaining quantity carries the discount not yet billed');
+ await rejects(run(dir,tx=>sales.convertDocument(tx,dir,entityId,order2.id,{})),'STATE_CONFLICT','the second order is fully billed');
  const delivered=await run(bill,tx=>sales.deliverDocument(tx,bill,entityId,inv.id,{}));
  assert.equal(delivered.state,'posted');
  assert.equal((await run(bill,tx=>tx.query("select count(*)::int n from lara.jobs where tenant_id=$1 and kind='document.deliver'",[tenantId]))).rows[0].n,1);
