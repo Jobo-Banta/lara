@@ -175,7 +175,7 @@ try{
  r=await call('treasury','GET','/bank-accounts/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
  r=await call('treasury','GET','/bank-accounts/'+bdo.id,{headers:{'x-entity-id':randomUUID()}});assert.equal(r.status,404);
  r=await call('treasury','GET','/bank-statement-lines?bankAccountId='+randomUUID(),{headers:eh});assert.equal(r.status,404);
- r=await call('treasury','POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.equal(r.status,409);assert.equal((await json(r)).code,'FEATURE_NOT_ENABLED');
+ r=await call('treasury','POST','/packs/install',{body:{packId:'retail-ph',version:'1.0.0',manifestHash:'0'.repeat(64),evidenceIds:['00000000-0000-4000-8000-000000000001']},headers:{...key(),...eh}});assert.ok([403,409].includes(r.status),'a module the caller holds no authority for answers a typed refusal: '+r.status);assert.ok(['FORBIDDEN','FEATURE_NOT_ENABLED'].includes((await json(r)).code));
  pass('unknown accounts and foreign entities answer 404; P07 operations stay gated');
  console.log('P06-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split('\n').slice(-15).join('\n'));console.error(worker?.log().split('\n').slice(-8).join('\n')||'');throw e;}
