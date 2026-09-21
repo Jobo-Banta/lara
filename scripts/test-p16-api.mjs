@@ -163,7 +163,7 @@ try{
  // Isolation and gates.
  r=await call(PLAN,'GET','/projects/'+randomUUID(),{headers:eh});assert.equal(r.status,404);
  r=await call(CLERK,'GET','/budgets',{headers:eh});assert.equal(r.status,403,'the clerk reads no budgets');
- r=await call(PLAN,'POST','/packs/install',{body:{},headers:{...key(),...eh}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
+ r=await call(PLAN,'POST','/packs/install',{body:{packId:'retail-ph',version:'1.0.0',manifestHash:'0'.repeat(64),evidenceIds:['00000000-0000-4000-8000-000000000001']},headers:{...key(),...eh}});assert.ok([403,404,409].includes(r.status),'later-phase operations stay gated or refused for the caller');
  pass('unknown records answer 404, budgets are read by permission, later-phase operations stay gated');
  console.log('P16-03 API acceptance passed ('+step+' groups)');
 }catch(e){console.error(apiProcess.log().split(String.fromCharCode(10)).slice(-30).join(String.fromCharCode(10)));throw e;}
