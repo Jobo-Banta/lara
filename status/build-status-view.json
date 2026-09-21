@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-21T09:53:04+00:00",
+  "updated_at": "2026-09-21T16:43:47+00:00",
   "releases": [
     {
       "id": "P00",
@@ -855,8 +855,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck.",
-      "evidence": "GitHub CI 35382047360 passed: scripts/test-p02-api.mjs 7 groups (API and worker processes, fresh and upgrade PostgreSQL 18), schema 15, domain 10, readiness, worker, restore with principal directory, foundation 23/23, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P02-REVIEW.md.",
-      "updated_at": "2026-09-18T18:51:28+00:00"
+      "evidence": "GitHub CI 35382047360 passed: scripts/test-p02-api.mjs 7 groups (API and worker processes, fresh and upgrade PostgreSQL 18), schema 15, domain 10, readiness, worker, restore with principal directory, foundation 23/23, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P02-REVIEW.md. Review correction \u2014 non-UUID ids and undecodable paths answer 404; the worker lease renews on its own connection (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P02-04",
@@ -1114,8 +1114,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015.",
-      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md.",
-      "updated_at": "2026-09-18T21:00:24+00:00"
+      "evidence": "GitHub CI 35394107803 passed: scripts/test-p03-domain.mjs 8 groups (P03-T01..T05 at the domain layer) in fresh and upgrade PostgreSQL 18, P03 schema 7, P02 suites, restore rehearsal, image scans. Local Supabase run 2026-09-19 PASS. docs/development/P03-REVIEW.md. Review correction \u2014 fiscal-year close on contra-income and credit-balance expense accounts; opening-row errors stage (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P03-03",
@@ -1406,8 +1406,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI.",
-      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases",
-      "updated_at": "2026-09-18T22:34:12+00:00"
+      "evidence": "GitHub Actions CI run 35401224779 (push, 85b4786) and 35401229520 (pull_request) succeeded: verify + images incl. scripts/test-p04-domain.mjs on fresh and upgraded databases Review correction \u2014 order conversions bill by source line with the discount carried once (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P04-03",
@@ -1706,8 +1706,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups).",
-      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs",
-      "updated_at": "2026-09-20T00:31:43+00:00"
+      "evidence": "GitHub Actions CI run 35478773366 (push, c78a23e) and 35478774995 (pull request) succeeded: verify + images; fresh and upgraded databases run scripts/test-p05-schema.mjs, test-p05-domain.mjs and test-p05-api.mjs Review correction \u2014 additional invoices link to their bill with distinct references (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P05-03",
@@ -1916,8 +1916,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups).",
-      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey",
-      "updated_at": "2026-09-20T06:10:34+00:00"
+      "evidence": "GitHub Actions CI run 35493217733 (push, 82401fc) succeeded: verify + images; fresh and upgraded databases run scripts/test-p06-schema.mjs, test-p06-domain.mjs, test-p06-api.mjs; the fresh database runs the browser suite with the treasury journey Review correction \u2014 settlements carry a branch; the cash session counts its branch only; variance entry in the book currency (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P06-03",
@@ -3225,8 +3225,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report.",
-      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed.",
-      "updated_at": "2026-09-20T17:32:40+00:00"
+      "evidence": "GitHub CI run 35525662535 (commit 61562ec): fresh and upgrade migrations, workflow suite, P11 schema/domain/API suites and the Playwright suite (14 tests incl. the assets journey) passed. Review correction \u2014 asset events without proceeds or amount are typed refusals (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P11-03",
@@ -3473,8 +3473,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider.",
-      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed.",
-      "updated_at": "2026-09-20T19:54:06+00:00"
+      "evidence": "GitHub CI run 35530924780 (commit d0eb62e): fresh and upgrade migrations, workflow suite, P12 schema/domain/API suites and the Playwright suite (15 tests incl. the assistant journey) passed. Review correction \u2014 monthly assistant budgets roll over (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P12-03",
@@ -3730,8 +3730,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate.",
-      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
-      "updated_at": "2026-09-21T00:35:14+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 the worker rotates share tokens (0034 grant) (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P13-02",
@@ -3760,8 +3760,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters.",
-      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
-      "updated_at": "2026-09-21T00:35:15+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 delivered share links carry a token minted at delivery and open the public verify page (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P13-03",
@@ -3925,8 +3925,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints.",
-      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
-      "updated_at": "2026-09-21T00:35:15+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 firm rollup scopes run under savepoints (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P14-03",
@@ -4060,8 +4060,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run.",
-      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed.",
-      "updated_at": "2026-09-21T00:35:16+00:00"
+      "evidence": "GitHub CI run 35546146679 (commit addc5e6): fresh and upgrade migrations, workflow suite, P13/P14/P15 schema, domain and API suites and the Playwright suite (18 tests incl. the portal, firm and group journeys) passed. Review correction \u2014 database-raised refusals become pair exceptions (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P15-03",
@@ -4203,8 +4203,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts.",
-      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
-      "updated_at": "2026-09-21T09:52:59+00:00"
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 budget actuals net reversals (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P16-03",
@@ -5295,8 +5295,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02).",
-      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
-      "updated_at": "2026-09-21T09:53:03+00:00"
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 tool runs keyed by grant across every granted entity; the grant naming the tool serves the call (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P18C-03",
@@ -5431,8 +5431,8 @@
       "spec_status": "specified_external_activation_gates_apply",
       "owner": "Claude Code",
       "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04).",
-      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed.",
-      "updated_at": "2026-09-21T09:53:04+00:00"
+      "evidence": "GitHub CI run 35584400992 (commit db2cf74): fresh and upgrade migrations, workflow suite, P16/P17/P18 schema, domain and API suites and the Playwright suite (21 tests incl. the planning, local operations and extensibility journeys) passed. Review correction \u2014 pack attempts recover from dead jobs, retry after rollback, versions compare numerically (docs/development/REVIEW-CORRECTIONS-2026-09-21.md): regression case added and CI run 35626218854 (commit b295306) passed with migration 0034.",
+      "updated_at": "2026-09-21T16:43:46+00:00"
     },
     {
       "id": "P18D-03",
@@ -5520,90 +5520,6 @@
     }
   ],
   "history": [
-    {
-      "at": "2026-09-21T09:53:01+00:00",
-      "id": "P17D-01",
-      "action": "done",
-      "note": "0032: payroll_batches (unique per file; approved by another principal; posted once per source and period), append-only employee_tax_records (identifier encrypted and masked, payroll_record.read), remittance_records (unique per agency, period and batch; remitted only with reference and evidence); batch (records, approve, post) and remittance (approve, remit) operations."
-    },
-    {
-      "at": "2026-09-21T09:53:01+00:00",
-      "id": "P17D-02",
-      "action": "done",
-      "note": "localops.mjs payroll: records validated line by line and against the totals (an untying file stays an exception), file hash refuses replays, records restricted and masked with an audit per read, the journal per the approved payroll profile once per source and period, remittances tied to the batch totals and remitted on evidence (P17-T04)."
-    },
-    {
-      "at": "2026-09-21T09:53:01+00:00",
-      "id": "P17D-03",
-      "action": "done",
-      "note": "API serves payroll and remittance operations behind the payroll_data capability and payroll_profile; encrypted identifiers under FIELD_ENCRYPTION_KEY."
-    },
-    {
-      "at": "2026-09-21T09:53:01+00:00",
-      "id": "P17D-04",
-      "action": "done",
-      "note": "workspace-localops.tsx /local/payroll: batches with restricted, masked records, approval, posting, remittances; browser journey covers a batch approved and posted with its remittance."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17D-05",
-      "action": "done",
-      "note": "P17-T04 in the domain and API suites; negatives: untying totals, replayed files, records without payroll_record.read, second posting of a period, remittance without evidence. Runbook P17D section."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17E-01",
-      "action": "done",
-      "note": "0032: local_obligations (unique per authority, kind, period and property; complete only with payment evidence and, where required, filing evidence; complete and waived final); obligation operations (create, edit, list, read, complete, waive)."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17E-02",
-      "action": "done",
-      "note": "localops.mjs obligations: the approved authority profile decides kinds and filing requirements; completion needs payment evidence and, where required, filing evidence by the completing authority; waivers need a reason (P17-T05)."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17E-03",
-      "action": "done",
-      "note": "API serves local obligation operations behind the local_obligations capability and local_authority_profile."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17E-04",
-      "action": "done",
-      "note": "workspace-localops.tsx /local/obligations: obligations, completion with evidence, waiver; browser journey covers completion only with the filing evidence and WCAG checks."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P17E-05",
-      "action": "done",
-      "note": "P17-T05 in the domain and API suites; negatives: completion without the required filing evidence, kinds outside the profile, waiver without reason. Runbook P17E section."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P18A-01",
-      "action": "done",
-      "note": "packages/database/migrations/0033_p18_extensibility.sql (shared by P18A\u2013D): report_definitions (one live version per name, validated query AST with version and cost, published by another principal, immutable once published) and append-only report_runs (scope, checksum, payload); custom_fields (cf_ keys only, never statutory, published by another principal); capabilities report_authoring/rule_proposals/client_tools/industry_packs and six permissions. Catalog, run and custom-field operations added to the OpenAPI; publish takes a reason."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P18A-02",
-      "action": "done",
-      "note": "packages/domain/src/extensibility.mjs reports: the catalog is the allowlist (metrics with their permissions, dimensions, budget); definitions compile to a versioned AST or are refused (unlisted field, unfilterable, unselected sort, over budget); one parameterized statement per run under row, cost and time budgets; the caller's scope on every row and the aggregate, entities outside the scope not disclosed, a reproducible checksum (P18-T01, P18-T05); custom fields never take statutory keys."
-    },
-    {
-      "at": "2026-09-21T09:53:02+00:00",
-      "id": "P18A-03",
-      "action": "done",
-      "note": "apps/api/src/workspace-api.mjs serves the report and custom-field operations; FEATURE_NOT_ENABLED until report_authoring is active; teardown and snapshot tooling cover the tables."
-    },
-    {
-      "at": "2026-09-21T09:53:03+00:00",
-      "id": "P18A-04",
-      "action": "done",
-      "note": "apps/web/src/app/_components/workspace-extend.tsx /extend: the catalog with its budget, the definition builder, publication by the reviewer, runs with rows, aggregate, scope and checksum, custom fields with independent publication; capabilities screen offers report_authoring; browser extensibility journey covers activation on screen, a definition published and run and a custom field published."
-    },
     {
       "at": "2026-09-21T09:53:03+00:00",
       "id": "P18A-05",
@@ -5699,6 +5615,90 @@
       "id": "P18D-05",
       "action": "done",
       "note": "P18-T04 in the domain and API suites; negatives: tampered hashes, unsupported upgrade paths, reinstalling, installing without pack authority. Runbook P18D section."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P02-03",
+      "action": "done",
+      "note": "/v1 API over the reviewed contract with actor resolution from the principal directory, header conventions, idempotent commands, typed errors, rate limits and a connection pool; evidence upload/verify/scan/download; exports and jobs; worker with leases, retries, dead-letter tasks, scan and export handlers with revocation recheck."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P03-02",
+      "action": "done",
+      "note": "Ledger domain implemented: chart and dimension rules, periods with close-task gated lock and versioned reopen, journal drafts with independent approval and posting through the database function, linked reversals, opening imports with replay and conflict rules, trial balance and statements with immutable snapshots, fiscal-year close once. Migrations 0013-0015."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P04-02",
+      "action": "done",
+      "note": "packages/domain/src/sales.mjs (tax kernel, rules, documents, corrections, collections, allocations, orders, deliveries, open items, aging); migrations 0017/0018; scripts/test-p04-domain.mjs (9 groups) and kernel unit test in CI."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P05-02",
+      "action": "done",
+      "note": "packages/domain/src/purchasing.mjs: bills with normalized-reference duplicate guard and reviewer disposition, PO two-way match with receipts of service, supplier credits, expense claims liquidating advances, payment proposals, beneficiary versions withdrawing authority, payment orders (authorize/release/settle/return), withholding certificates; scripts/test-p05-domain.mjs covers P05-T01..T05 (10 groups)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P06-02",
+      "action": "done",
+      "note": "packages/domain/src/treasury.mjs: reviewed bank accounts, statement CSV validation and commit through the import pipeline, deterministic proposals with ambiguity left unmatched, conserving matches with guarded confirmations, transfers as one entry, checks in custody until clearing with linked reversal on dishonor, cash sessions with variance policy and independent handover, bank file runs; scripts/test-p06-domain.mjs covers P06-T01..T05 (8 groups)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P11-02",
+      "action": "done",
+      "note": "packages/domain/src/assets.mjs: asset profile and recognition policies (settings kinds asset_profile, recognition_policy_<code>), classes under asset.approve, capitalization from posted bills with the clearing cover check, deterministic straight-line / declining-balance / sum-of-years / daily actual-actual / ratable / recurring generators with the residue in the final period, prospective versions that never rewrite posted periods, lifecycle events posted once (transfer, split, merge, disposal, impairment, revaluation, CIP capitalization) conserving cost and accumulated depreciation, runs posting once with a task on locked periods and drafts for recurring kinds, memo book/tax layers, asset_register report."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P12-02",
+      "action": "done",
+      "note": "packages/domain/src/assistant.mjs and ai-provider.mjs: feature configuration and evaluations with Finance acceptance, requests bound to the requester's own read permissions and budget, masking before the provider, an allowlisted tool gate that logs and denies everything else, fields validated against the tool schema with evidence and uncertainty, abstention on poor evidence, ask-your-books from the trial balance with the scope banner, deterministic explanations, tenant-only coding history, non-reconciling match proposals, drafts for close, audit and registration, timeout and budget fail-closed, revocation rechecked at start and completion, named review once; local fixture provider."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P13-01",
+      "action": "done",
+      "note": "packages/database/migrations/0028_p13_portals_and_messaging.sql: portal invites (one party and role, unique token hash, final states, revocable once accepted), portal memberships one per principal and party, share grants unique per token, message requests authorized only by another principal with a unique send key and frozen afterwards, append-only delivery receipts per attempt, provider payment intents unique per provider key with one live per invoice and fixed once live, append-only webhook receipts per provider event; RLS and grants (worker sends and rotates invite tokens). Nine operations added to the reviewed contract (memberships, portal scope, certificates, receipts, webhook receipts, public verification, invite acceptance, payment claim, signed webhook); 394 operations validate."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P13-02",
+      "action": "done",
+      "note": "packages/domain/src/portals.mjs and portal-providers.mjs with the portal scope in identity.actorContext and the party fence in core/sales/purchasing/evidence: invites and memberships bound to one party, entity and role with portal permissions only; tokens live only in the delivered message and rotate at every send; share grants over non-enumerable tokens exposing minimal fields; messages drafted, authorized by another principal, sent once per key with a receipt per attempt and a retry that never duplicates; supplier uploads routed to a review task naming missing legal fields, never a bill; payment intents keyed once, browser returns as claims, signed and timely webhooks deduplicated and verified server to server before the normal collection draft, never settled twice; local mail and fixture payment adapters."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P14-02",
+      "action": "done",
+      "note": "packages/domain/src/firm.mjs: firm registration and staff; mandates drafted by the client on engagement evidence, edited with versions, approved by a second principal (creating the owner's delegated identity and assignment), revoked with immediate assignment revocation, revocation-version bump and cross-tenant snapshot deletion; assignments as subsets of the mandate; the delegated actor context (identity.mjs) scopes a principal without membership to the mandate's entities and subset; client scopes, labelled roll-up with currency-separated open items, snapshots, and bulk reminders with independent per-client outcomes under savepoints."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P15-02",
+      "action": "done",
+      "note": "packages/domain/src/consolidation.mjs: group definition and activation by a second principal after an approved mapping; mapping versions validated against member charts; rate sets; pairs raised in the source entity between members of one active group, accepted in the target under its own authority (acceptance prepares the target document; approval and posting follow the entity's maker-checker), each side posted inside a savepoint with a failed second side recorded as an exception and the issued side never rolled back; runs validated as a whole (frozen closes, approved rate set and mapping, one statements snapshot per member); deterministic worksheet (translation at closing/average/historical with the residual in the reserve and rates recorded, eliminations from pairs posted on both sides \u2014 outstanding reciprocal balances and period revenue/expense once \u2014 manual eliminations with evidence, unresolved differences shown never plugged), approval refusing unresolved differences, publication as a consolidated_statements snapshot in the group book superseding the earlier run."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P16-02",
+      "action": "done",
+      "note": "packages/domain/src/planning.mjs with purchasing hooks (order approval reserves inside the bucket lock with warn/block policy and the authorized override; cancellation releases; a bill against the order consumes) and the sales hook (a progress or release invoice posting holds retention in its receivable with its revenue and recoups the documented advance by allocation); allocation runs with the exact-pool residual rule, stale-preview guard and one posting per rule version and period; projects with approved contract versions, certification on evidence, progress billing bounded by certification and contract, retention release as a due-now invoice against the retention receivable, profitability from posted facts."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P18C-02",
+      "action": "done",
+      "note": "extensibility.mjs tools: a client integration is a principal without membership scoped by its approved grants to tool.execute over the granted entities (identity.actorContext); read_report runs a published definition scoped to the entity, read_evidence returns unrestricted metadata, propose_draft and propose_task open tasks; every other tool and injected instruction is denied and recorded; the rate limit counts every request; revocation bumps the client's revocation version (P18-T02)."
+    },
+    {
+      "at": "2026-09-21T16:43:46+00:00",
+      "id": "P18D-02",
+      "action": "done",
+      "note": "extensibility.mjs packs: install refused unless the manifest hash matches the shipped catalog, dependencies are satisfied and an upgrade follows a declared path; the worker snapshots the profiles the manifest touches, applies settings and report definitions as drafts under the installer's identity and supersedes the previous version; rollback restores the snapshot as new drafts, retires the version's definitions and reinstates the previous version without touching posted facts (P18-T04)."
     }
   ]
 }
